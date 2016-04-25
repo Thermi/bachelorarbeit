@@ -1,0 +1,220 @@
+\documentclass[a4paper]{article}
+\usepackage{listing}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{tabularx}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{pdfpages}
+\usepackage{pgfplots}
+\usepackage[printonlyused]{acronym}
+\usepackage{setspace}
+
+\lstset{
+breaklines=true,
+literate={ö}{{\"o}}1
+         {ä}{{\"a}}1
+         {ü}{{\"u}}1
+         {ß}{{\ss}}2
+         {Ä}{{\"A}}1
+         {Ü}{{\"U}}1
+         {Ö}{{\"O}}1
+}
+
+
+\setstretch{1.3}
+\newcommand*\BlankPage{\newpage\null\thispagestyle{empty}\newpage}
+
+
+\newcommand{\comment}[1]{}  %comment not shown
+
+\begin{document}
+
+\pagenumbering{roman}
+
+
+\title{Motivation und Ziele der Bachelorarbeit}
+\author{Noel Kuntze}
+\clearpage\maketitle
+\thispagestyle{empty}
+
+\BlankPage
+
+\phantomsection
+
+\section*{Abkürzungsverzeichnis}
+\addcontentsline{toc}{section}{Abkürzungsverzeichnis}
+\begin{acronym}
+    \acro{ACK}{Acknownledge}
+    \acro{ADC}{Analog-Digital Converter}
+    \acro{AH}{Authentication Header}
+    \acro{AES}{Advanced Encryption Standard}
+    
+	\acro{API}{Application Programming Interface}
+	
+	\acro{BA}{Bachelorarbeit}
+    \acro{CBC-MAC}{Cipher Block Chaining MAC}
+    \acro{CI}{Codeimage}
+    \acrodefplural{CI}[CIs]{Codeimages}
+
+    \acro{CPU}{Central Processing Unit}
+    \acrodefplural{CPU}[CPUs]{Central Processing Units}
+    
+	\acro{DH}{Diffie-Hellman}
+	
+    \acro{DRNG}{Deterministic Random Number Generator}
+    \acrodefplural{DRNG}[DRNGs]{Deterministic Random Number Generators}
+
+	\acro{ESP}{Encapsulated Security Payload}
+	
+	\acro{GUI}{Graphical User Interface}
+	
+    \acro{HMAC}{Hashed Message Authentication Code}
+
+    \acro{IDE}{Integrated Development Environment}
+    
+    \acro{IoT}{Internet of Things}
+    \acro{IRC}{Internet Relay Chat}
+    
+    \acro{IV}{Initialisierungsvektor}
+
+    \acro{KB}{Kilo Byte}
+
+    \acro{LAT}{Line Address Table}
+
+
+    \acro{MAC}{Message Authentication Code}
+    \acrodefplural{MAC}[MACs]{Message Authentication Codes}
+    \acro{mC}[$\mu$$C$]{Microcontroller}
+    \acro{MOO}{Mode of Operation}
+
+    \acro{NACK}{Negative Acknowledge}
+    \acro{NED}{Network Description}
+    \acro{NDRNG}{Non-deterministic Random Number Generator}
+    \acrodefplural{NDRNG}[NDRNGs]{Non-deterministic Random Number Generators}
+
+    \acro{OFB}{Output Feedback Mode}
+    \acro{OMNeTpp}[OMNeT$++$]{Objective Modular Network Testbed in C++}
+
+    \acro{PC}{Personal Computer}
+    \acro{PRW}{Pseudo Random Words}
+    \acro{PRNG}{Pseudo Random Number Generator}
+    \acrodefplural{PRNG}[PRNGs]{Pseudo Random Number Generators}
+
+    \acro{RAM}{Random Access Memory}
+    \acro{RISC}{Reduced Instruction Set Computing}
+    
+   	\acro{PFS}{Perfect Forward Secrecy}
+    \acro{RNG}{Random Number Generator}
+    \acrodefplural{RNG}[RNGs]{Random Number Generators}
+
+    \acro{ROM}{Read Only Memory}
+
+    \acro{ROP}{Return Oriented Programming}
+
+    \acro{SCUBA}{Secure Code Update By Attestation}
+    \acro{SHA}{Secure Hashing Algorithm}
+    
+    \acro{SOC}{System On Chip}
+    
+    \acro{SWATT}{SoftWare-based ATTestation}
+
+    \acro{TI}{Texas Instruments}
+    \acro{TPM}{Trusted Platform Module}
+
+    \acro{TRNG}{True Random Number Generator}
+    \acrodefplural{TRNG}[TRNGs]{True Random Number Generators}
+
+	\acro{WFP}{Windows Filtering Platform}
+	
+	\acro{VICI}{Versatile IKE Configuration Interface}
+	
+    \acro{WSN}{Wireless Sensor Network}
+    \acrodefplural{WSN}[WSNs]{Wireless Sensor Networks}
+    \acro{WxorX}[W$\oplus$X]{Write xor Execute}
+
+    \acro{XOR}{Exclusive Or}
+\end{acronym}
+
+\newpage
+
+\thispagestyle{empty}
+\section{Motivation}
+Die Motivation hinter der Bachelorarbeit ist der Mangel eines für Endanwender 
+nutzbaren, quelloffenen und vielseitigen IPsec-Clients auf der Windows-Plattform.
+Mit dem ''Agile VPN''-Client von Microsoft existiert seit Windows 7 ein nativer
+IKEv2-Client, der jedoch nur wenige Authentifizierungsmöglichkeiten unterstützt.
+
+Des weiteren unterstütz er nur die \ac{DH} Schlüsselaushandlung für
+Schlüssellänge 1024 Bit, was laut NIST seit 2011 nur unzureichende Sicherheit bietet.
+Laut Adrian et al\footnote{\textit{Imperfect Forward Secrecy: How Diffie-Hellman Fails in Practice} \url{https://weakdh.org/imperfect-forward-secrecy-ccs15.pdf}}
+kann \c{DH} mit Schlüssellänge 1024 Bit bereits von Nationalstaaten gebrochen werden,
+weshalb es in der Praxis keinen ausreichenden Schutz mehr bietet. 
+Des weiteren unterstützt der ''Agile VPN''-Client kein \ac{PFS}.
+
+Der Client hat auch verschiedene Funktionale Probleme, so unterstützt er zum Beispiel
+keine IKE-Fragmentierung\footnote{Fragmentiert IKE-Pakete nicht auf Netzwerkebene, sondern auf Anwendungsebene},
+was zur IKE-Aushandlung mit großen Datenpaketen über defekte\footnote{Netzwerke, in denen der Administrator die kontraproduktive Idee hatte ICMP-Pakete zu verwerfen}
+Netzwerke nötig ist und implementiert Traffic-Selector-Narrowing nicht korrekt.
+
+Seit Windows 10 versendet Windows DNS-Anfragen für Domänen an alle konfigurierten
+DNS-Resolver, nicht nur an die Resolver, die für das genutzte Interface konfiguriert wurden.
+Dies ist ein Problem für die Privatsphäre und kann mit einem \ac{WFP}-Modul
+gelöst werden, welches DNS-Pakete verwirft, welche nicht über den VPN-Adapter
+geschickt werden.
+
+
+Das ''strongSwan''-Projekt der HSR Rapperswill stellt eine quelloffene
+IKE-Implementierung bereit, welche auf allen größeren Plattformen lauffähig ist
+(Microsoft Windows, FreeBSD, Linux, Google Android und Apple Mac OS X). 
+Darüber hinaus wurde im Rahmen des Projekts eine Userspace-Implementierung von IPsec entwickelt,
+welche auf Linux lauffähig ist. Für die Kontrolle des IPsec-Diensts von strongSwan
+existiert seit Version 5.2.0 eine synchrone \ac{API} (\ac{VICI}), die in C implementiert ist,
+jedoch mit bereitgestellten Perl, Ruby und Python-Modulen genutzt werden kann.
+
+Auf Basis dieser Implementierung ist es relativ leicht möglich einen ausreichend
+sicheren und vielseitigen IPsec-VPN-Client auf Windows-Basis zu entwickeln.
+Mit libipsec steht eine Basis für das Verarbeiten von IPsec-Paketen bereit, mit strongSwan eine
+bewähre IKE-Implementierung und mit \ac{VICI} eine nutzbare \ac{API} für die Konfiguration.
+
+Eine Portierung auf Windowsw würde in ihren Fähigkeiten durch den Windows-Kernel
+beschränkt. So beherrscht er kein regelbasiertes Routen, weshalb das Implementieren
+oder Erlauben von Protokollselektoren keinen Sinn ergibt. Eine weitere
+Beschränkung ist, dass der Verkehr zum Responder nicht getunnelt werden darf, da
+das sonst eine Schleife ergeben würde.
+
+libipsec krankt im Moment noch am Problem, dass das Plugin Pakete im Speicher unbegrenzt
+puffert, was dazu führen kann, dass dem Computer der Speicher ausgeht. Für dieses
+Problem stehen bereits Patches bereit, die jedoch noch getestet werden müssten.
+
+Die Motivation für das \ac{GUI} Python zu nutzen ist simpel: Ich beherrsche bereits
+Python und es lässt sich mit wxPython ein plattformübergreifend nutzbares User Interface erstellen.
+Mit dem \ac{VICI} Python Egg lässt sich ''strongSwan'' steuern.
+
+Ich selbst nutze ''strongSwan'' seit mehreren Jahren und helfe im \ac{IRC}-Kanal\footnote{irc://chat.frenode.net/strongswan}
+aus. Aus diesem Grund bin ich mit der Materie vertraut und erkenne den Mangel an einem
+nutzbaren IPsec-Client auf Windows.
+
+\section{Ziele}
+Das Ziel der \ac{BA} ist die Erstellung eines \ac{GUI} für die Konfiguration
+und Kontrolle von strongSwan auf Basis von wxPython und \ac{VICI}, sowie
+die Anpassung des strongSwan-Codes um als Roadwarrior auf WIndows-Basis nutzbar zu sein.
+Darunter fallen etwaige Anpassungen des libipsec-Codes oder die Anpassungen der kernel-wfp
+und kernel-iph-Plugins, sowie etwaige Änderungen an anderen Teilen von strongSwan, soweit
+benötigt.
+
+Kurzgefasst ist das Ziel der \ac{BA} die Ergänzung der momentanen Codebasis von strongSwan
+zur Nutzbarkeit als Roadwarrior auf Windows.
+
+\paragraph{Ziele}
+\begin{itemize}
+\item Port von libipsec auf Windows 7 oder neuer
+\item Implementierung von Routing
+\item \ac{GUI} mit wxPython und \ac{VICI}
+\end{itemize}
+
+\end{document}
