@@ -1,0 +1,86 @@
+\documentclass[a4paper]{article}
+
+\usepackage{listing}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{tabularx}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{pdfpages}
+\usepackage{pgfplots}
+\usepackage[printonlyused]{acronym}
+\usepackage{setspace}
+\pgfplotsset{compat=1.5}
+\lstset{
+breaklines=true,
+literate={ö}{{\"o}}1
+         {ä}{{\"a}}1
+         {ü}{{\"u}}1
+         {ß}{{\ss}}2
+         {Ä}{{\"A}}1
+         {Ü}{{\"U}}1
+         {Ö}{{\"O}}1
+}
+
+% use inbuilt bibtex
+% see makefile for compiling
+
+%\usepackage{biblatex}
+%\addbibresource{swatt.bib}
+
+\setstretch{1.3}
+\newcommand*\BlankPage{\newpage\null\thispagestyle{empty}\newpage}
+
+
+\newcommand{\comment}[1]{}  %comment not shown
+
+
+\begin{document}
+
+\newcommand{\me}{Noel \textsc{Kuntze}}
+\newcommand{\supervisor}{Prof. Dr. D. \textsc{Westhoff}}
+\newcommand{\univ}{Hochschule Offenburg}
+\newcommand{\fakul}{Fakultät für Medien und Informationswesen}
+\newcommand{\units}{Unternehmens- und IT-Sicherheit}
+\newcommand{\besucht}{besucht am: \today}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\newcommand{\newtitle}{Userspace IPsec-Processing unter Windows}
+
+\begin{titlepage}
+\center
+
+\def\svgwidth{8.5cm}
+\input{Hochschule_Offenburg-logo.pdf_tex}
+
+\textsc{\Large \units}\\[0.5cm]
+{\large UNITS (WS15/16)}\\[0.5cm]
+\textsc{\large \fakul}\\[0.5cm]
+\HRule \\[0.4cm]
+{ \huge \bfseries \newtitle }\\[0.4cm]
+\HRule \\[1.5cm]
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Author:}\\
+\me
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisor:} \\
+\supervisor
+\end{flushright}
+\end{minipage}\\[4cm]
+\large \today
+\end{titlepage}
+
+\input{chapter1.tex}
+\input{chapter2.tex}
+\input{chapter3.tex}
+\input{chapter4.tex}
+\input{chapter5.tex}
+
+\end{document}

@@ -100,6 +100,9 @@ literate={ö}{{\"o}}1
     \acro{OFB}{Output Feedback Mode}
     \acro{OMNeTpp}[OMNeT$++$]{Objective Modular Network Testbed in C++}
 
+    \acro{OTP}{One Time Pad}
+    \acrodefplural{OTP}[OTPs]{One Time Pads}
+    
     \acro{PC}{Personal Computer}
     \acro{PRW}{Pseudo Random Words}
     \acro{PRNG}{Pseudo Random Number Generator}
@@ -207,14 +210,38 @@ Darunter fallen etwaige Anpassungen des libipsec-Codes oder die Anpassungen der 
 und kernel-iph-Plugins, sowie etwaige Änderungen an anderen Teilen von strongSwan, soweit
 benötigt.
 
-Kurzgefasst ist das Ziel der \ac{BA} die Ergänzung der momentanen Codebasis von strongSwan
-zur Nutzbarkeit als Roadwarrior auf Windows.
-
 \paragraph{Ziele}
+Für die Portierung von libipsec:
 \begin{itemize}
-\item Port von libipsec auf Windows 7 oder neuer
-\item Implementierung von Routing
-\item \ac{GUI} mit wxPython und \ac{VICI}
+\item Transformierung von Paketen zu in UDP eingepackten ESP-Paketen
+\item Verwalten der Routen zu den getunnelten Netzen
+\item Unterstützung des Tunnel-Modus
+\item Kein Untersützung von protokolabhängigen Policies
+\item Keine Unterstützung für das Schützen von Verkehr direkt zum Server
 \end{itemize}
 
+Für das \ac{GUI}:
+\begin{itemize}
+\item Initierung und Terminierung von IPsec-Tunneln
+\item Anzeigen der Tunnelstatus
+\item Konfiguration von IKE-Konfigurationen mit IKEv1/IKEv2
+\item Konfiguration von IPsec-Tunneln mit den Standardisierten und verfügbaren Kryptographischen Algorithmen
+\item Konfiguration von IPsec-Tunneln 
+\item Unterstützung von Authentifizierung über RSA-Schlüssel, X.509-Zertifikaten, 
+EAP-MSCHAPv2, EAP-GTC, EAP-TLS, EAP-TTLS und Xauth
+\item Unterstützung des Tunnel-Modus
+\item Anzeigen von Debug-Informationen
+\item Neustarten des Diensts
+\item Unterstützung für das Laden von Zertifikaten und Textgeheimnissen
+\end{itemize}
+
+\paragraph{Auswirkungen}
+Durch die Bereitstellung eines flexiblen, quelloffenen IPsec-Clients für Windows
+wird die Nutzung von starker Authentifizierung auf Windows ermöglicht, worunter
+starke \ac{DH} und ECDH Austausche, sowie die Nutzung von Benutzernamen mit Passwort und \acp{OTP}
+fallen.
+Es ist zu erwarten, dass es Interesse am Ergebnis der \ac{BA} geben wird, da
+Anwender an der Nutzung von sicherer Authentifizierung interessiert sind
+und nur an der Nicht-Verfügbarkeit einer entsprechenden Software bei der Nutzung 
+scheitern.
 \end{document}
