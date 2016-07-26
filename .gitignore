@@ -4,4 +4,6 @@ DESTDIR
 DESTDIR.
 DESTDIRswanctl
 DESTDIR/*
-Bachelorarbeit/Poster/{Kopierauftrag.pdf,Symbol_Clock.svg,Windows_logo_-_2012.svg,strongswan.png,HW6P1.svg}
+Bachelorarbeit/Poster/*.svg
+Bachelorarbeit/Poster/*.png
+Bachelorarbeit/Poster/Kopierauftrag.pdf
