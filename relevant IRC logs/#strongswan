@@ -1,0 +1,162 @@
+[2016-04-14 16:17:11] <Thermi> ecdsa: Okay. Another topic: I am very close to starting to work on porting libipsec to Windows with the openvpn tap driver. Are there any major issues you see 
+with that? I would additionally write a GUI with wxpython and the vici python egg to be able to control charon.
+[2016-04-14 16:21:51] -!- bluenemo [~bluenemo@unaffiliated/bluenemo] hat #strongswan betreten
+[2016-04-14 16:24:50] <ecdsa> Thermi: I've not looked into that in detail. But if you can modify tun_device.c to work with that driver you could probably pretty much reuse kernel-libipsec (w
+ith a few changes to kernel-iph). If you want to get your changes upstream later, please consider https://wiki.strongswan.org/projects/strongswan/wiki/Contributions and the notes regarding c
+ode style.
+[2016-04-14 16:46:35] <elzid> Thermi: hi, sorry, I'm not getting anywhere with this SAD error, I can't find anything in the forums... you mentioned kernel modules?
+[2016-04-14 16:51:18] <elzid> Thermi: so I've uninstalled strongswan-libipsec package and that SAD error has gone away!
+[2016-04-14 16:52:17] <elzid> Now, why is this appearing in the logs: [IKE] no IKE config found for x.x.x.104...x.x.x.55, sending NO_PROPOSAL_CHOSEN
+[2016-04-14 16:52:44] <elzid> even though I've set ike=aes256-sha1-modp1536 in IPsec.conf
+[2016-04-14 16:53:03] <Thermi> ecdsa: What changes would kernel-iph pertain? I guess that's just the Windows equivalent to kernel-netlink?
+[2016-04-14 16:56:07] <ecdsa> Thermi: The networking part yes. You'd have to implement add_ip/del_ip where you probably create a TUN device (including calls to charon->kernel->tun similar to
+ kernel-pfroute). Not sure if anything has to be done regarding the routing or if this works out of the box.
+[2016-04-14 16:57:27] <ecdsa> elzid: You see this message because your peer tries to initiate an SA with you, seems redundant as you are initiating an SA. The only thing compared at that poi
+nt is the IKE version and the IP addresses (the proposals are not compared).
+[2016-04-14 17:00:20] <Thermi> ecdsa: ATM I am playing around with the idea to just riddle the code of libipsec with preprocessor ifs to call the openvpn tap driver shennanigans instead of t
+he linux tun shennanigans at the corresponding locations, assuming the function calls are more or less the same
+[2016-04-14 17:01:28] <ecdsa> Thermi: libipsec does not know about tun devices and kernel-libipsec does handle tun_device_t objects it does not care if that's an abstraction of a Linux or Wi
+ndows TUN device
+[2016-04-14 17:02:02] <ecdsa> Thermi: That's why I wrote you mainly have to patch tun_device.c
+[2016-04-14 17:03:42] <ecdsa> Thermi: https://git.strongswan.org/?p=strongswan.git;a=blob;f=src/libstrongswan/networking/tun_device.c;hb=HEAD
+[2016-04-14 17:04:58] <Thermi> ecdsa: Ah, okay.
+[2016-04-14 17:05:43] <elzid> ecdsa: Thanks. so this message appearing in the logs isn't necessarily a problem - it keeps reprinting every few seconds...
+[2016-04-14 17:08:46] <ecdsa> elzid: It's strange that this peer tries to establish an SA over and over after you successfully initiated one. And it's also strange that there is no match (th
+e IPs seem to match), does the other peer perhaps try to establish an IKEv2 connection? If you post the logs we can take a closer look.
+[2016-04-14 17:09:29] <elzid> ecdsa: sure, will do
+[2016-04-14 17:12:22] <Thermi> ecdsa: Is there an easy way to prevent the libipsec buffer bloat problem?
+[2016-04-14 17:13:43] -!- blu_ [~bluenemo@unaffiliated/bluenemo] hat #strongswan betreten
+[2016-04-14 17:14:34] <ecdsa> Thermi: Buffer bloat?
+[2016-04-14 17:15:08] <Thermi> "Note that libipsec is not intended for scenarios with high amounts of traffic or high burst traffic. It is not optimized for performance and buffers each pack
+et in memory. "
+[2016-04-14 17:15:32] -!- bluenemo [~bluenemo@unaffiliated/bluenemo] hat beendet [Ping timeout: 260 seconds]
+[2016-04-14 17:16:31] <ecdsa> Thermi: Should not be that much of a problem in road warrior scenarios unless the remote floods them with more packets than they can handle. But you could try the codel patches.
+[2016-04-14 17:16:46] <Thermi> ecdsa: Where do I find those patches?
+[2016-04-14 17:17:18] <ecdsa> Thermi: https://git.strongswan.org/?p=strongswan.git;a=shortlog;h=refs/heads/libipsec-queue
+[2016-04-14 17:17:23] <Thermi> Ty
+
+[2016-05-10 15:44:23] <ecdsa> Thermi: If a virtual IP is assigned by the peer the IKE_SA calls add_ip() of the kernel_net_t interface. It passes the name of the interface that has the physic
+al IP assigned. The kernel-netlink plugin optionally uses charon.install_virtual_ip_on to install all VIPs on a specific interface. And the kernel-libipsec plugin sets this setting to the na
+me of the created TUN device.
+[2016-05-10 15:44:56] <Thermi> ecdsa: And kernel-libipsec gets the name from libstrongswan (tun_device.c code)`
+[2016-05-10 15:44:57] <Thermi> *?
+[2016-05-10 15:45:26] <ecdsa> Thermi: Yep, get_name()
+[2016-05-10 15:45:41] <Thermi> Okay, thank you. 
+[2016-05-10 15:50:42] <ecdsa> Thermi: You could probably also create the TUN device in add_ip() of the kernel-iph plugin and directly set the IP via set_address() function (that's what the k
+ernel-pfroute plugin does)
+[2016-05-10 15:51:52] <Thermi> Hmh. No, I do not think that would be a good idea. But thank you for the information.
+[2016-05-10 15:52:01] <ecdsa> Thermi: Why not?
+[2016-05-10 15:52:36] <Thermi> Then a lot of code special to handling the tap driver would be distributed over kernel-iph and tun_device
+[2016-05-10 15:52:48] <ecdsa> Thermi: How so?
+[2016-05-10 15:53:04] <ecdsa> Thermi: kernel-iph would only use the tun_device_t interface
+[2016-05-10 15:54:58] <Thermi> ecdsa: That would effectively create two places for managing tun devices: tun_device.c and kernel-iph. Both would provide the same interface, but the place wou
+ld change depending on the platform, which I find not desireable. 
+[2016-05-10 15:55:53] <Thermi> ecdsa: I do not see a reason to go the extra mile of putting the code into kernel-iph, too, if I can just create and destroy the device in tun_device.c, keepin
+g the already written code by you and just having to litter it a little bit with #ifdefs
+[2016-05-10 15:56:38] <ecdsa> Thermi: I think you misunderstood me. kernel-iph would just use tun_device_create() and manage tun_device_t objects. It woulnd't have to care how tun_device_t i
+s implemented, that code would only be in tun_device.c.
+[2016-05-10 15:56:38] <Thermi> ecdsa: I am not experienced enough with the codebase to be able to safely do larger changes to the structure, so I'd like to avoid it
+[2016-05-10 15:56:55] <Thermi> Okay, but why would I want to put it in kernel-iph at all?
+[2016-05-10 15:57:41] <Thermi> As far as I understand, if I put it in kernel-iph, a tun device would only appear when the tunnel was already established. 
+[2016-05-10 15:57:46] <ecdsa> Thermi: Then you could create a TUN device per VIP/tunnel in case you can't use the same TUN device for multiple tunnels.
+[2016-05-10 15:58:04] <Thermi> ecdsa: Ah, I understand. But I do not think it is necessary.
+[2016-05-10 16:00:06] <Thermi> Coming back to handling the tun devices: Charon writes and reads from the device synchronously, yes?
+[2016-05-10 16:13:11] <Thermi> Is that the only place where it writes to it?
+[2016-05-10 16:14:22] <ecdsa> Thermi: Yes
+[2016-05-10 16:16:20] <Thermi> Yes to both?
+[2016-05-10 16:18:17] <ecdsa> Thermi: That it's the only place it writes to the TUN device. write_packet usually just calls write() so it blocks in case the TUN device is not ready
+[2016-05-10 16:18:34] <Thermi> Hmh. And is that blocking desired?
+[2016-05-10 16:18:42] <ecdsa> Thermi: Yes
+[2016-05-10 16:21:33] -!- fatdragon [~fatdragon@cpe-107-184-105-188.socal.res.rr.com] hat #strongswan betreten
+[2016-05-10 16:24:26] <Thermi> ecdsa: Isn't that synchronous IO?
+[2016-05-10 16:24:45] <ecdsa> Thermi: Yes
+[2016-05-10 16:25:18] <Thermi> well, then it should be fine if I do that, too.
+
+[2016-05-08 20:11:02] <Thermi> Does the Windows TAP-Driver actually support having only a single address (netmask 255.255.255.255 or prefix lenth 32) address installed? Windows itself accept
+s that just fine. I can easily just assign a single address with prefix length 32 on an ethernet interface and then add routes to other hosts over that ethetnet interface. Works just fine. I
+ can ping all the hosts I allow/route.
+[2016-05-08 20:11:46] <cron2> Thermi: well, that must be a newish windows thing.  Traditionally, windows would refuse anything that is smaller than .252 (read: .254 or .255)
+[2016-05-08 20:12:02] <Thermi> The background is that I want to marry the TAP driver to strongSwan, so people can use it to connect to IPSec VPNs from Windows, without having to use the crap
+py Agile VPN client. This is the shallow background (more information is available, but not necessary for these questions)=
+[2016-05-08 20:12:27] <Thermi> cron2: I tested it on Windows 10. I could test on 7 and 8.1. I don't want to support anything older than 8 anyway, because Microsoft itself doesn't support it.
+[2016-05-08 20:12:30] <cron2> the tap driver itself should not care - as long as windows hands it the packet, it will come out of the socket interface
+[2016-05-08 20:12:59] <Thermi> cron2: Okay, thank you. So what does the TAP driver actually do in tun mode? And what does Windows do?
+[2016-05-08 20:13:24] <Thermi> cron2: AFAIR the driver just emulates an ethernet interface, so I guess Windows wants to do ARP requests over it?
+[2016-05-08 20:13:34] <cron2> in tun mode, the tap driver will proxy-arp, and strip/add ethernet headers
+[2016-05-08 20:13:37] <cron2> yes
+[2016-05-08 20:13:58] <Thermi> cron2: Okay, thank you. So what addresses does it proxy arp? Any address? Only the ones that it is configured for?
+[2016-05-08 20:15:04] <cron2> I'm not sure, I did not look that closely at the IPv4 side of things.  For IPv6, it proxy-ND's for fe80::8 ("because I thought that this is a nice number") - I 
+think for IPv4, there is an ioctl() that OpenVPN calls and tells it which address is "the gateway", and that one is then proxy-arp'ed for
+[2016-05-08 20:16:02] <Thermi> Well, with IPsec, there isn't necessarily a gateway that it is reachable over, so I guess I'd have to touch the driver to add support for that?
+[2016-05-08 20:17:01] <Thermi> Coul I add a fake gw in the driver (something in site-local (169.[...])) that it proxy arps for and then just route all packets over the VPN over that gw? Or j
+ust make it proxy arp for anything?
+[2016-05-08 20:17:08] <cron2> Well, it being an ethernet interface, it needs to do next-hop resolving - so you can't point a default route "to the ethernet" (= arp for every single destinati
+on)
+[2016-05-08 20:17:12] <Thermi> And for IPv6, I'd have to change that, too.
+[2016-05-08 20:17:22] <cron2> for IPv6, just use fe80::8 and be happy with it :-)
+[2016-05-08 20:18:07] <cron2> for IPv4, just set up a fake local network, and tell the tap driver about the fake gateway - it only has local relevance, as soon as the packet is "outside the 
+driver", nobody remembers the gateway address it was sent to
+[2016-05-08 20:18:36] <Thermi> cron2: Sure. I want to avoid any possible address conflicts. Because nobody is supposed to use site-local anyway, I think it would make a good choice.
+[2016-05-08 20:19:09] <Thermi> I know how routing works, so no worries. I only wanted to have it proxy arp for anything, so I am free in choosing what IP I use as fake gw.
+[2016-05-08 20:19:38] <cron2> you'd need to modify the driver for that - but as long as your app is telling the driver, it would use that one
+[2016-05-08 20:19:55] <Thermi> I currently only care about two things: 1) I can put any IP packet I want into the VPN 2) I don't have guaranteed address conflicts.
+[2016-05-08 20:19:57] <cron2> for v6, what good is "pick another one"?  fe80:: is link-local anyway, so any address is as good as any other
+[2016-05-08 20:20:57] <Thermi> cron2: So you mean I could generate a fake LL address, use that as fake GW and just route over it?
+[2016-05-08 20:21:06] <cron2> sure
+[2016-05-08 20:21:10] <Thermi> The LL address range should be large enough to avoid conflicts, I guess.
+[2016-05-08 20:21:31] <cron2> trying to find the bit in openvpn right now that tells the tap adapter what the v4 gateway is
+[2016-05-08 20:22:02] <Thermi> I looked at how the agile VPN client does it, and it seems to be a layer three VPN implementation, so I'm somewhat baffled how it does that. The GW address is 
+0.0.0.0 in the routes it adds.
+[2016-05-08 20:22:22] <Thermi> So if the VPN interface it uses would be layer 2 (ethernet), it would do proxy arp for anything.
+[2016-05-08 20:22:30] <Thermi> *have to do
+[2016-05-08 20:22:46] <cron2> right - which blows up windows arp tables, which is sort of ugly
+[2016-05-08 20:23:01]  * cron2 wishes for a non-ethernet-style virtual interface on windows, but nobody made one yet
+[2016-05-08 20:23:19] <cron2> ah, here we go
+[2016-05-08 20:23:25] <cron2> openvpn, tun.c, look for
+[2016-05-08 20:23:29] <cron2>           status = DeviceIoControl (tt->hand, TAP_WIN_IOCTL_CONFIG_TUN,
+[2016-05-08 20:23:43] <cron2> (around line 5360 in git master)
+[2016-05-08 20:23:51] <Thermi> Got it. I have the source open right now.
+[2016-05-08 20:24:15] <cron2> this is the ioctl that tells the tap driver what is considered "the local IP address", "the remmote address"
+[2016-05-08 20:24:25] <cron2> and I think you want
+[2016-05-08 20:24:28] <cron2>           if (!DeviceIoControl (tt->hand, TAP_WIN_IOCTL_CONFIG_POINT_TO_POINT,
+[2016-05-08 20:24:35] <cron2> a few lines down :)
+[2016-05-08 20:25:11] <cron2> or maybe not - the first one sets up a subnet-style tun interface, the second one a traditional point-to-point ("my address, your address") but these two have to be in the same /30
+[2016-05-08 20:25:57] <cron2> given that TAP_WIN_IOCTL_CONFIG_TUN is not actually sending the gateway address, I think the tap driver actually might actually proxy-arp for everything in that subnet...
+[2016-05-08 20:26:32] <Thermi> Thank you. That /30 restriction is what my original questions and sentences pointed to. Windows itself accepts a /32 just fine. So the question is if the problem is caused by the driver or a restriction of former Windows versions
+[2016-05-08 20:26:35] <cron2> (... that source code is so full of "we needed to do that hack 10 years ago...")
+[2016-05-08 20:26:58] <cron2> it was definitely not permitted on earlier windows versions
+[2016-05-08 20:27:19] <Thermi> I'm checking 8.1 now.
+[2016-05-08 20:27:38] <cron2> well, more like "ME" and "XP" and such :) - this code base is OLD
+[2016-05-08 20:27:52] <Thermi> Yes, I noticed because of the lack of documentation on the driver. ;)
+[2016-05-08 20:29:01] <Thermi> Do you have any knowledge about writing a proper driver for newer Windows versions? I saw that there are newer driver frameworks available, but I do not really have the time to write a new one. :/
+[2016-05-08 20:29:13] <Thermi> It's my bachelor thesis and I only have about a month or so to finish it
+[2016-05-08 20:29:36] <cron2> just hack on the old tap driver, as everyone does :-) (but use the NDIS6 driver, not the old old NDIS5 one)
+[2016-05-08 20:29:56] <Thermi> Okay, will do, if necessary. Any plans on writing a newer one?
+[2016-05-08 20:29:58] <cron2> well, more precisely, just *use* the driver, and hack your way around the limitations - e.g. by using site-locals for IPv4
+[2016-05-08 20:30:37] <cron2> OpenVPN tech paid a consultant to write the NDIS6 one (as NDIS5 is no longer officially supported on win8 and up) because nobody in the open source community has any clue about windows drivers...
+[2016-05-08 20:30:41]  * cron2 <- unix guy
+[2016-05-08 20:31:03] <Thermi> Hehe.
+[2016-05-08 20:31:09] <Thermi> Okay, I understand.
+[2016-05-08 20:31:10] <cron2> (I *did* add the IPv6 stuff to the NDIS5 windows driver, but that was because I wanted v6 support and nobody else was willing to do it...)
+[2016-05-08 20:31:26] <Thermi> Isn't the company behind OpenVPN profit oriented?
+[2016-05-08 20:32:03] <cron2> there's "the company" (OpenVPN tech) which sells OpenVPN AS and support around that and runs [http://privatetunnel.net privatetunnel.net] as VPN service
+[2016-05-08 20:32:18] <cron2> and then there's "the open source community", which, well, does the open source project
+[2016-05-08 20:32:25] <cron2> we cooperate :)
+[2016-05-08 20:32:35] <Thermi> Windows 8.1 supports /32s.
+[2016-05-08 20:32:49] <Thermi> Okay. Which one of those actually "own" OpenVPNß
+[2016-05-08 20:32:51] <Thermi> *?
+[2016-05-08 20:33:02] <cron2> the core of OpenVPN AS is "the community version", but it has nice extras, like "GUI" - in the other direction, the company makes the iOS client, which works with the open source version as well...
+[2016-05-08 20:33:11] <Thermi> And I guess OpenVPN tech "owns" the Windows TAP driver?
+[2016-05-08 20:33:51] <cron2> OpenVPN tech *paid* for the TAP driver, and they provided signed installers, but if I'm not totally mistaken, the NDIS6 driver is GPLed
+[2016-05-08 20:34:18] <Thermi> Sure. I guess copy right is owned by OpenVPN tech?
+[2016-05-08 20:34:20] <cron2> so, i'm not sure how to answer "who owns it" - as with openvpn itself: it's GPLed
+[2016-05-08 20:34:44] <cron2> https://github.com/OpenVPN/tap-windows6
+[2016-05-08 20:34:45] <vpnHelper> Title: GitHub - OpenVPN/tap-windows6: Windows TAP driver (NDIS 6) (at [http://github.com github.com])
+[2016-05-08 20:34:51] <cron2> it says "GPL-2"
+[2016-05-08 20:34:58] <Thermi> Sure. Somebody still has copyright on it.
+[2016-05-08 20:35:12] <Thermi> "The source and object code of the tap-windows6 project is Copyright (C) 2002-2014 OpenVPN Technologies, "
+[2016-05-08 20:35:14] <Thermi> Tech.
+[2016-05-08 20:35:14] <cron2> the copyright notice 
+[2016-05-08 20:35:16] <cron2> yeah :)
+[2016-05-08 20:35:57] <Thermi> Hmh.
+
