@@ -15,6 +15,9 @@
 \usepackage[printonlyused]{acronym}
 \usepackage{setspace}
 \usepackage{afterpage}
+\usepackage{caption}
+\usepackage{fancyhdr}
+
 \pgfplotsset{compat=1.5}
 \lstset{
 breaklines=true,
@@ -27,6 +30,15 @@ literate={ö}{{\"o}}1
          {Ö}{{\"O}}1
 }
 
+% define fancy header and footer with 0.4 pt rules
+\pagestyle{fancy}
+\lhead{Noel Kuntze}
+\chead{}
+\rhead{\thepage}
+\cfoot{} % get rid of the page number 
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
 % use inbuilt bibtex
 % see makefile for compiling
 
@@ -35,12 +47,15 @@ literate={ö}{{\"o}}1
 
 \setstretch{1.3}
 \newcommand*\BlankPage{\newpage\null\thispagestyle{empty}\newpage}
-
-
 \newcommand{\comment}[1]{}  %comment not shown
+% add german translation for code listings
 
+\renewcommand\lstlistingname{Code}
+\renewcommand\lstlistlistingname{Codeverzeichnis}
 
 \begin{document}
+% disable page numbering 
+\pagenumbering{gobble}
 
 \newcommand{\me}{Noel \textsc{Kuntze}}
 \newcommand{\supervisor}{Prof. Dr. D. \textsc{Westhoff}}
@@ -51,6 +66,7 @@ literate={ö}{{\"o}}1
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 \newcommand{\newtitle}{Userspace IPsec-Processing unter Windows}
 
+% define nice title page 
 \begin{titlepage}
 \center
 
@@ -80,14 +96,15 @@ literate={ö}{{\"o}}1
 
 \BlankPage
 
+% start nice Roman numbering in capital letters. (Use "roman" for lower case Roman numbering)
 \pagenumbering{Roman}
-
+\input{inhaltsverzeichnis.tex}
 \input{abbildungsverzeichnis.tex}
 \input{codeverzeichnis.tex}
 \input{tabellenverzeichnis.tex}
 \input{abkuerzungsverzeichnis.tex}
-\input{inhaltsverzeichnis.tex}
 \newpage
+% use arabic numbering in the actual text of the thesis
 \pagenumbering{arabic}
 \input{einleitung.tex}
 \input{chapter1.tex}
