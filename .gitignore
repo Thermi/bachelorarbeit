@@ -1,5 +1,5 @@
 openvpn/openvpn*
-openvpn/tap-driver/*
+openvpn/tap-driver/code-signing-certificate
 DESTDIR
 DESTDIR.
 DESTDIRswanctl
