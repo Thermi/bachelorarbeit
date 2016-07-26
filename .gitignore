@@ -1,2 +1,7 @@
-openvpn/*
-tap-driver/*
+openvpn/openvpn*
+openvpn/tap-driver/*
+DESTDIR
+DESTDIR.
+DESTDIRswanctl
+DESTDIR/*
+Bachelorarbeit/Poster/{Kopierauftrag.pdf,Symbol_Clock.svg,Windows_logo_-_2012.svg,strongswan.png,HW6P1.svg}
