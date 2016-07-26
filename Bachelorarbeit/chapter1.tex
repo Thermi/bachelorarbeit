@@ -1,130 +1,64 @@
-\BlankPage
+\section{Grundlage}
+Um IPsec zu verstehen, müssen zuerst die Netzwerkgrundlagen verstanden werden.
+\subsection{Netzwerke}
+Moderne Computernetzwerke basieren auf Ethernet und \ac{IPv4} oder \ac{IPv6}, wie standardisiert
+von der \ac{IETF} in diversen \acp{RFCs}.
+Jeder Computer im Netzwerk hat mindestens eine sogenannte \ac{NIC}.
+Jede \ac{NIC} kann eine oder mehrere physikalische Netzwerkschnittstellen haben,
+die den Computer mit dem Netzwerk verbindet. Diese Schnittstelle hat eine einzigartige
+Adresse (Die MAC-Adresse), die sie im Netzwerk identifiziert, sowie eine gewisse Bandbreite, mit
+der Daten empfangen oder gesendet werden können. Diese Bandbreite hängt von der Schnittstelle, den Kabeltypen und der Kabelqualität ab.
+Wenn der Computer unter Benutzung der Schnittstelle Daten an einen anderen Computer im Netzwerk verschickt, wird diese Adresse genutzt, um ihn als
+Quelle zu identifizieren und dem anderen Computer zu ermöglichen, den Sender der Daten zu erfahren.
+Die MAC-Adresse des Empfängers muss vor dem Senden der Daten erfahren werden, um den Empfänger korrekt spezifizieren zu können.
+Die Alternative dazu wäre, die Daten an alle Teilnehmer zu senden, was jedoch ineffizient ist, da
+damit die Bandbreite aller anderen Teilnehmer im Netzwerk beansprucht werden würde.
+% TODO: Grafik mit Sterntopografie einfügen
+In der Realität werden in Computernetzwerken verschiedene Netzwerke für verschiedene Zwecke verwendet.
+% TODO: IP. ARP, TCP, UDP
+\subsection{Bridging}
+Bridging ist die Low-Tech-Lösung, um mehrere Computer zu verbinden ohne mindestens ebensoviele
+Kabel und Netzwerkschnittstellen zu benötigen.
 
-\phantomsection
+%TODO: Grafik mit Bridging einfügen
+\subsection{Switching}
+%TODO: Grafik mit Switching einfügen
+\subsection{Routing}
+%TODO: Grafik mit Routing einfügen
+\subsection{IPsec}
+%Protokollunabhängig
+\ac{IPsec} ist ein Konzept zum Absichern von beliebigen \ac{IP}-Paketen oder deren Nutzlasten.
+Es stellt Vertraulichkeit, Authentizität und Schutz vor Replay-Attacken bereit.
+Die Implementierung der Schutzmechanismen beruht auf sogenannten \acp{SAs} und \ac{SPs},
+die genutzt werden um die Daten zu schützen.
+%Kernelspace
+%ISAKMP/IKEv1
+%Agressive Mode
+%Main mode
+%PSK-Problem
+%IKEv2
+%AH
+%ESP
+%NAT-T
+\subsubsection{Route Based}
+Route based heißt, dass Pakete, die über das VPN
+gesendet werden sollen, in eine virtuelle Netzwerkschnittstelle geroutet werden.
+Da gewöhnliches Routing auf Basis der Zieladresse geschieht, ermöglicht eine solche Implementierung
+keine Protokol- oder Port-Selektoren.
 
-\section*{Abkürzungsverzeichnis}
-\addcontentsline{toc}{section}{Abkürzungsverzeichnis}
-\begin{acronym}
-    \acro{ACK}{Acknownledge}
-    \acro{ADC}{Analog-Digital Converter}
-    \acro{AH}{Authentication Header}
-    \acro{AES}{Advanced Encryption Standard}
-    
-	\acro{API}{Application Programming Interface}
-	
-	\acro{BA}{Bachelorarbeit}
-    \acro{CBC-MAC}{Cipher Block Chaining MAC}
-    \acro{CI}{Codeimage}
-    \acrodefplural{CI}[CIs]{Codeimages}
-
-    \acro{CPU}{Central Processing Unit}
-    \acrodefplural{CPU}[CPUs]{Central Processing Units}
-    
-	\acro{DH}{Diffie-Hellman}
-	
-    \acro{DRNG}{Deterministic Random Number Generator}
-    \acrodefplural{DRNG}[DRNGs]{Deterministic Random Number Generators}
-
-	\acro{ESP}{Encapsulated Security Payload}
-	
-	\acro{GUI}{Graphical User Interface}
-	
-    \acro{HMAC}{Hashed Message Authentication Code}
-
-    \acro{IDE}{Integrated Development Environment}
-    
-    \acro{IKE}{Internet Key Exchange}
-    
-    \acro{ISAKMP}{Internet Security Association and Key Management Protocol}
-    
-    \acro{IPsec}{Internet Protocol Security}
-    
-    \acro{IoT}{Internet of Things}
-    
-    \acro{IRC}{Internet Relay Chat}
-    
-    \acro{IV}{Initialisierungsvektor}
-
-    \acro{KB}{Kilo Byte}
-
-    \acro{LAT}{Line Address Table}
-
-
-    \acro{MAC}{Message Authentication Code}
-    \acrodefplural{MAC}[MACs]{Message Authentication Codes}
-    
-    \acro{MB}{Mega Byte}
-    \acrodefplural{MB}[MBs]{Mega Bytes}
-    
-    \acro{mC}[$\mu$$C$]{Microcontroller}
-    \acro{MOO}{Mode of Operation}
-
-    \acro{NACK}{Negative Acknowledge}
-    
-    \acro{NED}{Network Description}
-    
-    \acro{NDRNG}{Non-deterministic Random Number Generator}
-    \acrodefplural{NDRNG}[NDRNGs]{Non-deterministic Random Number Generators}
-
-    \acro{OFB}{Output Feedback Mode}
-    \acro{OMNeTpp}[OMNeT$++$]{Objective Modular Network Testbed in C++}
-
-    \acro{OTP}{One Time Pad}
-    \acrodefplural{OTP}[OTPs]{One Time Pads}
-    
-    \acro{PC}{Personal Computer}
-    
-    \acro{PRW}{Pseudo Random Words}
-    
-    \acro{PRNG}{Pseudo Random Number Generator}
-    \acrodefplural{PRNG}[PRNGs]{Pseudo Random Number Generators}
-
-    \acro{RAM}{Random Access Memory}
-    \acro{RISC}{Reduced Instruction Set Computing}
-    
-   	\acro{PFS}{Perfect Forward Secrecy}
-    \acro{RNG}{Random Number Generator}
-    \acrodefplural{RNG}[RNGs]{Random Number Generators}
-
-    \acro{ROM}{Read Only Memory}
-
-    \acro{ROP}{Return Oriented Programming}
-
-    \acro{SA}{Security Association}
-    \acrodefplural{SA}[SAs]{Security Associations}
-    
-    \acro{SAD}{Security Association Database}
-    \acrodefplural{SAD}[SADs]{Security Association Databases}
-    
-    \acro{SCUBA}{Secure Code Update By Attestation}
-    \acro{SHA}{Secure Hashing Algorithm}
-    
-    \acro{SOC}{System On Chip}
-    
-    \acro{SP}{Security Policy}
-    \acrodefplural{SP}[SPs]{Security Policies}
-    
-    \acro{SPD}{Security Policy Database}
-    \acrodefplural{SPD}[SPDs]{Security Policy Databases}
-    
-    \acro{SWATT}{SoftWare-based ATTestation}
-
-    \acro{TI}{Texas Instruments}
-    \acro{TPM}{Trusted Platform Module}
-
-    \acro{TRNG}{True Random Number Generator}
-    \acrodefplural{TRNG}[TRNGs]{True Random Number Generators}
-
-	\acro{WFP}{Windows Filtering Platform}
-	
-	\acro{VICI}{Versatile IKE Configuration Interface}
-	
-    \acro{WSN}{Wireless Sensor Network}
-    \acrodefplural{WSN}[WSNs]{Wireless Sensor Networks}
-    \acro{WxorX}[W$\oplus$X]{Write xor Execute}
-
-    \acro{XOR}{Exclusive Or}
-\end{acronym}
-
-\newpage
-
+Implementierungen von IPsec auf Endgeräten sind in der Regel Route based, gleichzeitig werden
+die ausgehandelten \acp{SPs} jedoch weiterhin erzwungen.
+Route based \acp{VPNs} werden für gewöhnlich dann genutzt, wenn dynamisches Routen genutzt wird,
+wie zum Beispiel \ac{BGP}, \ac{ISIS} oder \ac{OSPF}, da beim Verändern der Routen die \acp{SPs} nicht verändert
+und damit keine neuen CHILD\_SAs ausgehandelt werden müssen. Ein weiterer Vorteil ist, dass Neulinge es leichter haben
+den Paketfluss zu verfolgen.
+\subsubsection{Policy Based}
+Policy based bedeutet, dass die \ac{IPsec}-\acp{SPs}, die ausgehandelt wurden, direkt genutzt werden welche Pakete geschützt werden.
+Eine solche Implementierung ermöglicht es, \ac{IPsec} zur Absicherung von sehr genau spezifiziertem
+Verkehr zu nutzen, wie zum Beispiel nur \ac{ICMP}-Pakete mit Typ 0, Code 0 (Echo Reply), sowie Typ 8 und Code 0 (Echo Request).
+Policy based \ac{IPsec} ermöglicht es \ac{IPsec} direkt in den Stack zu integrieren, ohne notwendigerweise die Routen zu verändern.
+\subsubsection{IPsec unter Linux}
+Unter Linux gibt es zwei verschiedene \ac{IPsec}-Stacks. 
+PF\_KEYv2 (KLIPS) rfc2367
+XFRM
+\subsubsection{IPsec unter Windows}

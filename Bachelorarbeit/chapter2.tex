@@ -1,0 +1,33 @@
+\section{Implementierung}
+
+\subsection{strongSwan}
+\subsubsection{charon}
+\subsubsection{Userspace processing}
+\paragraph{OpenVPN TAP-Treiber}
+% 255.255.255.255 Netzmaske (Prefix-Länge 32 Bit)
+% Route über VPN-Adapter zu entferntem Netzwerk
+% Fake ARP
+% GW
+% Ethernet irr. vom eigentlichen Modus
+%async
+\paragraph{libipsec}
+libipsec ist eine Bibliothek, die IPsec im Tunnelmodus implementiert.
+Sie ist Teil des strongSwan-Quellcodes. Sie wird für die Verarbeitung von IP-Paketen
+in der Regel auf Systemen genutzt, die keine (funktionierenden) IPsec-Implementierung
+enthalten.
+
+libipsec besteht aus zwei Komponenten: Einerseits die Bibliothek, die die SAD und die SPD
+implementiert, sowie die Verarbeitung (libipsec) und ein Plugin, welches das Empfangen und das Senden
+der Pakete auf dem jeweiligen Betriebssystem implementiert (kernel-libipsec), für das strongSwan kompiliert wurde.
+
+\subparagraph{libipsec}
+\subparagraph{kernel-libipsec}
+% handle_plain
+% handle_esp
+% callbacks
+% synchronous
+% IoCompletionPort inkompatibel mit synchroner I/O -> kompletter Rewrite?
+% komplexe Änderungen des Verhaltens von kernel-libipsec
+
+\subsubsection{Kernelspace processing}
+

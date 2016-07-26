@@ -14,6 +14,7 @@
 \usepackage{pgfplots}
 \usepackage[printonlyused]{acronym}
 \usepackage{setspace}
+\usepackage{afterpage}
 \pgfplotsset{compat=1.5}
 \lstset{
 breaklines=true,
@@ -77,10 +78,21 @@ literate={ö}{{\"o}}1
 \large \today
 \end{titlepage}
 
+\BlankPage
+
+\pagenumbering{Roman}
+
+\input{abbildungsverzeichnis.tex}
+\input{codeverzeichnis.tex}
+\input{tabellenverzeichnis.tex}
+\input{abkuerzungsverzeichnis.tex}
+\input{inhaltsverzeichnis.tex}
+\newpage
+\pagenumbering{arabic}
+\input{einleitung.tex}
 \input{chapter1.tex}
 \input{chapter2.tex}
 \input{chapter3.tex}
-\input{chapter4.tex}
-\input{chapter5.tex}
-
+\input{bibliographie.tex}
+\input{eidesstattliche_erklaerung.tex}
 \end{document}

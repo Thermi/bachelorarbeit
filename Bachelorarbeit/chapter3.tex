@@ -1,0 +1,38 @@
+\section{Portierung von libipsec auf Windows}
+\subsection{Unterstützte Kryptographie}
+\subsection{Tun-Treiber}
+% openvpn
+% kompatibilität
+% Treiber-patches upstream
+Im Zuge der \ac{BA} wurde ein Patch für den TAP-Windows-Treiber entwicklelt, um die
+Prüfung der Quell-IP der ARP-Requests zu deaktivieren. Das ist erforderlich, um mit der
+virtuellen IP des Clients mit dem entfernten IP-Netzwerk kommunizieren zu können.
+Das liegt daran, dass der TAP-Windows-Treiber ein Ethernet-Gerät darstellt und damit
+vor der Übertragung der IP-Pakete vom Client zum Treiber die MAC-Adresse des virtuellen Routers bekannt sein muss.
+Das wird, wie in jedem herkömmmlichen IP-Netzwerk auf Ethernet-Basis, mit ARP bewerkstelligt.
+Die MAC-Adresse des virtuellen Routers hängt von der GUID des Adapters ab, welche zufällig ist
+und bei der Erstellung des Adapters initialisiert wird. Die MAC-Adresse kann auch über die Registry verändert werden.
+\paragraph{Treiberverhalten}
+
+\paragraph{Betriebsmodi}
+\begin{description}
+\item [TUN-Modus] 
+\item [TAP-Modus]
+\item [Point-To-Point-Modus]
+\end{description}
+\paragraph{Patch}
+Der entwickelte Patch deaktiviert die Überprüfung der Quell-IP der ARP-Requests, die
+vom Treiber verarbeitet werden. Wenn die Überprüfung erfolgreich war, so wird der ARP-Request
+beantwortet und dem Kernel wird damit mitgeteilt, wie die MAC-Adresse des virtuelen Gateways lautet.
+
+\subsection{Maßnahmen von Buffer Bloat}
+libipsec speichert die empfangenen Pakete vor- und nach der Verarbeitung in einer Wartschleife (Queue).
+Nach der Verarbeitung werden die Pakete nochmals gepuffert, bevor sie an das TUN-Gerät oder den Sockel
+weitergegeben werden. Wenn die Pakete langsamer verarbeitet oder verschickt werden als sie eintreffen,
+dann wächst der Puffer, bis der Anwendung (oder dem Computer) der Speicher ausgeht. Dann stürzt die Anwendung ab.
+Um das zu verhindern hat Martin Willi eine Controlled-Delay-Queue implementiert und im Git-Zweig libipsec-queue\footnote{\url{https://git.strongswan.org/?p=strongswan.git;a=shortlog;h=refs/heads/libipsec-queue}} eine komplette Implementierung der Queue in libipsec abgelegt.
+Die Queue verwirft Pakete wenn die Verzögerung zwischen der Ankunft und der Verarbeitung
+des letzten Pakets zu groß ist.
+%\section{GUI}
+%\subsection{Paradigmen}
+%\subsection{Tunnelkonfiguration}
