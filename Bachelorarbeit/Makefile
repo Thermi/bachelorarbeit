@@ -8,6 +8,8 @@ all:
 	rm -f bachelorarbeit.blg
 	rm -f bachelorarbeit.bbl
 	pdflatex bachelorarbeit.tex
+	bibtex bachelorarbeit.aux
+	pdflatex bachelorarbeit.tex
 	pdflatex bachelorarbeit.tex
 	
 clean:
