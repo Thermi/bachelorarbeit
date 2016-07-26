@@ -7,3 +7,13 @@ DESTDIR/*
 Bachelorarbeit/Poster/*.svg
 Bachelorarbeit/Poster/*.png
 Bachelorarbeit/Poster/Kopierauftrag.pdf
+win32-headers/
+win32-libs/
+*.aux
+*.bbl
+*.blg
+*.lof
+*.log
+*.lol
+*.out
+*.toc
