@@ -1,0 +1,7 @@
+./configure --host=x86_64-w64-mingw32 --prefix=/ --libdir=/bin --bindir=/bin --sbindir=/bin --disable-defaults --enable-monolithic --enable-static --enable-svc --enable-ikev2 
+--enable-ikev1 --enable-nonce --enable-pem --enable-pkcs1 --enable-x509 --enable-openssl --enable-socket-win --enable-kernel-wfp --enable-kernel-iph --enable-pubkey --enable-swanctl 
+--with-swanctldir=swanctl --with-strongswan-conf=strongswan.conf --enable-libipsec --enable-kernel-libipsec --enable-eap-tls --enable-mschapv2 --enable-eap-peap --enable-eap-gtc 
+--enable-eap-dynamic --enable-eap-identity --enable-md4 --enable-ipseckey --enable-dnscert --enable-files --enable-sha3 host_alias=x86_64-w64-mingw32 CC=x86_64-w64-mingw32-gcc 
+CFLAGS=-g -O2 -Wall -Werror -Wno-pointer-sign -Wno-format-security -Wno-format -mno-ms-bitfields -I/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/win32-headers/files/include/ 
+-I/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/openvpn/tap-driver/tap-windows6/src/ LDFLAGS=-L/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/win32-headers/files/lib/ 
+-L/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/win32-headers/files/bin/
