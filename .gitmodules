@@ -1,0 +1,10 @@
+[submodule "TAP-Windows"]
+	path = openvpn/tap-driver/tap-windows6
+	url = https://github.com/Thermi/tap-windows6
+
+[submodule "strongswan"]
+	path = strongswan
+	url = https://github.com/Thermi/strongswan
+[submodule "openvpn/tap-driver/tap-windows6"]
+	path = openvpn/tap-driver/tap-windows6
+	url = https://github.com/Thermi/tap-windows6
