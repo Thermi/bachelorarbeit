@@ -8,7 +8,7 @@ all:
 	rm -f bachelorarbeit.blg
 	rm -f bachelorarbeit.bbl
 	pdflatex bachelorarbeit.tex
-	bibtex bachelorarbeit.aux
+	biber bachelorarbeit
 	pdflatex bachelorarbeit.tex
 	pdflatex bachelorarbeit.tex
 	
