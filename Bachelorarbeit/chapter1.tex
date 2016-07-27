@@ -2,7 +2,7 @@
 Um IPsec zu verstehen, müssen zuerst die Netzwerkgrundlagen verstanden werden.
 \subsection{Netzwerke}
 Moderne Computernetzwerke basieren auf Ethernet und \ac{IPv4} oder \ac{IPv6}, wie standardisiert
-von der \ac{IETF} in diversen \acp{RFCs}.
+von der \ac{IETF} in diversen \acp{RFC}.
 Jeder Computer im Netzwerk hat mindestens eine sogenannte \ac{NIC}.
 Jede \ac{NIC} kann eine oder mehrere physikalische Netzwerkschnittstellen haben,
 die den Computer mit dem Netzwerk verbindet. Diese Schnittstelle hat eine einzigartige
@@ -29,7 +29,7 @@ Kabel und Netzwerkschnittstellen zu benötigen.
 %Protokollunabhängig
 \ac{IPsec} ist ein Konzept zum Absichern von beliebigen \ac{IP}-Paketen oder deren Nutzlasten.
 Es stellt Vertraulichkeit, Authentizität und Schutz vor Replay-Attacken bereit.
-Die Implementierung der Schutzmechanismen beruht auf sogenannten \acp{SAs} und \ac{SPs},
+Die Implementierung der Schutzmechanismen beruht auf sogenannten \acp{SA} und \ac{SP},
 die genutzt werden um die Daten zu schützen.
 %Kernelspace
 %ISAKMP/IKEv1
@@ -47,13 +47,13 @@ Da gewöhnliches Routing auf Basis der Zieladresse geschieht, ermöglicht eine s
 keine Protokol- oder Port-Selektoren.
 
 Implementierungen von IPsec auf Endgeräten sind in der Regel Route based, gleichzeitig werden
-die ausgehandelten \acp{SPs} jedoch weiterhin erzwungen.
-Route based \acp{VPNs} werden für gewöhnlich dann genutzt, wenn dynamisches Routen genutzt wird,
-wie zum Beispiel \ac{BGP}, \ac{ISIS} oder \ac{OSPF}, da beim Verändern der Routen die \acp{SPs} nicht verändert
+die ausgehandelten \acp{SP} jedoch weiterhin erzwungen.
+Route based \acp{VPN} werden für gewöhnlich dann genutzt, wenn dynamisches Routen genutzt wird,
+wie zum Beispiel \ac{BGP}, \ac{ISIS} oder \ac{OSPF}, da beim Verändern der Routen die \acp{SP} nicht verändert
 und damit keine neuen CHILD\_SAs ausgehandelt werden müssen. Ein weiterer Vorteil ist, dass Neulinge es leichter haben
 den Paketfluss zu verfolgen.
 \subsubsection{Policy Based}
-Policy based bedeutet, dass die \ac{IPsec}-\acp{SPs}, die ausgehandelt wurden, direkt genutzt werden welche Pakete geschützt werden.
+Policy based bedeutet, dass die \ac{IPsec}-\acp{SP}, die ausgehandelt wurden, direkt genutzt werden welche Pakete geschützt werden.
 Eine solche Implementierung ermöglicht es, \ac{IPsec} zur Absicherung von sehr genau spezifiziertem
 Verkehr zu nutzen, wie zum Beispiel nur \ac{ICMP}-Pakete mit Typ 0, Code 0 (Echo Reply), sowie Typ 8 und Code 0 (Echo Request).
 Policy based \ac{IPsec} ermöglicht es \ac{IPsec} direkt in den Stack zu integrieren, ohne notwendigerweise die Routen zu verändern.
