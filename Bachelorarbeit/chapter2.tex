@@ -11,9 +11,17 @@
 
 % You should have received a copy of the GNU General Public License
 % along with Foobar. If not, see <http://www.gnu.org/licenses/>.
-\section{Implementierung}
-
+\section{Basis}
+Als Basis der Arbeit wurde der quelloffene VPN-Dienst ''strongSwan'' gewählt,
+welcher von der Hochschule für Technik Rapperswill entwickelt wird.
+Um die Pakete vom Kernelspace in Empfang nehmen zu können, wird der quelloffene
+TAP-Gerätetreiber von OpenVPN Technologies, Inc. genutzt. Dieser stellt funktionierende
+und nutzbare TUN- und TAP-Geräte bereit, mit denen gearbeitet werden kann.
+Für die Verarbeitung der Pakete wird die in ''strongSwan'' integrierte Bibliothek ''libipsec'',
+das Plugin ''kernel-libipsec'', sowie bestehende Funktionsheader aus ''libstrongswan''
+aus ''strongSwan'' genutzt.
 \subsection{strongSwan}
+''strongSwan'' implementiert einen beträchtlichen Teil der Funktionalität des ''IKEv2''-Standards\cite{charlie_kaufman_rfc_2005}.
 \subsubsection{charon}
 \subsubsection{Userspace processing}
 \paragraph{OpenVPN TAP-Treiber}
@@ -35,6 +43,7 @@ der Pakete auf dem jeweiligen Betriebssystem implementiert (kernel-libipsec), f�
 
 \subparagraph{libipsec}
 \subparagraph{kernel-libipsec}
+%demultiplexing NON-ESP marker, SPI
 % handle_plain
 % handle_esp
 % callbacks

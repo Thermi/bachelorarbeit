@@ -16,27 +16,41 @@ Um IPsec zu verstehen, müssen zuerst die Netzwerkgrundlagen verstanden werden.
 \subsection{Netzwerke}
 Moderne Computernetzwerke basieren auf Ethernet und \ac{IPv4} oder \ac{IPv6}, wie standardisiert
 von der \ac{IETF} in diversen \acp{RFC}.
-Jeder Computer im Netzwerk hat mindestens eine sogenannte \ac{NIC}.
-Jede \ac{NIC} kann eine oder mehrere physikalische Netzwerkschnittstellen haben,
-die den Computer mit dem Netzwerk verbindet. Diese Schnittstelle hat eine einzigartige
-Adresse (Die MAC-Adresse), die sie im Netzwerk identifiziert, sowie eine gewisse Bandbreite, mit
-der Daten empfangen oder gesendet werden können. Diese Bandbreite hängt von der Schnittstelle, den Kabeltypen und der Kabelqualität ab.
-Wenn der Computer unter Benutzung der Schnittstelle Daten an einen anderen Computer im Netzwerk verschickt, wird diese Adresse genutzt, um ihn als
-Quelle zu identifizieren und dem anderen Computer zu ermöglichen, den Sender der Daten zu erfahren.
-Die MAC-Adresse des Empfängers muss vor dem Senden der Daten erfahren werden, um den Empfänger korrekt spezifizieren zu können.
-Die Alternative dazu wäre, die Daten an alle Teilnehmer zu senden, was jedoch ineffizient ist, da
-damit die Bandbreite aller anderen Teilnehmer im Netzwerk beansprucht werden würde.
-% TODO: Grafik mit Sterntopografie einfügen
-In der Realität werden in Computernetzwerken verschiedene Netzwerke für verschiedene Zwecke verwendet.
-% TODO: IP. ARP, TCP, UDP
-\subsection{Bridging}
-Bridging ist die Low-Tech-Lösung, um mehrere Computer zu verbinden ohne mindestens ebensoviele
-Kabel und Netzwerkschnittstellen zu benötigen.
+Der Empfang und das Senden von Daten geschieht mit Hilfe von Netzwerkschnittstellen, die die Computer
+mit dem Netzwerk verbinden.
+Die Adressierung der Computer im Netzwerk geschieht mithilfe der \ac{IP}-Adresse des Empfängers.
+Um bidirektionale Kommunikation zu ermöglichen, enthält ein \ac{IP}-Paket als Quelle die
+\ac{IP}-Adresse des Senders.
+Die Übertragung von \ac{IP}-Paketen zwischen verschiedenen Computern findet durch Nutzung
+der vorhandenen Übertragungswege statt, sei es Ethernet über entsprechende Kabel oder
+über andere Träger, wie Glasfaser oder Funk.
+Die Adressierung der Netzwerkschnittstellen erfolgt über deren MAC-Adressen, was für \ac{IPsec}
+jedoch nicht relevant ist, da nur \ac{IP}-Pakete oder die Payload davon, also das Protokoll
+auf der Transportschicht, geschützt werden.
 
-%TODO: Grafik mit Bridging einfügen
-\subsection{Switching}
-%TODO: Grafik mit Switching einfügen
 \subsection{Routing}
+Beim Routen eines Pakets wird nach dem Empfang oder Senden eines \ac{IP}-Pakets durch Nutzung
+des sogenannten ''Routing Table'' nachgeschlagen, wohin ein Paket weitergeleitet
+werden muss, um den Empfänger zu erreichen.
+Hierbei wird nach dem längsten passenden Präfix im Routing Table gesucht, um die
+korrekte Route zu finden.
+
+\subsubsection{Policy Based Routing}
+Policy Based Routing ist eine Sonderform des Routings. Hierbei wird nicht die Zieladresse
+zum Finden der Route genutzt, eine Regel.
+
+Linux implementiert \ac{PBR} durch die die Nutzung von Regeln, die Pakete auf Basis von entweder Firewall-Markierungen, der Ziel- oder Quelladresse,
+dem Wert des \ac{TOS}-Felds oder der benutzten eingehenden oder ausgehenden Netzwerkschnittstelle in bestimmte
+Routing-Tabellen umleitet. 
+Die Firewallmarkierung kann ist 32 Bit lang und kann in der Firewall (iptables, nftables, ebtables)
+auf eigens gewählte Werte und mit eigens gewählten Regeln gesetzt werden.
+Linux erlaubt Anwendungen die Firewallmarkierung direkt im Netzwerksockel zu setzen.
+
+Windows implementiert kein \ac{PBR}.
+% PBR
+% FWMARK
+% Linux socket mark
+
 %TODO: Grafik mit Routing einfügen
 \subsection{IPsec}
 %Protokollunabhängig
@@ -44,6 +58,10 @@ Kabel und Netzwerkschnittstellen zu benötigen.
 Es stellt Vertraulichkeit, Authentizität und Schutz vor Replay-Attacken bereit.
 Die Implementierung der Schutzmechanismen beruht auf sogenannten \acp{SA} und \ac{SP},
 die genutzt werden um die Daten zu schützen.
+
+\ac{IPsec} an sich lebt nur im Kernel, jedoch wird für die Aushandlung von Sitzungsschlüsseln,
+Algorithmen und dem Erneuern derselben eine Komponente im Userland benötigt.
+
 %Kernelspace
 %ISAKMP/IKEv1
 %Agressive Mode
@@ -75,3 +93,6 @@ Unter Linux gibt es zwei verschiedene \ac{IPsec}-Stacks.
 PF\_KEYv2 (KLIPS) rfc2367
 XFRM
 \subsubsection{IPsec unter Windows}
+Firewall
+Agile VPN
+Windows XP
