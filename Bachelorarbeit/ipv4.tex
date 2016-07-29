@@ -1,0 +1,35 @@
+% This file is part of Bachelorarbeit
+
+% Bachelorarbeit is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License version 3 as published by
+% the Free Software Foundation.
+
+% Bachelorarbeit is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+
+% You should have received a copy of the GNU General Public License
+% along with Foobar. If not, see <http://www.gnu.org/licenses/>.
+
+\begin{bytefield}[boxformatting={\centering\itshape},
+bitwidth=1.1em,
+endianness=big]{32}
+\bitheader{0-31}\\
+\bitbox{4}{Version}
+\bitbox{4}{IHL}
+\bitbox{6}{DSCP}
+\bitbox{2}{ECN}
+\bitbox{16}{Total Length}\\
+\bitbox{16}{Identification}
+\bitbox{4}{Flags}
+\bitbox{12}{Fragment Offset}\\
+\bitbox{8}{Time To Live}
+\bitbox{8}{Protocol}
+\bitbox{16}{Header Checksum}\\
+\bitbox{32}{Source Address}\\
+\bitbox{32}{Destination Address} \\
+\bitbox{24}{Options}
+\bitbox{8}{Padding}\\
+\end{bytefield}
+

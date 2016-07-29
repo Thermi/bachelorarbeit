@@ -1,0 +1,17 @@
+\begin{bytefield}[boxformatting={\centering\itshape},
+bitwidth=.8em,
+endianness=big,
+%bitheight=2ex
+]{32}
+\bitheader{0-31} \\
+\begin{rightwordgroup} {\parbox{6em}{\raggedright UDP-Kopf}} 
+\bitbox{16}{Quellport} &
+\bitbox{16}{Zielport} \\
+\bitbox{16}{Länge} &
+\bitbox{16}{Prüfsumme}
+\end{rightwordgroup} \\
+\begin{rightwordgroup} {\parbox{6em}{\raggedright ESP-Paket}} 
+\wordbox[tlr]{3}{ESP-Paket} \\
+\wordbox[blr]{1}{$\cdots$}
+\end{rightwordgroup} \\
+\end{bytefield}

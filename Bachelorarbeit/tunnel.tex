@@ -1,0 +1,10 @@
+\begin{bytefield}[boxformatting={\centering\itshape},
+bitwidth=.8em,
+endianness=big,
+bitheight=6ex
+]{32}
+\bitbox{5}{Äußerer IP-Kopf} & 
+\bitbox{8}{IPsec-Paketkopf} &
+\bitbox{18}{Innerer IP-Paketkopf mit Nutzlast} &
+\bitbox{8}{IPsec-Anhänger} &
+\end{bytefield}

@@ -1,0 +1,14 @@
+\begin{bytefield}[boxformatting={\centering\itshape},
+bitwidth=.8em,
+endianness=big]{32}
+\bitheader{0-31} \\
+\bitbox{8}{Nächster Header} &
+\bitbox{8}{Nutzlastlänge} &
+\bitbox{16}{Reserviert} \\
+\bitbox{32}{Security Parameters Index (SPI} \\
+\bitbox{32}{Sequenznummer} \\
+\wordbox[tlr]{1}{Authentifizierungsdaten (Integrity Check Value) (ICV)}\\
+\wordbox[blr]{1}{$\cdots$} \\
+\wordbox[tlr]{2}{Nutzlast} \\
+\wordbox[blr]{1}{$\cdots$} \\
+\end{bytefield}

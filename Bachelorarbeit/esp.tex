@@ -1,0 +1,31 @@
+% This file is part of Bachelorarbeit
+
+% Bachelorarbeit is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License version 3 as published by
+% the Free Software Foundation.
+
+% Bachelorarbeit is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+
+% You should have received a copy of the GNU General Public License
+% along with Foobar. If not, see <http://www.gnu.org/licenses/>.
+
+\begin{bytefield}[boxformatting={\centering\itshape},
+bitwidth=1.1em,
+endianness=big]{32}
+\bitheader{0-31} \\
+\bitbox{32}{Security Parameters Index (SPI)} \\
+\bitbox{32}{Sequenznummer} \\
+\wordbox[tlr]{3}{Nutzlast} \\
+\bitbox[blr]{8}{} &
+\bitbox[tlr]{24}{} \\
+\bitbox[lr]{32}{Padding (0-255 Oktette)} \\
+\bitbox[blr]{16}{}
+\bitbox{8}{Paddinglänge} &
+\bitbox{8}{Nächster Header} \\
+\wordbox[tlr]{1}{Authentifizierungsdaten (Integrity Check Value) (ICV)}\\
+\wordbox[blr]{1}{$\cdots$} \\
+\end{bytefield}
+
