@@ -2,7 +2,9 @@
 
 # makefile for Bachelorarbeit
 
-all:
+all: clean build
+
+build:
 	rm -f bachelorarbeit.aux
 	rm -f bachelorarbeit.bcf
 	rm -f bachelorarbeit.blg
