@@ -12,6 +12,16 @@
 % You should have received a copy of the GNU General Public License
 % along with Foobar. If not, see <http://www.gnu.org/licenses/>.
 \section{Einleitung}
+\subsection{Abstract}
+Der Mangel an Unterstützung für TUN/TAP-Geräte unter Windows von strongSwan, sowie Fehler und
+fehlende Unterstützung für Mehrfaktorauthentifizierung im nativen IPsec-Stack von modernen
+Windows-Versionen zusammen mit dem Mangel an frei verfügbaren Alternativen zu den mangelhaften existierenden Lösungen
+lässt den Bedarf an einem Client für IPsec-Roadwarrior-VPNs ungedeckt.
+
+Diese Arbeit zielt darauf ab, Unterstützung für den OpenVPN TAP-Treiber
+für Windows in strongSwan zu implementieren, sodass die Grundlage für die Implementierung
+eines offenen Clients auf Basis von strongSwan gelegt ist.
+
 \subsection{Motivation}
 Die Motivation für die Arbeit ist der Mangel eines modernen, flexiblen, offenen
 und  gepflegten IPsec-VPN-Clients für die Windows-Platform.
