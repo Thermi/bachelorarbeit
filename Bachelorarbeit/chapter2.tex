@@ -31,11 +31,11 @@ Diese Tabelle bezieht sich nur auf die Fähigkeiten, die auf Windows unterstütz
 Diese Tabelle macht keine Aussage über die Unterstützung der Software auf anderen Platformen.
 \begin{table}[h]
 \caption{Vorhandene IPsec-Implementierungen auf Windows }
-\begin{tabular}{cccccc}
-Implementierung & Softwareversion & IKE-Versionen & ESP-Verarbeitung & Funktionalität & Sonstiges \\
-strongswan & 5.5.0 & IKEv1 und IKEv2 & Nein, nutzt den nativen Stack & MOBIKE, eap-tls, eap-ttls, eap-tnc, RSA-Authentifizierung (unvollständig) & Vollständige Informationen\footnote{\url{https://wiki.strongswan.org/projects/strongswan/wiki/Windows}} \\
-Windows Agile VPN Client & ? & IKEv1 und IKEv2 & Ja, im Userspace & MOBIKE, ... & hat Probleme beim Installieren der Routen für den ausgehandelten \ac{TS}, kein \ac{DPD}, keine \ac{MFA} möglich, nur schwacher \ac{DH} verfügbar, keine Installation von Routen für IPv6.\footcite{_windows7_2016} \\
-\end{tabular}
+\begin{tabular*}{20cm}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|p{6cm}|}\firsthline
+Name & Version & IKE & ESP & Funktionalität & Sonstiges \\ \hline 
+strongswan & 5.5.0 & v1, v2 & \ac{WFP} & MOBIKE, eap-tls, eap-ttls, eap-tnc, RSA-Authentifizierung (unvollständig) & Vollständige Informationen\footnote{\url{https://wiki.strongswan.org/projects/strongswan/wiki/Windows}} \\ \hline 
+Windows Agile VPN Client & foo & v1, v2 & Userspace & MOBIKE, ... & hat Probleme beim Installieren der Routen für den ausgehandelten \ac{TS}, kein \ac{DPD}, keine \ac{MFA} möglich, nur schwacher \ac{DH} verfügbar, keine Installation von Routen für IPv6.\footcite{_windows7_2016} \\ \hline 
+\end{tabular*}
 \label{tab:IPsec-Implementierungen}
 \end{table}
 \subsection{strongSwan}
@@ -62,10 +62,15 @@ der Pakete auf dem jeweiligen Betriebssystem implementiert (kernel-libipsec), f�
 \subparagraph{libipsec}
 \subparagraph{kernel-libipsec}
 %demultiplexing NON-ESP marker, SPI
+\subparagraph{libstrongswan}
+libstrongswan ist eine interne Bibliothek von strongSwan, die von den verschiedenen
+Versionen von charon geladen wird, um diverse Funktionalität zu erhalten, wie
+Linked-Lists, Hashtables, Arrays, sowie die Funktionen um TUN-Geräte zu erstellen und zu öffnen.
 % handle_plain
 % handle_esp
 % callbacks
 % synchronous
+% WaitForMultipleObjects
 % IoCompletionPort inkompatibel mit synchroner I/O -> kompletter Rewrite?
 % komplexe Änderungen des Verhaltens von kernel-libipsec
 
