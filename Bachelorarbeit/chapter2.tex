@@ -20,8 +20,26 @@ und nutzbare TUN- und TAP-Geräte bereit, mit denen gearbeitet werden kann.
 Für die Verarbeitung der Pakete wird die in ''strongSwan'' integrierte Bibliothek ''libipsec'',
 das Plugin ''kernel-libipsec'', sowie bestehende Funktionsheader aus ''libstrongswan''
 aus ''strongSwan'' genutzt.
+
+\subsection{Bestehende Implementierungen für Windows}
+
+%native
+%Agile Client
+%shrewsoft client
+%strongswan
+Diese Tabelle bezieht sich nur auf die Fähigkeiten, die auf Windows unterstützt sind.
+Diese Tabelle macht keine Aussage über die Unterstützung der Software auf anderen Platformen.
+\begin{table}[h]
+\caption{Vorhandene IPsec-Implementierungen auf Windows }
+\begin{tabular}{cccccc}
+Implementierung & Softwareversion & IKE-Versionen & ESP-Verarbeitung & Funktionalität & Sonstiges \\
+strongswan & 5.5.0 & IKEv1 und IKEv2 & Nein, nutzt den nativen Stack & MOBIKE, eap-tls, eap-ttls, eap-tnc, RSA-Authentifizierung (unvollständig) & Vollständige Informationen\footnote{\url{https://wiki.strongswan.org/projects/strongswan/wiki/Windows}} \\
+Windows Agile VPN Client & ? & IKEv1 und IKEv2 & Ja, im Userspace & MOBIKE, ... & hat Probleme beim Installieren der Routen für den ausgehandelten \ac{TS}, kein \ac{DPD}, keine \ac{MFA} möglich, nur schwacher \ac{DH} verfügbar, keine Installation von Routen für IPv6.\footcite{_windows7_2016} \\
+\end{tabular}
+\label{tab:IPsec-Implementierungen}
+\end{table}
 \subsection{strongSwan}
-''strongSwan'' implementiert einen beträchtlichen Teil der Funktionalität des ''IKEv2''-Standards\cite{charlie_kaufman_rfc_2005}.
+''strongSwan'' implementiert einen beträchtlichen Teil der Funktionalität des ''IKEv2''-Standards\footcite{charlie_kaufman_rfc_2014}.
 \subsubsection{charon}
 \subsubsection{Userspace processing}
 \paragraph{OpenVPN TAP-Treiber}
