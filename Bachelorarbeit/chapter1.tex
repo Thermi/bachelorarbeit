@@ -46,6 +46,7 @@ Die Firewallmarkierung kann ist 32 Bit lang und kann in der Firewall (iptables, 
 auf eigens gewählte Werte und mit eigens gewählten Regeln gesetzt werden.
 Linux erlaubt Anwendungen die Firewallmarkierung direkt im Netzwerksockel zu setzen.
 
+
 Windows implementiert kein \ac{PBR}.
 % PBR
 % FWMARK
@@ -61,6 +62,22 @@ die genutzt werden um die Daten zu schützen.
 
 \ac{IPsec} an sich lebt nur im Kernel, jedoch wird für die Aushandlung von Sitzungsschlüsseln,
 Algorithmen und dem Erneuern derselben eine Komponente im Userland benötigt.
+
+Im Userland existiert in der Regel ein Systemdienst (Daemon), der eine oder
+mehrere Versionen von \ac{IKE} spricht und so ermöglicht \ac{IPsec} \acp{SA}
+mit anderen Computern auszuhandeln um \ac{IP}-Pakete zu schützen.
+Es steht jedem Systemadministrator jedoch frei die \ac{IPsec} \acp{SA} und \acp{SP}
+manuell zu konfigurieren.\footcite[][18]{stephen_kent_rfc_2005}
+
+Der Daemon kommuniziert mit dem Kernel und übergibt ihm die ausgehandelten \ac{IPsec}
+\acp{SA} und \acp{SP}, die in der \ac{SAD} und \ac{SPD} verwaltet werden.
+
+Die Kommunikation zwischen den Diensten wird über Authentifizierungsverfahren wie \ac{PSK},
+Zertifikatsauthentifizierung, RSA- oder ECDSA-Schlüssel oder \ac{EAP} unter Benutzung 
+des Oakley-Protokols\footcite{hilarie_k._orman_rfc_1998} abgesichert, welches mithilfe des \ac{DH}-Schlüsselaustauschprotokolls
+geheime Schlüssel zwischen den Teilnehmern aushandelt.\footcite[][50]{charlie_kaufman_rfc_2014}\footcite[][8]{douglas_maughan_rfc_1998}
+
+
 
 %Kernelspace
 %ISAKMP/IKEv1
