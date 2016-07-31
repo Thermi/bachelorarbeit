@@ -31,7 +31,7 @@ Diese Tabelle bezieht sich nur auf die Fähigkeiten, die auf Windows unterstütz
 Diese Tabelle macht keine Aussage über die Unterstützung der Software auf anderen Platformen.
 \begin{table}[h]
 \caption{Vorhandene IPsec-Implementierungen auf Windows }
-\begin{tabular*}{20cm}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|p{6cm}|}\firsthline
+\begin{tabular*}{\textwidth}{|p{2cm}|p{1cm}|p{1cm}|p{2cm}|p{2cm}|p{4cm}|p{4cm}|}\firsthline
 Name & Version & IKE & ESP & Funktionalität & Sonstiges \\ \hline 
 strongswan & 5.5.0 & v1, v2 & \ac{WFP} & MOBIKE, eap-tls, eap-ttls, eap-tnc, RSA-Authentifizierung (unvollständig) & Vollständige Informationen\footnote{\url{https://wiki.strongswan.org/projects/strongswan/wiki/Windows}} \\ \hline 
 Windows Agile VPN Client & foo & v1, v2 & Userspace & MOBIKE, ... & hat Probleme beim Installieren der Routen für den ausgehandelten \ac{TS}, kein \ac{DPD}, keine \ac{MFA} möglich, nur schwacher \ac{DH} verfügbar, keine Installation von Routen für IPv6.\footcite{_windows7_2016} \\ \hline 
