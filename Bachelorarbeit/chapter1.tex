@@ -34,6 +34,9 @@ des sogenannten ''Routing Table'' nachgeschlagen, wohin ein Paket weitergeleitet
 werden muss, um den Empfänger zu erreichen.
 Hierbei wird nach dem längsten passenden Präfix im Routing Table gesucht, um die
 korrekte Route zu finden.
+Der \ac{TTL}-Wert des Pakets wird überprüft und dekrementiert. Wenn er 0 erreicht,
+wird das Paket verworfen und eine \ac{ICMP}-Fehlermeldung an den Absender verschickt.
+
 
 \subsubsection{Policy Based Routing}
 Policy Based Routing ist eine Sonderform des Routings. Hierbei wird nicht die Zieladresse
@@ -48,9 +51,6 @@ Linux erlaubt Anwendungen die Firewallmarkierung direkt im Netzwerksockel zu set
 
 
 Windows implementiert kein \ac{PBR}.
-% PBR
-% FWMARK
-% Linux socket mark
 
 %TODO: Grafik mit Routing einfügen
 \subsection{IPsec}
