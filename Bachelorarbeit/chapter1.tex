@@ -59,6 +59,8 @@ Windows implementiert kein \ac{PBR}.
 Es stellt Vertraulichkeit, Authentizität und Schutz vor Replay-Attacken bereit.
 Die Implementierung der Schutzmechanismen beruht auf sogenannten \acp{SA} und \ac{SP},
 die genutzt werden um die Daten zu schützen.
+Die Kombination aus zugehörigen \acp{SA} und \acp{SP} wird allgemein als CHILD\_SA
+bezeichnet.
 
 \ac{IPsec} an sich lebt nur im Kernel, jedoch wird für die Aushandlung von Sitzungsschlüsseln,
 Algorithmen und dem Erneuern derselben eine Komponente im Userland benötigt.
@@ -77,17 +79,50 @@ Zertifikatsauthentifizierung, RSA- oder ECDSA-Schlüssel oder \ac{EAP} unter Ben
 des Oakley-Protokols\footcite{hilarie_k._orman_rfc_1998} abgesichert, welches mithilfe des \ac{DH}-Schlüsselaustauschprotokolls
 geheime Schlüssel zwischen den Teilnehmern aushandelt.\footcite[][50]{charlie_kaufman_rfc_2014}\footcite[][8]{douglas_maughan_rfc_1998}
 
+\paragraph{IKE\_SA}
+Eine IKE\_SA bezeichnet eine Verbindung, die zwei Teilnehmer mittels IKE ausgehandelt haben.
+Eine IKE\_SA wird durch die \ac{IP}-Adressen, sowie durch \acp{SPI} identifiziert.
+Beiden Teilnehmern ist ein mittels \ac{IKE\ ausgehandeltes geteiltes Geheimnis bekannt,
+welches genutzt wird um Nachrichten zwischen den Teilnehmern zu verschlüsseln und zu authentisieren.
 
+IKE\_SAs haben zu CHILD\_SAs eine 1:N-Beziehung. Eine einzelne IKE\_SA kann keine, eine
+oder mehrere CHILD\_SAs verwalten.
 
-%Kernelspace
-%ISAKMP/IKEv1
-%Agressive Mode
-%Main mode
-%PSK-Problem
-%IKEv2
-%AH
-%ESP
-%NAT-T
+\paragraph{CHILD\_SA}
+Eine CHILD\_SA ist die Sammlung aller zugehörigen \ac{IPsec} \acp{SA} und \acp{SP},
+die zu einem Tunnel gehören. Wenn der Tunnel mit Komprimierung ausgehandelt wurde,
+so gehören die Komprimierungs-\acp{SA}, die dabei erstellt werden, auch dazu\footcite[][7]{abraham_shacham_rfc_2001}\footcite[][61]{charlie_kaufman_rfc_2014}.
+
+Das Aushandeln einer CHILD\_SA wird unter IKEv1 im sogenannten Quick Mode durchgeführt, der dem Agressive Mode
+oder Main Mode folgt.
+Eine CHILD\_SA wird als ganzes verwaltet. Wenn eine einzelne \ac{SA} gelöscht wird, so wird
+auch die dazugehörige \ac{SA} in der Gegenrichtung nd die \acp{SP} gelöscht.
+Um die kryptografischen Schlüssel von CHILD\_SAs zu erneuern muss sie komplett neu ausgehandelt werden.
+In verschiedenen Implementierungen wird das Rekeyen von CHILD\_SAs mit IKEv1 unterschiedlich gehandhabt.
+Für IKEv2 ist das Verhalten standardisiert\footcite[][16]{charlie_kaufman_rfc_2014}.
+\paragraph{PFS}
+\ac{PFS} disjunkt die Schlüssel für die CHILD\_SAs von den Schlüsseln
+für die \ac{IPsec}-\acp{SA}, indem beim Aushandeln einer CHILD\_SA ein weiterer
+\ac{DH}-Schlüsselaustausch stattfindet\footcite[13]{charlie_kaufman_rfc_2014}.
+Ohne \ac{PFS} werden die Schlüssel für die CHILD\_SAs vom Schlüssel der
+
+\paragraph{Rekeying und Reauthentication}
+Beide IKE-Versionen unterstützen das Reauthentifizieren von IKE SAs und das Rekeyen
+von CHILD\_SAs\footcite[][616]{charlie_kaufman_rfc_2014}.
+
+\subsubsection{IKE}
+\paragraph{IKEv1/ISAKMP}
+IKEv1 wird oft als equivalent zu \ac{ISAKMP} verwendet, wobei es auch keinen für diese Arbeit bedeutsamen
+Unterschied gibt. Daher werden die Begriffe hier auch equivalent genutzt.
+IKEv1 ist die erste, älteste Version des \ac{IKE}-Protokolls, welches zum Aushandeln
+von CHILD\_SAs genutzt wird.
+\paragraph{IKEv2}
+IKEv2 ist die logische Weiterentwicklung von IKEv1 und beinhaltet Verbesserungen
+im Bezug auf den Verbindungsaufbau, Robustheit, Sicherheit und Flexibilität\footcite[136, 137]{charlie_kaufman_rfc_2014}.
+Mit der neuen Version wurde XAUTH durch \ac{EAP} ersetzt, was die Delegation der
+Authentifizierung zu einem oder mehreren RADIUS-Servern ermöglicht und weitere Authentifizierungsmodi ermöglicht.
+Des weiteren wurde der unsichere ''Agressive Mode entfern'' und der Standard klarer formuliert.
+
 \subsubsection{Route Based}
 Route based heißt, dass Pakete, die über das VPN
 gesendet werden sollen, in eine virtuelle Netzwerkschnittstelle geroutet werden.
