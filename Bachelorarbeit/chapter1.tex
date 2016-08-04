@@ -82,7 +82,7 @@ geheime Schlüssel zwischen den Teilnehmern aushandelt.\footcite[][50]{charlie_k
 \paragraph{IKE\_SA}
 Eine IKE\_SA bezeichnet eine Verbindung, die zwei Teilnehmer mittels IKE ausgehandelt haben.
 Eine IKE\_SA wird durch die \ac{IP}-Adressen, sowie durch \acp{SPI} identifiziert.
-Beiden Teilnehmern ist ein mittels \ac{IKE\ ausgehandeltes geteiltes Geheimnis bekannt,
+Beiden Teilnehmern ist ein mittels \ac{IKE} ausgehandeltes geteiltes Geheimnis bekannt,
 welches genutzt wird um Nachrichten zwischen den Teilnehmern zu verschlüsseln und zu authentisieren.
 
 IKE\_SAs haben zu CHILD\_SAs eine 1:N-Beziehung. Eine einzelne IKE\_SA kann keine, eine
@@ -109,7 +109,9 @@ Ohne \ac{PFS} werden die Schlüssel für die CHILD\_SAs vom Schlüssel der
 \paragraph{Rekeying und Reauthentication}
 Beide IKE-Versionen unterstützen das Reauthentifizieren von IKE SAs und das Rekeyen
 von CHILD\_SAs\footcite[][616]{charlie_kaufman_rfc_2014}.
-
+Der Zweck Reauthentifizierung einer IKE\_SA ist zu überprüfen, ob die Authentifizierungsinformation
+eines Teilnehmers noch gültig ist, zum Beispiel ob ein Zertifikat ausgelafen ist oder gesperrt
+wurde über eine \ac{CRL} oder mittels \ac{OCSP}.
 \subsubsection{IKE}
 \paragraph{IKEv1/ISAKMP}
 IKEv1 wird oft als equivalent zu \ac{ISAKMP} verwendet, wobei es auch keinen für diese Arbeit bedeutsamen
@@ -141,9 +143,13 @@ Eine solche Implementierung ermöglicht es, \ac{IPsec} zur Absicherung von sehr 
 Verkehr zu nutzen, wie zum Beispiel nur \ac{ICMP}-Pakete mit Typ 0, Code 0 (Echo Reply), sowie Typ 8 und Code 0 (Echo Request).
 Policy based \ac{IPsec} ermöglicht es \ac{IPsec} direkt in den Stack zu integrieren, ohne notwendigerweise die Routen zu verändern.
 \subsubsection{IPsec unter Linux}
-Unter Linux gibt es zwei verschiedene \ac{IPsec}-Stacks. 
-PF\_KEYv2 (KLIPS) rfc2367
-XFRM
+Unter Linux gibt es zwei verschiedene \ac{IPsec}-Stacks.
+Es existiert einerseits der KLIPS-Stack, der konform zu RFC 2367\footcite[][]{daniel_l._mcdonald_rfc_1998} ist
+und auf Route based IPsec basiert. strongSwan unterstützt diesen Stack.
+
+Des weiteren gibt es den XFRM-Stack, welcher auf Policy based IPsec basiert, jedoch mithilfe eines \ac{VTI}
+auch für Route based IPsec genutzt werden kann. Auch dieser wird von strongSwan unterstützt.
+
 \subsubsection{IPsec unter Windows}
 Firewall
 Agile VPN
