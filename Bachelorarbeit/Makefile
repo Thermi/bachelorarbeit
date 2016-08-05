@@ -9,10 +9,10 @@ build:
 	rm -f bachelorarbeit.bcf
 	rm -f bachelorarbeit.blg
 	rm -f bachelorarbeit.bbl
-	pdflatex bachelorarbeit.tex
+	pdflatex -8bit bachelorarbeit.tex
 	biber bachelorarbeit
-	pdflatex bachelorarbeit.tex
-	pdflatex bachelorarbeit.tex
+	pdflatex -8bit bachelorarbeit.tex
+	pdflatex -8bit bachelorarbeit.tex
 	
 clean:
 	rm -f bachelorarbeit.aux
