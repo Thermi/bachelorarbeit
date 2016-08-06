@@ -12,14 +12,14 @@
 % You should have received a copy of the GNU General Public License
 % along with Foobar. If not, see <http://www.gnu.org/licenses/>.
 \section{Basis}
-Als Basis der Arbeit wurde der quelloffene VPN-Dienst ''strongSwan'' gewählt,
+Als Basis der Arbeit wurde der quelloffene VPN-Dienst strongSwan gewählt,
 welcher von der Hochschule für Technik Rapperswill entwickelt wird.
 Um die Pakete vom Kernelspace in Empfang nehmen zu können, wird der quelloffene
 TAP-Gerätetreiber von OpenVPN Technologies, Inc. genutzt. Dieser stellt funktionierende
 und nutzbare TUN- und TAP-Geräte bereit, mit denen gearbeitet werden kann.
-Für die Verarbeitung der Pakete wird die in ''strongSwan'' integrierte Bibliothek ''libipsec'',
-das Plugin ''kernel-libipsec'', sowie bestehende Funktionsheader aus ''libstrongswan''
-aus ''strongSwan'' genutzt.
+Für die Verarbeitung der Pakete wird die in strongSwan integrierte Bibliothek libipsec,
+das Plugin kernel-libipsec, sowie bestehende Teile von libstrongswan
+aus strongSwan genutzt.
 
 \subsection{Bestehende Implementierungen für Windows}
 
@@ -28,20 +28,34 @@ aus ''strongSwan'' genutzt.
 %shrewsoft client
 %strongswan
 Diese Tabelle bezieht sich nur auf die Fähigkeiten, die auf Windows unterstützt sind.
-Diese Tabelle macht keine Aussage über die Unterstützung der Software auf anderen Platformen.
+Sie macht keine Aussage über die Unterstützung der Software auf anderen Platformen
+und ich beanspruche nicht, dass sie Vollständig ist.
 \begin{table}[h]
 \caption{Vorhandene IPsec-Implementierungen auf Windows }
 \begin{tabular*}{\textwidth}{|p{2cm}|p{1cm}|p{1cm}|p{2cm}|p{2cm}|p{4cm}|p{4cm}|}\firsthline
 Name & Version & IKE & ESP & Funktionalität & Sonstiges \\ \hline 
 strongswan & 5.5.0 & v1, v2 & \ac{WFP} & MOBIKE, eap-tls, eap-ttls, eap-tnc, RSA-Authentifizierung (unvollständig) & Vollständige Informationen\footnote{\url{https://wiki.strongswan.org/projects/strongswan/wiki/Windows}} \\ \hline 
 Windows Agile VPN Client & foo & v1, v2 & Userspace & MOBIKE, ... & hat Probleme beim Installieren der Routen für den ausgehandelten \ac{TS}, kein \ac{DPD}, keine \ac{MFA} möglich, nur schwacher \ac{DH} verfügbar, keine Installation von Routen für IPv6.\footcite{_windows7_2016} \\ \hline 
+Shrewsoft Client & foo & v1 & Userspace & XAUTH, ... & & \\ \hline
 \end{tabular*}
 \label{tab:IPsec-Implementierungen}
 \end{table}
 \subsection{strongSwan}
-''strongSwan'' implementiert einen beträchtlichen Teil der Funktionalität des ''IKEv2''-Standards\footcite{charlie_kaufman_rfc_2014}.
+strongSwan implementiert einen beträchtlichen Teil der Funktionalität der \acp{RFC} für IKEv2\footcite{_ipsecstandards_2016}.
+Die Software ist multithreaded und in Objektorientiertem C geschrieben.
+Die Grundlage wurde von Martin Willi und Jan Hutter in ihrer Diplomarbeit im Jahr 2005 gelegt\footcite[][]{jan_hutter_strongswan_2005}.
 \subsubsection{charon}
+Charon ist der Daemon, der in der Diplomarbeit\footcite[][]{jan_hutter_strongswan_2005} entwickelt wurde.
+Er arbeitet parallel und wurde in objektorientiertem C geschrieben, so wie die Software Xine.
+Intern werden verschiedene Bibliotheken genutzt, angefangen von libstrongswan bis zu libcharon.
+Es existieren verschiedene Versionen von charon für verschiedene Zwecke, zum Beispiel
+charon-svc. charon-svc ist eine Version von charon, die als Dienst auf Windows genutzt werden kann.
+% Mehr Informationen?
 \subsubsection{Userspace processing}
+Userspace processing wurde in charon von Guiliano Grassi und Ralf Sager für Android implementiert,
+um die Entwicklung der strongSwan-App für Android zu ermöglichen. Auf Android ist kernelspace processing
+von \ac{IPsec}-Paketen nicht möglich, da die Privilegien der Anwendung das nicht erlauben.
+
 \paragraph{OpenVPN TAP-Treiber}
 % 255.255.255.255 Netzmaske (Prefix-Länge 32 Bit)
 % Route über VPN-Adapter zu entferntem Netzwerk
@@ -66,6 +80,12 @@ der Pakete auf dem jeweiligen Betriebssystem implementiert (kernel-libipsec), f�
 libstrongswan ist eine interne Bibliothek von strongSwan, die von den verschiedenen
 Versionen von charon geladen wird, um diverse Funktionalität zu erhalten, wie
 Linked-Lists, Hashtables, Arrays, sowie die Funktionen um TUN-Geräte zu erstellen und zu öffnen.
+
+Der Code für das lesen und schreiben von Paketen existiert bereits für Linux, Mac OSX
+und FreeBSD.
+Die Operationen basieren dabei auf File Descriptors, welche mit poll() multiplext nach
+Daten abgefragt werden.
+
 % handle_plain
 % handle_esp
 % callbacks
