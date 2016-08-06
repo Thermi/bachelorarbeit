@@ -35,16 +35,25 @@ und bei der Erstellung des Adapters initialisiert wird. Die MAC-Adresse kann auc
 Der TAP-Treiber beherrscht drei verschiedene Betriebsmodi für verschiedene Zwecke.
 Laut dem Quellcode des Treibers ist der Point-To-Point-Modus veraltet.
 \begin{description}
-\item [TUN-Modus] 
-\item [TAP-Modus]
+\item [TUN-Modus] Im TUN-Modus schneidet der Treiber den Ethernet-Rahmen um das IP-Paket ab
+und reicht das Paket über das Handle an die Software weiter. Pakete, die an den Treiber gegeben werden, werden um einen Ethernet-Rahmen
+ergänzt, bei dem die Zieladresse die MAC-Adresse des virtuellen Adapters ist und die Quelladresse die MAC-Adresse des virtuellen Routers.
+% remote subnet, local subnet, local IP
+\item [TAP-Modus] Im TAP-Modus kopiert der Treiber jeden Ethernet-Paket zwischen Anwendung und Gerät.
+% remote subnet, local subnet, local IP
 \item [Point-To-Point-Modus]
 \end{description}
 \paragraph{Patch}
 Der entwickelte Patch deaktiviert die Überprüfung der Quell-IP der ARP-Requests, die
 vom Treiber verarbeitet werden. Wenn die Überprüfung erfolgreich war, so wird der ARP-Request
-beantwortet und dem Kernel wird damit mitgeteilt, wie die MAC-Adresse des virtuelen Gateways lautet.
+beantwortet und dem Kernel wird damit mitgeteilt, wie die MAC-Adresse des virtuellen Routers lautet.
 
-\subsection{Maßnahmen von Buffer Bloat}
+Für die Implementierung der Routen wurde die Nutzung eines virtuellen Routers gewählt,
+da das Routen aller \ac{IP}-Adressen über das Gerät die \ac{ARP}-Tabelle des Clients
+mehr gefüllt hätte und eine \ac{ARP}-Adressabfrage bei jeder Kommunikation mit einer neuen
+\ac{IP}-Adresse zu Folge hätte.
+
+\subsection{Maßnahmen gegen Buffer Bloat}
 libipsec speichert die empfangenen Pakete vor- und nach der Verarbeitung in einer Wartschleife (Queue).
 Nach der Verarbeitung werden die Pakete nochmals gepuffert, bevor sie an das TUN-Gerät oder den Sockel
 weitergegeben werden. Wenn die Pakete langsamer verarbeitet oder verschickt werden als sie eintreffen,
