@@ -109,9 +109,14 @@ Ohne \ac{PFS} werden die Schlüssel für die CHILD\_SAs vom Schlüssel der
 \paragraph{Rekeying und Reauthentication}
 Beide IKE-Versionen unterstützen das Reauthentifizieren von IKE SAs und das Rekeyen
 von CHILD\_SAs\footcite[][616]{charlie_kaufman_rfc_2014}.
-Der Zweck Reauthentifizierung einer IKE\_SA ist zu überprüfen, ob die Authentifizierungsinformation
+Der Zweck der Reauthentifizierung einer IKE\_SA ist zu überprüfen, ob die Authentifizierungsinformation
 eines Teilnehmers noch gültig ist, zum Beispiel ob ein Zertifikat ausgelafen ist oder gesperrt
 wurde über eine \ac{CRL} oder mittels \ac{OCSP}.
+Der Zweck von Rekeying ist die kryptografischen Schlüssel in gewissen Abständen zu wechseln,
+zum Beispiel alle 6 Stunden, oder wenn 4 GB übertragen wurden oder wenn eine gewisse Anzahl
+Pakete übertragen wurde. Dies wird getan, damit die Menge an Daten, die bei einer Kompromitierung
+eines Schlüssels offengelegt wird, begrenzt ist.
+
 \subsubsection{IKE}
 \paragraph{IKEv1/ISAKMP}
 IKEv1 wird oft als equivalent zu \ac{ISAKMP} verwendet, wobei es auch keinen für diese Arbeit bedeutsamen
