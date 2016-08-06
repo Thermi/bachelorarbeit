@@ -149,11 +149,13 @@ Verkehr zu nutzen, wie zum Beispiel nur \ac{ICMP}-Pakete mit Typ 0, Code 0 (Echo
 Policy based \ac{IPsec} ermöglicht es \ac{IPsec} direkt in den Stack zu integrieren, ohne notwendigerweise die Routen zu verändern.
 \subsubsection{IPsec unter Linux}
 Unter Linux gibt es zwei verschiedene \ac{IPsec}-Stacks.
-Es existiert einerseits der KLIPS-Stack, der konform zu RFC 2367\footcite[][]{daniel_l._mcdonald_rfc_1998} ist
-und auf Route based IPsec basiert. strongSwan unterstützt diesen Stack.
+Es existiert einerseits der KLIPS-Stack, der vom FreeS/WAN-Projekt entwickelt wurde
+und auf Route based IPsec basiert.
 
 Des weiteren gibt es den XFRM-Stack, welcher auf Policy based IPsec basiert, jedoch mithilfe eines \ac{VTI}
-auch für Route based IPsec genutzt werden kann. Auch dieser wird von strongSwan unterstützt.
+auch für Route based IPsec genutzt werden kann.
+
+Beide Stacks sind konform zu RFC 2367\footcite[][]{daniel_l._mcdonald_rfc_1998}.
 
 \subsubsection{IPsec unter Windows}
 Firewall
