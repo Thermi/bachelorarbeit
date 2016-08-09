@@ -12,10 +12,92 @@
 % You should have received a copy of the GNU General Public License
 % along with Foobar. If not, see <http://www.gnu.org/licenses/>.
 \section{Portierung von libipsec auf Windows}
-\subsection{bestehende Implementierung}
+Die Portierung von libipsec auf Windows, sodass sie dort lauffähig ist, ist das Ziel
+der Bachelorarbeit. Die zu portierenden Teile des Programmcodes betreffen nur
+die Codesegmente, die Plattformspezifische \acp{API} oder \acp{ABI} verwenden,
+also primär alles um Dateiein- und ausgabe, sowie das verwalten von TUN-Geräten.
+Unter Unix und Linux werden hier \acp{FD} verwendet. Unter Windows werden stattdessen
+Handles genutzt, welche einen anderen Dateityp darstellen. Des weiteren unterscheidet
+sich die Methode zum Multiplexen von Lese-Aufrufen einer Liste von Dateien stark.
+Unter Unix und Linux wird hierfür poll() genutzt, unter Windows geschieht das jedoch
+Event-basiert mit WaitForMultipleObjects().
+Explizite Beispiele hierfür sind im Abschnitt über die Portierung von libipsec sichtbar.
+Bei der Portierung wurde für das verwalten von Speicherabschnitten 
+primär alloca() genutzt, statt malloc() und seine Unterarten. Der Unterschied hierbei ist die
+Speicherdauer. Mit alloca() allokierter Speicher ist nur bis zum Verlassen der Funktion gültig
+und wird automatisch freigegeben. Mit malloc() allokierter Speicher muss manuell freigegeben werden.
+
+\subsection{Bestehende Implementierung}
+Die bestehende Implementierung umfasst die eigentliche Bibliothek, eine Implementierung
+eines Kernel-Interface zwischen libipsec und charon, sowie Code in libstrongswan
+um TUN-Geräte zu öffnen.
+\subsubsection{libipsec}
+libipsec implementiert die Verarbeitung von Paketen, das Erzwingen der \acp{SP},
+das Verwalten der \acp{SP}, \acp{SA}, Routen und der TUN-Geräte.
+Die hierbei relevanten Dateien sind unter /src/libipsec/ zu finden.
+
+% route installation
+% queues
+% processing
+% event driven
+% job
+\subsubsection{kernel-libipsec}
+Die hier zu portierenden Bestandteile waren ausschließlich Codeteile, die
+sich mit der Dateiein- und ausgabe beschäftigten.
+
+Die primäre Aufgabe hier war die Installation der Routen in ''kernel\_libipsec\_ipsec.c''
+für Windows anzupassen, da hier ein Gateway verwendet wird auf einem TAP-Gerät
+statt ein echtes TUN-Gerät, sowie die Anpassung des Codes für die Ein- und Ausgabe 
+und einige Methoden in
+''kernel\_libipsec\_router.c'', da das Multiplexen der Handles, sowie die Benachrichtigung
+von anderen Threads auf Windows anders abläuft als auf Linux und Unix.
+
+Für das Multiplexen der Eingabe stehen unter Windows zwei Verfahren zur Verfügung:
+\begin{itemize}
+\item WaitForMultipleObjects
+\item IOCompletionPorts
+\end{itemize}
+
+WaitForMultipleObjects funktioniert mit einem Array aus Handles. In der Struktur des Handles
+ist das event-Attribut auf ein einzgartiges Event gesetzt, welches genutzt wird um
+das Handle zu finden, dessen Lesevorgang abgeschlossen oder abgebrochen wurde.
+% Mehr Erläuterung benötigt
+
+IOCompletionPorts funktionieren, indem man einen IOCompletionPort mit CreateIoCompletionPort()
+anlegt und Handles mit ihm asoziiert. Bei der Asoziierung wird ein einzigartiger Schlüssel
+übergeben, der bei der Signalisierung wieder zurückgegeben wird um das Handle identifizieren zu können.
+Der CompletionPort kann erst nach dem Schließen der asoziierten Handles geschlossen werden.
+% Mehr Erläuterung benötigt
+
+Da es relativ einfach ist WaitForMultipleObjects() zu nutzen, habe ich diese Methode
+für die Implementierung von handle\_plain() genutzt.
+
+
+
+% libipsec router
+% handle_plain
+% notification event
+% job
+% handle_plain
+% handle_esp
+% up
+% destroy
+%kernel_libipsec_ipsec route installation
+\subsubsection{libstrongswan}
+Hier galt es das Öffnen, Konfigurieren und Schließen von TUN-Geräten
+mit dem TAP-Treiber zu implementieren.
+% Bezugsquelle für den Treiber
+% callbacks
+% synchronous
+% WaitForMultipleObjects
+% IoCompletionPort inkompatibel mit synchroner I/O -> kompletter Rewrite?
+% komplexe Änderungen des Verhaltens von kernel-libipsec
+
+\subsubsection{kernel-iph}
+% address installation
+% route installation
 \subsection{Portierung}
 \subsubsection{Überlegungen zur Portierung}
-\subsubsection{}
 \subsection{Unterstützte Kryptographie}
 \subsection{Tun-Treiber}
 % openvpn
@@ -61,6 +143,3 @@ dann wächst der Puffer, bis der Anwendung (oder dem Computer) der Speicher ausg
 Um das zu verhindern hat Martin Willi eine Controlled-Delay-Queue implementiert und im Git-Zweig libipsec-queue\footnote{\url{https://git.strongswan.org/?p=strongswan.git;a=shortlog;h=refs/heads/libipsec-queue}} eine komplette Implementierung der Queue in libipsec abgelegt.
 Die Queue verwirft Pakete wenn die Verzögerung zwischen der Ankunft und der Verarbeitung
 des letzten Pakets zu groß ist.
-%\section{GUI}
-%\subsection{Paradigmen}
-%\subsection{Tunnelkonfiguration}
