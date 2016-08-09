@@ -70,11 +70,8 @@ in der Regel auf Systemen genutzt, die keine (funktionierenden) IPsec-Implementi
 enthalten.
 
 libipsec besteht aus zwei Komponenten: Einerseits die Bibliothek, die die SAD und die SPD
-implementiert, sowie die Verarbeitung (libipsec) und ein Plugin, welches das Empfangen und das Senden
-der Pakete auf dem jeweiligen Betriebssystem implementiert (kernel-libipsec), für das strongSwan kompiliert wurde.
-
-\subparagraph{libipsec}
-\subparagraph{kernel-libipsec}
+implementiert, sowie die Verarbeitung (libipsec) und ein Plugin, welches ein Kernel-Interface
+für das Verwalten der \ac{SAD} und \ac{SPD} emuliert (kernel-libipsec).
 %demultiplexing NON-ESP marker, SPI
 \subparagraph{libstrongswan}
 libstrongswan ist eine interne Bibliothek von strongSwan, die von den verschiedenen
@@ -85,14 +82,6 @@ Der Code für das lesen und schreiben von Paketen existiert bereits für Linux, 
 und FreeBSD.
 Die Operationen basieren dabei auf File Descriptors, welche mit poll() multiplext nach
 Daten abgefragt werden.
-
-% handle_plain
-% handle_esp
-% callbacks
-% synchronous
-% WaitForMultipleObjects
-% IoCompletionPort inkompatibel mit synchroner I/O -> kompletter Rewrite?
-% komplexe Änderungen des Verhaltens von kernel-libipsec
 
 \subsubsection{Kernelspace processing}
 
