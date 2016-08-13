@@ -35,6 +35,64 @@
 \usepackage[top=1in, bottom=1.25in, left=1.25in, right=1.25in]{geometry}
 \usepackage{rotating}
 
+% for crossing out cells. :(
+% from https://tex.stackexchange.com/questions/156162/strike-out-a-table-cell
+\pagestyle{empty}% for cropping
+\usepackage{colortbl}
+\usepackage{pgf}
+\usepackage{zref-savepos}
+
+\newcounter{NoTableEntry}
+\renewcommand*{\theNoTableEntry}{NTE-\the\value{NoTableEntry}}
+
+\newcommand*{\notableentry}{%
+  \multicolumn{1}{@{}c@{}|}{%
+    \stepcounter{NoTableEntry}%
+    \vadjust pre{\zsavepos{\theNoTableEntry t}}% top
+    \vadjust{\zsavepos{\theNoTableEntry b}}% bottom
+    \zsavepos{\theNoTableEntry l}% left
+    %
+    \begin{pgfpicture}%
+      \pgfsetlinewidth{.4pt}%
+      \pgfsetstrokecolor{red}%
+      \edef\llx{0sp}%
+      \edef\urx{%
+        \the\numexpr
+          \zposx{\theNoTableEntry r}%
+          -\zposx{\theNoTableEntry l}%
+        \relax sp%
+      }%
+      \edef\lly{%
+        \the\numexpr
+          \zposy{\theNoTableEntry b}%
+          -\zposy{\theNoTableEntry l}%
+        \relax sp%
+      }%
+      \edef\ury{%
+        \the\numexpr
+          \zposy{\theNoTableEntry t}%
+          -\zposy{\theNoTableEntry l}%
+        \relax sp%
+      }%
+      \pgfpathmoveto{\pgfpoint{\llx}{\lly}}%
+      \pgfpathlineto{\pgfpoint{\urx}{\ury}}%
+      \pgfpathmoveto{\pgfpoint{\llx}{\ury}}%
+      \pgfpathlineto{\pgfpoint{\urx}{\lly}}%
+      \pgfusepath{stroke}%
+      \pgfresetboundingbox
+    \end{pgfpicture}%
+    %
+    \hspace{0pt plus 1filll}%
+    \zsavepos{\theNoTableEntry r}% right
+  }%
+}
+
+% End of the stuff for crossing out tables
+
+% Stuff for hvaing a diagonal line 
+% can be gotten here: https://ctan.org/tex-archive/macros/latex/contrib/slashbox
+\usepackage{slashbox}
+
 \lstset{language=C,frame=single,numbers=left,numbersep=5pt,basicstyle=\footnotesize}
 
 % see makefile for compiling
