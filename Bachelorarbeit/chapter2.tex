@@ -27,17 +27,40 @@ aus strongSwan genutzt.
 %Agile Client
 %shrewsoft client
 %strongswan
-Diese Tabelle bezieht sich nur auf die Fähigkeiten, die auf Windows unterstützt sind.
+Diese Tabelle bezieht sich nur auf die Fähigkeiten, die ab Windows 7 unterstützt sind.
 Sie macht keine Aussage über die Unterstützung der Software auf anderen Platformen
-und ich beanspruche nicht, dass sie Vollständig ist.
+und ich beanspruche nicht, dass sie vollständig ist.
 \begin{table}[h]
 \caption{Vorhandene IPsec-Implementierungen auf Windows }
+\resizebox{\textwidth}{!}{%
 \begin{tabular*}{\textwidth}{|p{2cm}|p{1cm}|p{1cm}|p{2cm}|p{2cm}|p{4cm}|p{4cm}|}\firsthline
 Name & Version & IKE & ESP & Funktionalität & Sonstiges \\ \hline 
-strongswan & 5.5.0 & v1, v2 & \ac{WFP} & MOBIKE, eap-tls, eap-ttls, eap-tnc, RSA-Authentifizierung (unvollständig) & Vollständige Informationen\footnote{\url{https://wiki.strongswan.org/projects/strongswan/wiki/Windows}} \\ \hline 
-Windows Agile VPN Client & foo & v1, v2 & Userspace & MOBIKE, ... & hat Probleme beim Installieren der Routen für den ausgehandelten \ac{TS}, kein \ac{DPD}, keine \ac{MFA} möglich, nur schwacher \ac{DH} verfügbar, keine Installation von Routen für IPv6.\footcite{_windows7_2016} \\ \hline 
-Shrewsoft Client & foo & v1 & Userspace & XAUTH, ... & & \\ \hline
+strongswan & 5.5.0 & v1, v2 & \ac{WFP} & MOBIKE, eap-tls, eap-ttls, eap-tnc, 
+RSA-Authentifizierung, IKE-Fragmentierung (IKEv1 und IKEv2), AES-CBC, AES-GCM, 
+AES-GMAC, AES-CCM, SHA-1, SHA-2, MODP-1024 bis 8192, ECP-192 bis 521, 
+ECP-224-BP bis 512-BP (Brainpool-Kurven), NTRU-112 bis 256, NEWHOPE, ... 
+Vollständige Informationen\footcite[][]{_ikev1ciphersuites_????}\footcite[][]{_ikev2ciphersuites_????}(unvollständig) & 
+Vollständige Informationen\footcite[][]{_windows_????} \\ \hline 
+
+Windows Agile VPN Client & foo & v1, v2 & Userspace & MOBIKE, IKEv1-Fragmentierung, ... & hat Probleme
+beim Installieren der Routen für den ausgehandelten \ac{TS}, kein \ac{DPD}, keine 
+\ac{MFA} möglich, nur schwacher \ac{DH} verfügbar, keine Installation von Routen 
+für IPv6.\footcite{_windows7_2016} \\ \hline 
+Shrewsoft Client & 2.2.2 & v1 & Userspace & \ac{NAT-T}, NAT keepalive, IKE-Fragmentierung,
+RSA-Authentifizierung in allen Varianten, Main-Mode, Aggressive-Mode, Configuration-Mode, Quic-Mode,
+AES, Blowfish, 3Des, CAST, DES, MD5, SHA-1, PFS, Tunnel mode,
+XAUTH, \footcite[][]{_shrew_????}& Vollständige Informationen\footcite[][]{_shrew_????}\\ \hline
+
+NCP client & 10.10.03 r30578 & v1, v2& Userspace & & \\ \hline
+bintec\footcite[][]{} & 3.10 &v1, v2 & Userspace & PSK-Authentifizierung, Authentifizierung 
+mit X509-Zertifikaten, \ac{IPsec} über \ac{TCP}, Priorisierung von 
+\ac{VOIP}-Verkehr, \ac{DPD}, \ac{NAT-T}, Config-Modus, \ac{XAUTH}, 
+\ac{GUI}, \ac{IPv6}, FIPS 140-2 zertifiziert, AES, 3DES, Blowfish,
+RSA, MD5, SHA-1, SHA, PFS, Proprietär, Komerziell, Integrierte Firewall, 
+Unterstützt Windows XP und neuer, XAUTH unterstützt scheinbar \ac{MFA}, PKCS\#11\footcite[][]{_bintec_????}\\ 
+\hline
 \end{tabular*}
+}
 \label{tab:IPsec-Implementierungen}
 \end{table}
 \subsection{strongSwan}
@@ -56,13 +79,49 @@ Userspace processing wurde in charon von Guiliano Grassi und Ralf Sager für And
 um die Entwicklung der strongSwan-App für Android zu ermöglichen. Auf Android ist kernelspace processing
 von \ac{IPsec}-Paketen nicht möglich, da die Privilegien der Anwendung das nicht erlauben.
 
-\paragraph{OpenVPN TAP-Treiber}
-% 255.255.255.255 Netzmaske (Prefix-Länge 32 Bit)
-% Route über VPN-Adapter zu entferntem Netzwerk
-% Fake ARP
-% GW
-% Ethernet irr. vom eigentlichen Modus
-%async
+\paragraph{OpenVPNTAP-Treiber}
+Der OpenVPN-Tap-Treiber ist unter den Namen ''TAP-Windows'' bekannt und wurde von
+OpenVPN Technologies, Inc. für den Einsatz mit OpenVPN entwickelt.
+Der Treiber stellt unter Windows ein Ethernet-Gerät dar, inklusive Kollisionsdomäne.
+Dies ist für dein Einsatz mit \ac{IPsec} etwas unbeholfen, da \ac{IPsec} \ac{IP}-Pakete
+überträgt und keine Ethernet-Rahmen.
+Der Treiber unterstützt, wie OpenVPN, das Tunneln von Ethernet-Frames jedoch (TAP-Modus).
+Der Treiber bewerkstelligt das, indem er den Ethernet-Rahmen eines eingehenden Pakets vom
+Host verwirft und nur das IP-Paket weiterleitet. Vice Versa ergänzt er IP-Pakete, die er von
+der Software erhält um einen Ethernet-Rahmen. Um über den Adapter kommunizieren zu können
+stellt der Treiber einen virtuellen Router bereit, dessen \ac{IP}-Adresse, wie die lokale  und
+die entfernte IP-Adresse(n) konfigurierbar ist.
+Der Treiber reagiert nicht auf jede ARP-Anfrage, sondern nur auf solche, bei denen
+die Quelladresse im ARP-Request der lokalen konfigurierten gleicht, sowie die erfragte Adresse
+der konfigurierten entfernten Adresse (oder einer der Entfernten, falls ein gesamtes Netzwerk
+als entfernte IP konfiguriert wurde) gleicht.
+Die MAC-Adresse des virtuellen Routers hängt von der GUID des Adapters ab, welche zufällig ist
+und bei der Erstellung des Adapters initialisiert wird. Die MAC-Adresse kann 
+auch über die Registry verändert werden.
+
+Um mit dem virtuellen Adapter kommunizieren zu können, wird ein Handle mit dem Gerät
+geöffnet, über das dann asynchron gelesen und geschrieben werden kann.
+
+\paragraph{Betriebsmodi}
+Der TAP-Treiber beherrscht drei verschiedene Betriebsmodi für verschiedene Zwecke.
+Laut dem Quellcode des Treibers ist der Point-To-Point-Modus veraltet.
+\begin{description}
+\item [TUN-Modus] Im TUN-Modus schneidet der Treiber den Ethernet-Rahmen um das 
+IP-Paket ab und reicht das Paket über das Handle an die Software weiter. 
+Pakete, die an den Treiber gegeben werden, werden um einen Ethernet-Rahmen
+ergänzt, bei dem die Zieladresse die MAC-Adresse des virtuellen Adapters ist 
+und die Quelladresse die MAC-Adresse des virtuellen Routers.
+In diesem Modus existiert eine lokale IP-Adresse, ein virtueller Router und 
+ein entferntes Netzwerk.
+% remote subnet, local subnet, local IP
+\item [TAP-Modus] Im TAP-Modus kopiert der Treiber jeden Ethernet-Paket zwischen 
+Anwendung und Gerät.
+% remote subnet, local subnet, local IP
+\item [Point-To-Point-Modus] Im Point-To-Point-Modus existiert eine lokale IP 
+und eine entfernte IP. Empfangene Ethernet-Frames werden entfernt und nur
+das enthaltene IP-Paket weitergereicht.
+\end{description}
+
 \paragraph{libipsec}
 libipsec ist eine Bibliothek, die IPsec im Tunnelmodus implementiert.
 Sie ist Teil des strongSwan-Quellcodes. Sie wird für die Verarbeitung von IP-Paketen
