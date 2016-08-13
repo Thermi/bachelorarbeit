@@ -131,6 +131,7 @@ Authentifizierung zu einem oder mehreren RADIUS-Servern ermöglicht und weitere 
 Des weiteren wurde der unsichere ''Agressive Mode entfern'' und der Standard klarer formuliert.
 
 \subsubsection{Route Based}
+\label{subsec:routebased}
 Route based heißt, dass Pakete, die über das VPN
 gesendet werden sollen, in eine virtuelle Netzwerkschnittstelle geroutet werden.
 Da gewöhnliches Routing auf Basis der Zieladresse geschieht, ermöglicht eine solche Implementierung
@@ -143,6 +144,7 @@ wie zum Beispiel \ac{BGP}, \ac{ISIS} oder \ac{OSPF}, da beim Verändern der Rout
 und damit keine neuen CHILD\_SAs ausgehandelt werden müssen. Ein weiterer Vorteil ist, dass Neulinge es leichter haben
 den Paketfluss zu verfolgen.
 \subsubsection{Policy Based}
+\label{subsec:policybased}
 Policy based bedeutet, dass die \ac{IPsec}-\acp{SP}, die ausgehandelt wurden, direkt genutzt werden welche Pakete geschützt werden.
 Eine solche Implementierung ermöglicht es, \ac{IPsec} zur Absicherung von sehr genau spezifiziertem
 Verkehr zu nutzen, wie zum Beispiel nur \ac{ICMP}-Pakete mit Typ 0, Code 0 (Echo Reply), sowie Typ 8 und Code 0 (Echo Request).
@@ -158,6 +160,19 @@ auch für Route based IPsec genutzt werden kann.
 Beide Stacks sind konform zu RFC 2367\footcite[][]{daniel_l._mcdonald_rfc_1998}.
 
 \subsubsection{IPsec unter Windows}
-Firewall
-Agile VPN
-Windows XP
+Microsoft hat im Laufe der Entwicklungsgeschichte von Windows drei verschiedene
+\ac{IPsec}-Implementierungen implementiert, die teilweise parallel existierten.
+Seit Windows 7 existiert in Windows eine Implementierung von \ac{IPsec} im Netzwerkmnanager,
+der den Config-Modus implementiert, sodass Windows als Roadwarrior-Client operieren kann.
+Diese Implementierung nutzt eine Route-based-Implementierung, wie in \autoref{subsec:routebased}
+erklärt.
+
+In der Firewall von Windows existiert eine Implementierung, die Policy-based ist
+und daher flexibler ist und es erlaubt Firewall-Regeln zu schreiben, die abhängig davon sind,
+ob ein Paket mit \ac{IPsec} geschützt war. Des weiteren unterstützt diese Implementierung
+den Config-Modus nicht, daher ist sie nicht für die Benutzung als Roadwarrior geeignet.
+Mit Stand 1016-08-13 unterstützt diese Implementierung die folgenden
+Algorithmen:
+\begin{itemize}
+\item AES-128-CBC
+\end{itemize}
