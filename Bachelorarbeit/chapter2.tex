@@ -30,42 +30,6 @@ aus strongSwan genutzt.
 Diese Tabelle bezieht sich nur auf die Fähigkeiten, die ab Windows 7 unterstützt sind.
 Sie macht keine Aussage über die Unterstützung der Software auf anderen Platformen
 und ich beanspruche nicht, dass sie vollständig ist.
-\begin{table}[h]
-\caption{Vorhandene IPsec-Implementierungen auf Windows }
-\resizebox{\textwidth}{!}{%
-\begin{tabular*}{\textwidth}{|p{2cm}|p{1cm}|p{1cm}|p{2cm}|p{2cm}|p{2cm}|p{6cm}|}\firsthline
-Name & Version & IKE & ESP & Lizenz & Sonstiges \\ \hline 
-strongswan & 5.5.0 & v1, v2 & \ac{WFP} & GPLv2/MIT & MOBIKE, eap-tls, eap-ttls, eap-tnc, 
-RSA-Authentifizierung, IKE-Fragmentierung (IKEv1 und IKEv2), AES-CBC, AES-GCM, 
-AES-GMAC, AES-CCM, SHA-1, SHA-2, MODP-1024 bis 8192, ECP-192 bis 521, 
-ECP-224-BP bis 512-BP (Brainpool-Kurven), NTRU-112 bis 256, NEWHOPE, ... 
-Vollständige Informationen\footcite[][]{_ikev1ciphersuites_????}\footcite[][]{_ikev2ciphersuites_????}(unvollständig)
-Vollständige Informationen\footcite[][]{_windows_????} \\ \hline 
-
-Windows Agile VPN Client & foo & v1, v2 & Userspace & Proprietär/mitgeliefert & 
-MOBIKE, IKEv1-Fragmentierung, hat Probleme beim Installieren der Routen für den 
-ausgehandelten \ac{TS}, kein \ac{DPD}, keine 
-\ac{MFA} möglich, nur schwacher \ac{DH} verfügbar, keine Installation von Routen 
-für IPv6.\footcite{_windows7_2016} \\ \hline 
-
-Shrewsoft Client & 2.2.2 & v1 & Userspace & Shareware/Komerziell & \ac{NAT-T}, NAT keepalive, IKE-Fragmentierung,
-RSA-Authentifizierung in allen Varianten, Main-Mode, Aggressive-Mode, Configuration-Mode, Quick-Mode,
-AES, Blowfish, 3Des, CAST, DES, MD5, SHA-1, PFS, Tunnel mode,
-XAUTH, \footcite[][]{_shrew_????}, vollständige Informationen\footcite[][]{_shrew_????}\\ \hline
-
-NCP client & 10.10.03 r30578 & v1, v2& Userspace & Proprietär/Komerziell & \\ \hline
-bintec\footcite[][]{} & 3.10 &v1, v2 & Userspace & Proprietär/Komerziell &
-PSK-Authentifizierung, Authentifizierung 
-mit X509-Zertifikaten, \ac{IPsec} über \ac{TCP}, Priorisierung von 
-\ac{VOIP}-Verkehr, \ac{DPD}, \ac{NAT-T}, Config-Modus, \ac{XAUTH}, 
-\ac{GUI}, \ac{IPv6}, FIPS 140-2 zertifiziert, AES, 3DES, Blowfish,
-RSA, MD5, SHA-1, SHA, PFS, Proprietär, Komerziell, Integrierte Firewall, 
-Unterstützt Windows XP und neuer, XAUTH unterstützt scheinbar \ac{MFA}, PKCS\#11\footcite[][]{_bintec_????}  \\ 
-\hline
-\end{tabular*}
-}
-\label{tab:IPsec-Implementierungen}
-\end{table}
 
 \subsection{strongSwan}
 strongSwan implementiert einen beträchtlichen Teil der Funktionalität der \acp{RFC} für IKEv2\footcite{_ipsecstandards_2016}.
