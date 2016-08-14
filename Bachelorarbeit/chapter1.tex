@@ -11,9 +11,9 @@
 
 % You should have received a copy of the GNU General Public License
 % along with Foobar. If not, see <http://www.gnu.org/licenses/>.
-\section{Grundlage}
+\chapter{Grundlage}
 Um IPsec zu verstehen, müssen zuerst die Netzwerkgrundlagen verstanden werden.
-\subsection{Netzwerke}
+\section{Netzwerke}
 Moderne Computernetzwerke basieren auf Ethernet und \ac{IPv4} oder \ac{IPv6}, wie standardisiert
 von der \ac{IETF} in diversen \acp{RFC}.
 Der Empfang und das Senden von Daten geschieht mit Hilfe von Netzwerkschnittstellen, die die Computer
@@ -28,7 +28,7 @@ Die Adressierung der Netzwerkschnittstellen erfolgt über deren MAC-Adressen, wa
 jedoch nicht relevant ist, da nur \ac{IP}-Pakete oder die Payload davon, also das Protokoll
 auf der Transportschicht, geschützt werden.
 
-\subsection{Routing}
+\section{Routing}
 Beim Routen eines Pakets wird nach dem Empfang oder Senden eines \ac{IP}-Pakets durch Nutzung
 des sogenannten ''Routing Table'' nachgeschlagen, wohin ein Paket weitergeleitet
 werden muss, um den Empfänger zu erreichen.
@@ -38,7 +38,7 @@ Der \ac{TTL}-Wert des Pakets wird überprüft und dekrementiert. Wenn er 0 errei
 wird das Paket verworfen und eine \ac{ICMP}-Fehlermeldung an den Absender verschickt.
 
 
-\subsubsection{Policy Based Routing}
+\subsection{Policy Based Routing}
 Policy Based Routing ist eine Sonderform des Routings. Hierbei wird nicht die Zieladresse
 zum Finden der Route genutzt, eine Regel.
 
@@ -53,7 +53,7 @@ Linux erlaubt Anwendungen die Firewallmarkierung direkt im Netzwerksockel zu set
 Windows implementiert kein \ac{PBR}.
 
 %TODO: Grafik mit Routing einfügen
-\subsection{IPsec}
+\section{IPsec}
 %Protokollunabhängig
 \ac{IPsec} ist ein Konzept zum Absichern von beliebigen \ac{IP}-Paketen oder deren Nutzlasten.
 Es stellt Vertraulichkeit, Authentizität und Schutz vor Replay-Attacken bereit.
@@ -79,7 +79,7 @@ Zertifikatsauthentifizierung, RSA- oder ECDSA-Schlüssel oder \ac{EAP} unter Ben
 des Oakley-Protokols\footcite{hilarie_k._orman_rfc_1998} abgesichert, welches mithilfe des \ac{DH}-Schlüsselaustauschprotokolls
 geheime Schlüssel zwischen den Teilnehmern aushandelt.\footcite[][50]{charlie_kaufman_rfc_2014}\footcite[][8]{douglas_maughan_rfc_1998}
 
-\paragraph{IKE\_SA}
+\subsubsection{IKE\_SA}
 Eine IKE\_SA bezeichnet eine Verbindung, die zwei Teilnehmer mittels IKE ausgehandelt haben.
 Eine IKE\_SA wird durch die \ac{IP}-Adressen, sowie durch \acp{SPI} identifiziert.
 Beiden Teilnehmern ist ein mittels \ac{IKE} ausgehandeltes geteiltes Geheimnis bekannt,
@@ -88,7 +88,7 @@ welches genutzt wird um Nachrichten zwischen den Teilnehmern zu verschlüsseln u
 IKE\_SAs haben zu CHILD\_SAs eine 1:N-Beziehung. Eine einzelne IKE\_SA kann keine, eine
 oder mehrere CHILD\_SAs verwalten.
 
-\paragraph{CHILD\_SA}
+\subsubsection{CHILD\_SA}
 Eine CHILD\_SA ist die Sammlung aller zugehörigen \ac{IPsec} \acp{SA} und \acp{SP},
 die zu einem Tunnel gehören. Wenn der Tunnel mit Komprimierung ausgehandelt wurde,
 so gehören die Komprimierungs-\acp{SA}, die dabei erstellt werden, auch dazu\footcite[][7]{abraham_shacham_rfc_2001}\footcite[][61]{charlie_kaufman_rfc_2014}.
@@ -100,13 +100,13 @@ auch die dazugehörige \ac{SA} in der Gegenrichtung nd die \acp{SP} gelöscht.
 Um die kryptografischen Schlüssel von CHILD\_SAs zu erneuern muss sie komplett neu ausgehandelt werden.
 In verschiedenen Implementierungen wird das Rekeyen von CHILD\_SAs mit IKEv1 unterschiedlich gehandhabt.
 Für IKEv2 ist das Verhalten standardisiert\footcite[][16]{charlie_kaufman_rfc_2014}.
-\paragraph{PFS}
+\subsubsection{PFS}
 \ac{PFS} disjunkt die Schlüssel für die CHILD\_SAs von den Schlüsseln
 für die \ac{IPsec}-\acp{SA}, indem beim Aushandeln einer CHILD\_SA ein weiterer
 \ac{DH}-Schlüsselaustausch stattfindet\footcite[13]{charlie_kaufman_rfc_2014}.
 Ohne \ac{PFS} werden die Schlüssel für die CHILD\_SAs vom Schlüssel der
 
-\paragraph{Rekeying und Reauthentication}
+\subsubsection{Rekeying und Reauthentication}
 Beide IKE-Versionen unterstützen das Reauthentifizieren von IKE SAs und das Rekeyen
 von CHILD\_SAs\footcite[][616]{charlie_kaufman_rfc_2014}.
 Der Zweck der Reauthentifizierung einer IKE\_SA ist zu überprüfen, ob die Authentifizierungsinformation
@@ -117,20 +117,20 @@ zum Beispiel alle 6 Stunden, oder wenn 4 GB übertragen wurden oder wenn eine ge
 Pakete übertragen wurde. Dies wird getan, damit die Menge an Daten, die bei einer Kompromitierung
 eines Schlüssels offengelegt wird, begrenzt ist.
 
-\subsubsection{IKE}
-\paragraph{IKEv1/ISAKMP}
+\subsection{IKE}
+\subsubsection{IKEv1/ISAKMP}
 IKEv1 wird oft als equivalent zu \ac{ISAKMP} verwendet, wobei es auch keinen für diese Arbeit bedeutsamen
 Unterschied gibt. Daher werden die Begriffe hier auch equivalent genutzt.
 IKEv1 ist die erste, älteste Version des \ac{IKE}-Protokolls, welches zum Aushandeln
 von CHILD\_SAs genutzt wird.
-\paragraph{IKEv2}
+\subsubsection{IKEv2}
 IKEv2 ist die logische Weiterentwicklung von IKEv1 und beinhaltet Verbesserungen
 im Bezug auf den Verbindungsaufbau, Robustheit, Sicherheit und Flexibilität\footcite[136, 137]{charlie_kaufman_rfc_2014}.
 Mit der neuen Version wurde XAUTH durch \ac{EAP} ersetzt, was die Delegation der
 Authentifizierung zu einem oder mehreren RADIUS-Servern ermöglicht und weitere Authentifizierungsmodi ermöglicht.
 Des weiteren wurde der unsichere ''Agressive Mode entfern'' und der Standard klarer formuliert.
 
-\subsubsection{Route Based}
+\subsection{Route Based}
 \label{subsec:routebased}
 Route based heißt, dass Pakete, die über das VPN
 gesendet werden sollen, in eine virtuelle Netzwerkschnittstelle geroutet werden.
@@ -143,13 +143,13 @@ Route based \acp{VPN} werden für gewöhnlich dann genutzt, wenn dynamisches Rou
 wie zum Beispiel \ac{BGP}, \ac{ISIS} oder \ac{OSPF}, da beim Verändern der Routen die \acp{SP} nicht verändert
 und damit keine neuen CHILD\_SAs ausgehandelt werden müssen. Ein weiterer Vorteil ist, dass Neulinge es leichter haben
 den Paketfluss zu verfolgen.
-\subsubsection{Policy Based}
+\subsection{Policy Based}
 \label{subsec:policybased}
 Policy based bedeutet, dass die \ac{IPsec}-\acp{SP}, die ausgehandelt wurden, direkt genutzt werden welche Pakete geschützt werden.
 Eine solche Implementierung ermöglicht es, \ac{IPsec} zur Absicherung von sehr genau spezifiziertem
 Verkehr zu nutzen, wie zum Beispiel nur \ac{ICMP}-Pakete mit Typ 0, Code 0 (Echo Reply), sowie Typ 8 und Code 0 (Echo Request).
 Policy based \ac{IPsec} ermöglicht es \ac{IPsec} direkt in den Stack zu integrieren, ohne notwendigerweise die Routen zu verändern.
-\subsubsection{IPsec unter Linux}
+\subsection{IPsec unter Linux}
 Unter Linux gibt es zwei verschiedene \ac{IPsec}-Stacks.
 Es existiert einerseits der KLIPS-Stack, der vom FreeS/WAN-Projekt entwickelt wurde
 und auf Route based IPsec basiert.
@@ -159,7 +159,7 @@ auch für Route based IPsec genutzt werden kann.
 
 Beide Stacks sind konform zu RFC 2367\footcite[][]{daniel_l._mcdonald_rfc_1998}.
 
-\subsubsection{IPsec unter Windows}
+\subsection{IPsec unter Windows}
 Microsoft hat im Laufe der Entwicklungsgeschichte von Windows drei verschiedene
 \ac{IPsec}-Implementierungen implementiert, die teilweise parallel existierten.
 Seit Windows 7 existiert in Windows eine Implementierung von \ac{IPsec} im Netzwerkmnanager,
@@ -171,8 +171,3 @@ In der Firewall von Windows existiert eine Implementierung, die Policy-based ist
 und daher flexibler ist und es erlaubt Firewall-Regeln zu schreiben, die abhängig davon sind,
 ob ein Paket mit \ac{IPsec} geschützt war. Des weiteren unterstützt diese Implementierung
 den Config-Modus nicht, daher ist sie nicht für die Benutzung als Roadwarrior geeignet.
-Mit Stand 1016-08-13 unterstützt diese Implementierung die folgenden
-Algorithmen:
-\begin{itemize}
-\item AES-128-CBC
-\end{itemize}
