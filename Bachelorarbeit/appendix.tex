@@ -65,6 +65,7 @@ NCP Secure Entry Client & IKEv1, IKEv2 \\ \hline
 bintec Secure IPsec Client & IKEv1, IKEv2 \\ \hline
 \end{tabular*}
 \label{tab:IPsec-Implementierungen-IKE-Versionen}
+\caption{Unterstützte IKE-Versionen der IPsec-Implementierungen}
 \end{table}
 
 
@@ -78,6 +79,7 @@ NCP Secure Entry Client & Proprietär \\ \hline
 bintec Secure IPsec Client & Proprietär \\ \hline
 \end{tabular*}
 \label{tab:IPsec-Implementierungen-Lizenzen}
+\caption{Lizenzen der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
@@ -137,6 +139,7 @@ CAST-128-CBC         &  x  & o & x & o & o \\  \hline
 chacha20poly1305     &  x  & o & o & o & o \\  \hline
 \end{tabular*}
 \label{tab:IPsec-Implementierungen-Vertraulichkeit-Algorithmen}
+\caption{Unterstützte Algorithmen für Vertraulichkeit der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
@@ -152,9 +155,9 @@ AES-XCBC                                                & x & o & o & o & o \\  
 AES-128-GMAC                                            & x & o & o & o & o \\  \hline
 AES-192-GMAC                                            & x & o & o & o & o \\  \hline
 AES-256-GMAC                                            & x & o & o & o & o \\  \hline
-
 \end{tabular*}
 \label{tab:IPsec-Implementierungen-Authentizitaet-Algorithmen}
+\caption{Unterstützte Algorithmen für Authentizität der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
@@ -187,6 +190,7 @@ NTRU-256       & x & o & o & o & o \\  \hline
 NEWHOPE-128    & x & o & o & o & o \\  \hline
 \end{tabular*}
 \label{tab:IPsec-Implementierungen-DH-Algorithmen}
+\caption{Unterstützte Schlüsselaustauschprotokolle der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
@@ -207,9 +211,9 @@ EAP-AKA                                                  & x & o & o & o & o  \\
 EAP-TNC                                                  & x & o & o & o & o  \\ \hline
 TNC-IMC                                                  & x & o & o & o & o  \\ \hline
 TNC-IMV                                                  & x & o & o & o & o  \\ \hline
-
 \end{tabular*}
 \label{tab:IPsec-Implementierungen-Authentifizierungs-Modi}
+\caption{Unterstützte Authentifizierungsmethoden der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
@@ -219,6 +223,7 @@ CRL  & x & x & o & x & x \\ \hline
 OCSP & x & ? & o & x & x \\ \hline
 \end{tabular*}
 \label{tab:IPsec-Implementierungen-CRL-Support}
+\caption{Unterstützte Mechanismen zum Zurückziehen von Zertifikaten der IPsec-Implementierungen}
 \end{table}
 
 
@@ -228,9 +233,9 @@ OCSP & x & ? & o & x & x \\ \hline
 Tunnel-Modus     & x & x & x & x & x \\  \hline
 Transport-Modus  & x & x & o & o & o \\  \hline
 BEET-Modus       & x & o & o & o & o \\  \hline
-Komprimierung    & x & o & o & x & o \\ \hline
 \end{tabular*}
 \label{tab:IPsec-Implementierungen-Tunnel-Modi}
+\caption{Unterstützte Tunnel-Modi der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
@@ -242,6 +247,7 @@ Quick Mode      & x & o & x & x & ? \\ \hline
 Config Mode     & x & x & x & x & x \\ \hline
 \end{tabular*}
 \label{tab:IPsec-Implementierungen-IKE-Modi}
+\caption{Unterstützte IKE-Modi der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
@@ -256,7 +262,8 @@ IPv6                  & x & x                     & x & x & x \\ \hline
 Attribut-Zertifikate  & x & ?                     & o & o & ? \\ \hline
 PFS                   & x & o                     & x & x & x \\ \hline
 IKE-Fragmentierung    & x & ?\footnote{Nur IKEv1} & x & o & o \\ \hline
-
+Komprimierung         & x & o                     & o & x & o \\ \hline
 \end{tabular*}
 \label{tab:IPsec-Implementierungen-Features}
+\caption{Unterstützte Features der IPsec-Implementierungen}
 \end{table}
