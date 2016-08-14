@@ -11,7 +11,7 @@
 
 % You should have received a copy of the GNU General Public License
 % along with Foobar. If not, see <http://www.gnu.org/licenses/>.
-\chapter{Basis}
+\section{Basis}
 Als Basis der Arbeit wurde der quelloffene VPN-Dienst strongSwan gewählt,
 welcher von der Hochschule für Technik Rapperswill entwickelt wird.
 Um die Pakete vom Kernelspace in Empfang nehmen zu können, wird der quelloffene
@@ -21,29 +21,29 @@ Für die Verarbeitung der Pakete wird die in strongSwan integrierte Bibliothek l
 das Plugin kernel-libipsec, sowie bestehende Teile von libstrongswan
 aus strongSwan genutzt.
 
-\section{Bestehende Implementierungen für Windows}
+\subsection{Bestehende Implementierungen für Windows}
 
-In \autoref{ch:appendix} ist eine Auflistung aller mir bekannten IPsec-Clients für Windows,
+In \autoref{sec:appendix} ist eine Auflistung aller mir bekannten IPsec-Clients für Windows,
 inklusive Matrizen der jeweils unterstützten Algorithmen und Verfahren in den ISAKMP-
 und IKE-Standards.
 
-\section{strongSwan}
+\subsection{strongSwan}
 strongSwan implementiert einen beträchtlichen Teil der Funktionalität der \acp{RFC} für IKEv2\footcite{_ipsecstandards_2016}.
 Die Software ist multithreaded und in Objektorientiertem C geschrieben.
 Die Grundlage wurde von Martin Willi und Jan Hutter in ihrer Diplomarbeit im Jahr 2005 gelegt\footcite[][]{jan_hutter_strongswan_2005}.
-\subsection{charon}
+\subsubsection{charon}
 Charon ist der Daemon, der in der Diplomarbeit\footcite[][]{jan_hutter_strongswan_2005} entwickelt wurde.
 Er arbeitet parallel und wurde in objektorientiertem C geschrieben, so wie die Software Xine.
 Intern werden verschiedene Bibliotheken genutzt, angefangen von libstrongswan bis zu libcharon.
 Es existieren verschiedene Versionen von charon für verschiedene Zwecke, zum Beispiel
 charon-svc. charon-svc ist eine Version von charon, die als Dienst auf Windows genutzt werden kann.
 % Mehr Informationen?
-\subsection{Userspace processing}
+\subsubsection{Userspace processing}
 Userspace processing wurde in charon von Guiliano Grassi und Ralf Sager für Android implementiert,
 um die Entwicklung der strongSwan-App für Android zu ermöglichen. Auf Android ist kernelspace processing
 von \ac{IPsec}-Paketen nicht möglich, da die Privilegien der Anwendung das nicht erlauben.
 
-\subsubsection{OpenVPNTAP-Treiber}
+\paragraph{OpenVPNTAP-Treiber}
 Der OpenVPN-Tap-Treiber ist unter den Namen ''TAP-Windows'' bekannt und wurde von
 OpenVPN Technologies, Inc. für den Einsatz mit OpenVPN entwickelt.
 Der Treiber stellt unter Windows ein Ethernet-Gerät dar, inklusive Kollisionsdomäne.
@@ -66,7 +66,7 @@ auch über die Registry verändert werden.
 Um mit dem virtuellen Adapter kommunizieren zu können, wird ein Handle mit dem Gerät
 geöffnet, über das dann asynchron gelesen und geschrieben werden kann.
 
-\subsubsection{Betriebsmodi}
+\paragraph{Betriebsmodi}
 Der TAP-Treiber beherrscht drei verschiedene Betriebsmodi für verschiedene Zwecke.
 Laut dem Quellcode des Treibers ist der Point-To-Point-Modus veraltet.
 \begin{description}
@@ -86,7 +86,7 @@ und eine entfernte IP. Empfangene Ethernet-Frames werden entfernt und nur
 das enthaltene IP-Paket weitergereicht.
 \end{description}
 
-\subsubsection{libipsec}
+\paragraph{libipsec}
 libipsec ist eine Bibliothek, die IPsec im Tunnelmodus implementiert.
 Sie ist Teil des strongSwan-Quellcodes. Sie wird für die Verarbeitung von IP-Paketen
 in der Regel auf Systemen genutzt, die keine (funktionierenden) IPsec-Implementierung
@@ -96,7 +96,7 @@ libipsec besteht aus zwei Komponenten: Einerseits die Bibliothek, die die SAD un
 implementiert, sowie die Verarbeitung (libipsec) und ein Plugin, welches ein Kernel-Interface
 für das Verwalten der \ac{SAD} und \ac{SPD} emuliert (kernel-libipsec).
 %demultiplexing NON-ESP marker, SPI
-\subsubsection{libstrongswan}
+\subparagraph{libstrongswan}
 libstrongswan ist eine interne Bibliothek von strongSwan, die von den verschiedenen
 Versionen von charon geladen wird, um diverse Funktionalität zu erhalten, wie
 Linked-Lists, Hashtables, Arrays, sowie die Funktionen um TUN-Geräte zu erstellen und zu öffnen.
@@ -106,6 +106,5 @@ und FreeBSD.
 Die Operationen basieren dabei auf File Descriptors, welche mit poll() multiplext nach
 Daten abgefragt werden.
 
-\subsection{Kernelspace processing}
-Informationen über Kernelspace processing
-\BlankPage
+\subsubsection{Kernelspace processing}
+
