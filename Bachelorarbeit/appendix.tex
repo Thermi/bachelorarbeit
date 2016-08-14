@@ -1,0 +1,243 @@
+% This file is part of Bachelorarbeit
+
+% Bachelorarbeit is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License version 3 as published by
+% the Free Software Foundation.
+
+% Bachelorarbeit is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+
+% You should have received a copy of the GNU General Public License
+% along with Foobar. If not, see <http://www.gnu.org/licenses/>.
+
+\section{Appendix}
+
+Die Daten aus diesen Tabellen wurden unter Nutzung der öffentlich zugänglichen
+Dokumente auf den entsprechenden Herstellerwebseiten erstellt.
+
+Wenn bei einem symmetrischen Verschlüsselungsalgorithmus kein Modus angegeben
+war, wurde \ac{CBC} angenommen.
+
+Wenn bei einem Authentifizierungsmodus nicht alle unterstützen Permutationen
+angegeben waren, wurden alle standardisierten Permutationen als unterstützt 
+angenommen.
+
+Wenn ein Feature nicht explizit als unterstützt angegeben wurde, so wurde angenommen
+dass es nicht unterstützt wird.
+
+Offenbar ist der ''bintec Secure IPsec Client'' nur ein Rebranding des ''NCP Secure Entry Client'',
+wenn man vom \ac{GUI} ausgehen kann. 
+Ein weiteres Indiz ist, dass im Installer des ''bintec Secure IPsec Client''
+der String ''NCP engineering GmbH'' auftaucht. Daher wäre es zu verstehen,
+wenn aus den Dokumentationen der beiden Produkte Featureparität hervorkäme.
+Dem ist aber nicht so, wie aus den Tabellen hervorgeht.
+
+\paragraph{Symbolik}
+\begin{description}
+\item[x] Unterstützt
+\item[o] Nicht unterstützt
+\item[?] unbekannt
+\end{description}
+\paragraph{Referenzen zur Bibliographie}
+\begin{itemize}
+\item strongSwan\footcite[][]{_ikev1ciphersuites_2016}\footcite[][]{_ikev2ciphersuites_2016}
+\item Windows Agile VPN Client\footcite[][]{_windows7_2016}
+\item Shrewsoft VPN Client\footcite[][]{_shrew_2013}
+\item NCP Secure Entry Client\footcite[][]{jurgen_honig_datenblatt_2016}
+\item bintec Secure IPsec Client\footcite[][]{_bintec_2016-1}
+\end{itemize}
+
+\begin{table}[h]
+\begin{tabular*}{\textwidth}{|c|c|}\firsthline
+Software & Lizenz \\ \hline
+strongSwan & MIT/GPLv2 \\ \hline
+Windows Agile VPN Client & Proprietär \\ \hline
+Shrewsoft VPN Client & Shareware\footnote{\url{https://www.shrew.net/static/help-2.1.x/vpnhelp.htm?WindowsLicense.html}} \\ \hline
+NCP Secure Entry Client & Proprietär \\ \hline
+bintec Secure IPsec Client & Proprietär \\ \hline
+\end{tabular*}
+\label{tab:IPsec-Implementierungen-Lizenzen}
+\end{table}
+
+\begin{table}[h]
+\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+AES-128-CBC          &  x  & x & x & x & x \\  \hline
+AES-192-CBC          &  x  & x & x & x & x \\  \hline
+AES-256-CBC          &  x  & x & x & x & x \\  \hline
+AES-128-GCM-8        &  x  & o & o & o & o \\  \hline
+AES-128-GCM-12       &  x  & o & o & o & o \\  \hline
+AES-128-GCM-16       &  x  & o & o & o & o \\  \hline
+AES-192-GCM-8        &  x  & o & o & o & o \\  \hline
+AES-192-GCM-12       &  x  & o & o & o & o \\  \hline
+AES-192-GCM-16       &  x  & o & o & o & o \\  \hline
+AES-256-GCM-8        &  x  & o & o & o & o \\  \hline
+AES-256-GCM-12       &  x  & o & o & o & o \\  \hline
+AES-256-GCM-16       &  x  & o & o & o & o \\  \hline
+AES-128-CTR          &  x  & o & o & o & o \\  \hline
+AES-192-CTR          &  x  & o & o & o & o \\  \hline
+AES-256-CTR          &  x  & o & o & o & o \\  \hline
+AES-128-CCM-8        &  x  & o & o & o & o \\  \hline
+AES-128-CCM-12       &  x  & o & o & o & o \\  \hline
+AES-128-CCM-16       &  x  & o & o & o & o \\  \hline
+AES-192-CCM-8        &  x  & o & o & o & o \\  \hline
+AES-192-CCM-12       &  x  & o & o & o & o \\  \hline
+AES-192-CCM-16       &  x  & o & o & o & o \\  \hline
+AES-256-CCM-8        &  x  & o & o & o & o \\  \hline
+AES-256-CCM-12       &  x  & o & o & o & o \\  \hline
+AES-256-CCM-16       &  x  & o & o & o & o \\  \hline
+AES-128-GMAC         &  x  & o & o & o & o \\  \hline
+AES-192-GMAC         &  x  & o & o & o & o \\  \hline
+AES-256-GMAC         &  x  & o & o & o & o \\  \hline
+DES-CBC              &  o  & o & x & o & o \\  \hline
+3DES-CBC             &  x  & x & x & x & x \\  \hline
+blowfish-128-CBC     &  x  & o & x & x & x \\  \hline
+blowfish-192-CBC     &  x  & o & x & x & x \\  \hline
+blowfish-256-CBC     &  x  & o & x & x & x \\  \hline
+camellia-128-CBC     &  x  & o & o & o & o \\  \hline
+camellia-192-CBC     &  x  & o & o & o & o \\  \hline
+camellia-256-CBC     &  x  & o & o & o & o \\  \hline
+camellia-128-CCM-8   &  x  & o & o & o & o \\  \hline
+camellia-128-CCM-12  &  x  & o & o & o & o \\  \hline
+camellia-128-CCM-16  &  x  & o & o & o & o \\  \hline
+camellia-192-CCM-8   &  x  & o & o & o & o \\  \hline
+camellia-192-CCM-12  &  x  & o & o & o & o \\  \hline
+camellia-192-CCM-16  &  x  & o & o & o & o \\  \hline
+camellia-256-CCM-8   &  x  & o & o & o & o \\  \hline
+camellia-256-CCM-12  &  x  & o & o & o & o \\  \hline
+camellia-256-CCM-16  &  x  & o & o & o & o \\  \hline
+serpent-128-CBC      &  x  & o & o & o & o \\  \hline
+serpent-192-CBC      &  x  & o & o & o & o \\  \hline
+serpent-256-CBC      &  x  & o & o & o & o \\  \hline
+twofish-128-CBC      &  x  & o & o & o & o \\  \hline
+twofish-192-CBC      &  x  & o & o & o & o \\  \hline
+twofish-256-CBC      &  x  & o & o & o & o \\  \hline
+CAST-128-CBC         &  x  & o & x & o & o \\  \hline
+chacha20poly1305     &  x  & o & o & o & o \\  \hline
+\end{tabular*}
+\label{tab:IPsec-Implementierungen-Vertraulichkeit-Algorithmen}
+\end{table}
+
+\begin{table}[h]
+\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+MD5                                                     & x & o & x & x & x \\  \hline
+SHA-1                                                   & x & x & x & o & x \\  \hline
+SHA-256                                                 & x & x & o & x & x \\  \hline
+SHA-384                                                 & x & x & o & x & x \\  \hline
+SHA-512                                                 & x & o & o & x & x \\  \hline
+SHA-256-96\footnote{SHA-256 mit Truncation auf 96 Bit}  & x & x & o & o & o \\  \hline
+AES-XCBC                                                & x & o & o & o & o \\  \hline
+AES-128-GMAC                                            & x & o & o & o & o \\  \hline
+AES-192-GMAC                                            & x & o & o & o & o \\  \hline
+AES-256-GMAC                                            & x & o & o & o & o \\  \hline
+
+\end{tabular*}
+\label{tab:IPsec-Implementierungen-Authentizitaet-Algorithmen}
+\end{table}
+
+\begin{table}[h]
+\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+MODP-768       & x & o & x & x & x \\  \hline
+MODP-1024      & x & x & x & x & x \\  \hline
+MODP-1536      & x & o & x & x & x \\  \hline
+MODP-2048      & x & o & x & x & x \\  \hline
+MODP-3072      & x & o & x & x & x \\  \hline
+MODP-4096      & x & o & x & x & x \\  \hline
+MODP-6144      & x & o & x & x & x \\  \hline
+MODP-8192      & x & o & x & x & x \\  \hline
+MODP-1024s160  & x & o & o & o & o \\  \hline
+MODP-2048s224  & x & o & o & o & o \\  \hline
+MODP-2048s256  & x & o & o & o & o \\  \hline
+ECP-192        & x & o & o & x & o \\  \hline
+ECP-224        & x & o & o & x & o \\  \hline
+ECP-256        & x & o & o & x & o \\  \hline
+ECP-384        & x & o & o & x & o \\  \hline
+ECP-521        & x & o & o & x & o \\  \hline
+ECP-224BP      & x & o & o & o & o \\  \hline
+ECP-256BP      & x & o & o & o & o \\  \hline
+ECP-384BP      & x & o & o & o & o \\  \hline
+ECP-512BP      & x & o & o & o & o \\  \hline
+NTRU-112       & x & o & o & o & o \\  \hline
+NTRU-128       & x & o & o & o & o \\  \hline
+NTRU-192       & x & o & o & o & o \\  \hline
+NTRU-256       & x & o & o & o & o \\  \hline
+NEWHOPE-128    & x & o & o & o & o \\  \hline
+\end{tabular*}
+\label{tab:IPsec-Implementierungen-DH-Algorithmen}
+\end{table}
+
+\begin{table}[h]
+\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec                  \\ \hline
+Hybrid\footnote{Client mit XAUTH, Server mittels X.509}  & x & x & x & x & x  \\ \hline
+PSK                                                      & x & o & x & x & o  \\ \hline
+PSK + XAUTH                                              & x & o & x & x & o  \\ \hline
+X.509                                                    & x & x & x & x & x  \\ \hline
+EAP-MD5                                                  & x & o & o & x & o  \\ \hline
+EAP-PAP                                                  & x & o & o & x & o  \\ \hline
+EAP-CHAP                                                 & x & o & o & x & o  \\ \hline
+EAP-MSCHAPv2                                             & x & x & o & x & o  \\ \hline
+EAP-GTC                                                  & x & o & o & o & o  \\ \hline
+EAP-TLS                                                  & x & x & o & x & o  \\ \hline
+EAP-TTLS                                                 & x & o & o & o & o  \\ \hline
+EAP-AKA                                                  & x & o & o & o & o  \\ \hline
+EAP-TNC                                                  & x & o & o & o & o  \\ \hline
+TNC-IMC                                                  & x & o & o & o & o  \\ \hline
+TNC-IMV                                                  & x & o & o & o & o  \\ \hline
+
+\end{tabular*}
+\label{tab:IPsec-Implementierungen-Authentifizierungs-Modi}
+\end{table}
+
+\begin{table}[h]
+\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+CRL  & x & x & o & x & x \\ \hline
+OCSP & x & ? & o & x & x \\ \hline
+\end{tabular*}
+\label{tab:IPsec-Implementierungen-CRL-Support}
+\end{table}
+
+
+\begin{table}[h]
+\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+Tunnel-Modus     & x & x & x & x & x \\  \hline
+Transport-Modus  & x & x & o & o & o \\  \hline
+BEET-Modus       & x & o & o & o & o \\  \hline
+Komprimierung    & x & o & o & x & o \\ \hline
+\end{tabular*}
+\label{tab:IPsec-Implementierungen-Tunnel-Modi}
+\end{table}
+
+\begin{table}[h]
+\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+Main Mode       & x & x & x & x & ? \\ \hline
+Aggressive Mode & x & x & x & x & ? \\ \hline 
+Quick Mode      & x & o & x & x & ? \\ \hline
+Config Mode     & x & x & x & x & x \\ \hline
+\end{tabular*}
+\label{tab:IPsec-Implementierungen-IKE-Modi}
+\end{table}
+
+\begin{table}[h]
+\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\backslashbox{Feature}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+NAT-T                 & x & x                     & x & x & x \\ \hline
+DPD                   & x & x                     & x & x & x \\ \hline
+MOBIKE                & x & x                     & o & o & o \\ \hline
+GUI                   & o & x                     & x & x & x \\ \hline
+IPsec über TCP        & o & o                     & o & x & x \\ \hline
+IPv6                  & x & x                     & x & x & x \\ \hline
+Attribut-Zertifikate  & x & ?                     & o & o & ? \\ \hline
+PFS                   & x & o                     & x & x & x \\ \hline
+IKE-Fragmentierung    & x & ?\footnote{Nur IKEv1} & x & o & o \\ \hline
+
+\end{tabular*}
+\label{tab:IPsec-Implementierungen-Features}
+\end{table}
