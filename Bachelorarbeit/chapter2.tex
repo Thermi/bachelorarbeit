@@ -95,6 +95,21 @@ enthalten.
 libipsec besteht aus zwei Komponenten: Einerseits die Bibliothek, die die SAD und die SPD
 implementiert, sowie die Verarbeitung (libipsec) und ein Plugin, welches ein Kernel-Interface
 für das Verwalten der \ac{SAD} und \ac{SPD} emuliert (kernel-libipsec).
+
+libipsec empfängt und sendet Pakete über die gleichen Sockets, den der restliche Teil
+des Daemons benutzt, um mit anderen IKE-Peers zu kommunizieren. Das sind Sockets,
+die auf UDP mit Port 500 und 4500 gebunden sind; die IKE-Standardports.
+libipsec unterstützt die Verarbeitung von ESPINUDP-Paketen, sowie von normalen ESP-Paketen,
+da sie sich strukturell nur gering unterscheiden. Jedoch wird aufgrund der Tatsache,
+dass mit den gegebenen Sockets kommuniziert wird, UDP-Encapsulation forciert.
+Um ESP-Pakete verschicken zu können, müsste ein Socket geöffnet werden der das
+verschicken von solchen Paketen erlauben würde. Das ist jedoch auf der Plattform,
+für die die Bibliothek ursprünglich geschaffen wurde (Android) nicht erlaubt, da
+die Privilegien der Anwendung dort sehr beschränkt sind.
+
+Prinzipiell wäre es jedoch möglich dies zu implementieren. Dafür müsste ein
+raw-Socket geöffnet werden, über den rein IP gesprochen wird.
+
 %demultiplexing NON-ESP marker, SPI
 \subparagraph{libstrongswan}
 libstrongswan ist eine interne Bibliothek von strongSwan, die von den verschiedenen
