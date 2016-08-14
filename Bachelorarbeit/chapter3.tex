@@ -11,7 +11,8 @@
 
 % You should have received a copy of the GNU General Public License
 % along with Foobar. If not, see <http://www.gnu.org/licenses/>.
-\section{Portierung von libipsec auf Windows}
+
+\chapter{Portierung von libipsec auf Windows}
 Die Portierung von libipsec auf Windows, sodass sie dort lauffähig ist, ist das Ziel
 der Bachelorarbeit. Die zu portierenden Teile des Programmcodes betreffen nur
 die Codesegmente, die Plattformspezifische \acp{API} oder \acp{ABI} verwenden,
@@ -27,11 +28,11 @@ primär alloca() genutzt, statt malloc() und seine Unterarten. Der Unterschied h
 Speicherdauer. Mit alloca() allokierter Speicher ist nur bis zum Verlassen der Funktion gültig
 und wird automatisch freigegeben. Mit malloc() allokierter Speicher muss manuell freigegeben werden.
 
-\subsection{Bestehende Implementierung}
+\section{Bestehende Implementierung}
 Die bestehende Implementierung umfasst die eigentliche Bibliothek, eine Implementierung
 eines Kernel-Interface zwischen libipsec und charon, sowie Code in libstrongswan
 um TUN-Geräte zu öffnen.
-\subsubsection{libipsec}
+\subsection{libipsec}
 libipsec implementiert die Verarbeitung von Paketen, das Erzwingen der \acp{SP},
 das Verwalten der \acp{SP}, \acp{SA}, Routen und der TUN-Geräte.
 Die hierbei relevanten Dateien sind unter /src/libipsec/ zu finden.
@@ -41,7 +42,7 @@ Die hierbei relevanten Dateien sind unter /src/libipsec/ zu finden.
 % processing
 % event driven
 % job
-\subsubsection{kernel-libipsec}
+\subsection{kernel-libipsec}
 Die hier zu portierenden Bestandteile waren ausschließlich Codeteile, die
 sich mit der Dateiein- und ausgabe beschäftigten.
 
@@ -58,7 +59,7 @@ Für das Multiplexen der Eingabe stehen unter Windows zwei Verfahren zur Verfüg
 \item IOCompletionPorts
 \end{itemize}
 
-WaitForMultipleObjects\footcite[][]{_waitformultipleobjects_????} funktioniert mit einem Array aus Handles. In der Struktur des Handles
+WaitForMultipleObjects\footcite[][]{_waitformultipleobjects_2016} funktioniert mit einem Array aus Handles. In der Struktur des Handles
 ist das event-Attribut auf ein einzgartiges Event gesetzt, welches genutzt wird um
 das Handle zu finden, dessen Lesevorgang abgeschlossen oder abgebrochen wurde.
 Nach dem Kopieren des Handles in das Array und dem Setzen des Events wird ein asynchroner
@@ -67,7 +68,7 @@ Dadurch beendet der Aufruf von WaitForMultipleObjects() nach dem aufruf direkt, 
 ein Lesevorgang schon zuvor erfolgreich war und der Programmcode wird etwas kürzer.
 % Mehr Erläuterung benötigt
 
-IOCompletionPorts\footcite[][]{_createiocompletionport_????} funktionieren, indem man einen IOCompletionPort mit CreateIoCompletionPort()
+IOCompletionPorts\footcite[][]{_createiocompletionport_2016} funktionieren, indem man einen IOCompletionPort mit CreateIoCompletionPort()
 anlegt und Handles mit ihm asoziiert. Bei der Asoziierung wird ein einzigartiger Schlüssel
 übergeben, der bei der Signalisierung wieder zurückgegeben wird um das Handle identifizieren zu können.
 Der CompletionPort kann erst nach dem Schließen der asoziierten Handles geschlossen werden.
@@ -497,7 +498,7 @@ static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
 % up
 % destroy
 %kernel_libipsec_ipsec route installation
-\subsubsection{libstrongswan}
+\subsection{libstrongswan}
 Hier galt es das Öffnen, Konfigurieren und Schließen von TUN-Geräten
 mit dem TAP-Windows-Treiber zu implementieren.
 
@@ -527,7 +528,7 @@ wie die IP des virtuellen Routers, den Status des Geräts sowie der Modus des Ge
 % WaitForMultipleObjects
 % komplexe Änderungen des Verhaltens von kernel-libipsec
 
-\subsubsection{kernel-iph}
+\subsection{kernel-iph}
 kernel-iph ist ein Plugin für charon, das das Kernel-Interface
 für die Verwaltung von IP-Adressen und Routen implementiert.
 
@@ -536,9 +537,9 @@ Eine vollständige Implementierung existiert im Zweig "win-vip", die in den Zwei
 gemerged wurde, um eine vollständige Implementierung dort zu erhalten.
 %TODO: Codebeispiele?
 
-\subsection{Portierung}
+\section{Portierung}
 \subsubsection{Überlegungen zur Portierung}
-\subsection{Unterstützte Kryptographie}
+\section{Unterstützte Kryptographie}
 Die unterstützte Kryptographie ist notwendigerweise von den deklarierten Identifikatoren
 für IKE beschränkt. strongSwan unterstützt mehr Verschlüsselungsalgorithmen als
 in den \acp{RFC} deklariert wurde. Aus diesem Grund nutzt strongSwan Identifikatoren
@@ -547,7 +548,7 @@ nicht standardisiert sind.
 
 strongSwan unterstützt eine große Anzahl von Algorithmen\footnote{\url{https://wiki.strongswan.org/projects/strongswan/wiki/IKEv1CipherSuites} \url{https://wiki.strongswan.org/projects/strongswan/wiki/IKEv2CipherSuites}}. Diese sind auch für den Einsatz im ESP-Protokoll nutzbar,
 wenn libipsec benutzt wird.
-\subsection{Tun-Treiber}
+\section{Tun-Treiber}
 % openvpn
 % kompatibilität
 % Treiber-patches upstream
@@ -555,7 +556,7 @@ Im Zuge der \ac{BA} wurde ein Patch für den TAP-Windows-Treiber entwicklelt, um
 Prüfung der Quell-IP der ARP-Requests zu deaktivieren. Das ist erforderlich, um mit der
 virtuellen IP des Clients mit dem entfernten IP-Netzwerk kommunizieren zu können.
 
-\paragraph{Patch}
+\subsubsection{Patch}
 Der entwickelte Patch deaktiviert die Überprüfung der Quell-IP der ARP-Requests, die
 vom Treiber verarbeitet werden. Wenn die Überprüfung erfolgreich war, so wird der ARP-Request
 beantwortet und dem Kernel wird damit mitgeteilt, wie die MAC-Adresse des virtuellen Routers lautet.
@@ -565,7 +566,7 @@ da das Routen aller \ac{IP}-Adressen über das Gerät die \ac{ARP}-Tabelle des C
 mehr gefüllt hätte und eine \ac{ARP}-Adressabfrage bei jeder Kommunikation mit einer neuen
 \ac{IP}-Adresse zu Folge hätte.
 
-\subsection{Maßnahmen gegen Buffer Bloat}
+\section{Maßnahmen gegen Buffer Bloat}
 libipsec speichert die empfangenen Pakete vor- und nach der Verarbeitung in einer 
 Wartschleife (Queue).
 Nach der Verarbeitung werden die Pakete nochmals gepuffert, bevor sie an das TUN-Gerät 
