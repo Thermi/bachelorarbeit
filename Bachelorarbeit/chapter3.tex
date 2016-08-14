@@ -58,7 +58,7 @@ Für das Multiplexen der Eingabe stehen unter Windows zwei Verfahren zur Verfüg
 \item IOCompletionPorts
 \end{itemize}
 
-WaitForMultipleObjects\footcite[][]{_waitformultipleobjects_????} funktioniert mit einem Array aus Handles. In der Struktur des Handles
+WaitForMultipleObjects\footcite[][]{_waitformultipleobjects_2016} funktioniert mit einem Array aus Handles. In der Struktur des Handles
 ist das event-Attribut auf ein einzgartiges Event gesetzt, welches genutzt wird um
 das Handle zu finden, dessen Lesevorgang abgeschlossen oder abgebrochen wurde.
 Nach dem Kopieren des Handles in das Array und dem Setzen des Events wird ein asynchroner
@@ -67,7 +67,7 @@ Dadurch beendet der Aufruf von WaitForMultipleObjects() nach dem aufruf direkt, 
 ein Lesevorgang schon zuvor erfolgreich war und der Programmcode wird etwas kürzer.
 % Mehr Erläuterung benötigt
 
-IOCompletionPorts\footcite[][]{_createiocompletionport_????} funktionieren, indem man einen IOCompletionPort mit CreateIoCompletionPort()
+IOCompletionPorts\footcite[][]{_createiocompletionport_2016} funktionieren, indem man einen IOCompletionPort mit CreateIoCompletionPort()
 anlegt und Handles mit ihm asoziiert. Bei der Asoziierung wird ein einzigartiger Schlüssel
 übergeben, der bei der Signalisierung wieder zurückgegeben wird um das Handle identifizieren zu können.
 Der CompletionPort kann erst nach dem Schließen der asoziierten Handles geschlossen werden.
