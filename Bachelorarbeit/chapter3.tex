@@ -36,6 +36,13 @@ libipsec implementiert die Verarbeitung von Paketen, das Erzwingen der \acp{SP},
 das Verwalten der \acp{SP}, \acp{SA}, Routen und der TUN-Geräte.
 Die hierbei relevanten Dateien sind unter /src/libipsec/ zu finden.
 
+Standardmäßig installiert strongSwan die IP-Adressen die per Config-Mode
+oder \ac{CP} empfangen wird auf dem ausgehenden Interface (Linux, Kernelspace processing),
+was für die Kommunikation mit dem Peer genutzt wird,
+oder auf dem loopback-Adapter (Windows).
+Um die IP-Adresse für TUN-Geräte korrekt zu setzen, nutzt libipsec den Parameter
+"charon.install_virtual_ip_on" von strongswan.conf, der während der Initialisierung
+des Plugins gesetzt wird.
 % route installation
 % queues
 % processing
@@ -535,6 +542,132 @@ Ursprünglich war das Verwalten von IP-Adressen im Master-Zweig nicht implementi
 Eine vollständige Implementierung existiert im Zweig "win-vip", die in den Zweig 'windows-libipsec'
 gemerged wurde, um eine vollständige Implementierung dort zu erhalten.
 %TODO: Codebeispiele?
+Nachgerüstet werden musste Code zum Beachten des "charon.install_virtual_ip_on" Parameters
+der in der Datei "strongswan.conf" definiert werden kann und den libipsec nutzt um
+die Installation der empfangenen IP-Adresse(n) auf den richtigen Adapter zu erzwingen.
+Der Code kopiert den Adapternamen während der Initialisierung des Plugins, daher
+ändert ein Ändern des Parameters während der Laufzeit nicht die Schnittstelle,
+auf die die IP-Adresse installiert werden würde.
+
+Die bekannten IP-Adressen werden in kernel-iph in einer Datenstruktur gespeichert,
+um sie schnell nachschlagen zu können und Berechnungen zu tätigen. Die Struktur
+wird einerseits durch manuelles Einfügen und Entfernen von selbstinstallierten Adressen
+bewerkstelligt, als auch durch Events, die der Kernel per 
+
+\begin{lstlisting}[caption=Ergänzung zu private_kernel_iph_net_t]
+/**
+ * Private data of kernel_iph_net implementation.
+ */
+struct private_kernel_iph_net_t {
+        [...]
+        /**
+         * Whether to install virtual IPs
+         */
+        bool install_virtual_ip;
+
+        /**
+         * Where to install virtual IPs
+         */
+
+        char *install_virtual_ip_on;
+};
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Code für add_ip]
+METHOD(kernel_net_t, add_ip, status_t,
+	private_kernel_iph_net_t *this, host_t *vip, int prefix, char *name)
+{
+	if (!this->install_virtual_ip)
+	{	/* disabled by config */
+		return SUCCESS;
+	}
+	MIB_UNICASTIPADDRESS_ROW row;
+	u_long status;
+        iface_t *iface = NULL, *entry = NULL;
+
+        /* Print out all known interfaces */
+        enumerator_t *enumerator = this->ifaces->create_enumerator(this->ifaces);
+        while(enumerator->enumerate(enumerator, &entry))
+        {
+            DBG1(DBG_KNL, "interface %s\n index: %d\n description %s\n type %d", entry->ifname, entry->ifindex, entry->ifdesc, entry->iftype);
+        }
+        enumerator->destroy(enumerator);
+	/* name of the MS Loopback adapter */
+        if (!this->install_virtual_ip_on || this->ifaces->find_first(this->ifaces, (void*)iface_by_name,
+						(void**)&iface, this->install_virtual_ip_on) != SUCCESS)
+        {
+            name = "{DB2C49B1-7C90-4253-9E61-8C6A881194ED}";
+        }
+        else
+        {
+            name = this->install_virtual_ip_on;
+        }
+	host2unicast(vip, prefix, &row);
+
+	row.InterfaceIndex = add_addr(this, name, vip, TRUE);
+	if (!row.InterfaceIndex)
+	{
+		DBG1(DBG_KNL, "interface '%s' not found", name);
+		return NOT_FOUND;
+	}
+
+	status = CreateUnicastIpAddressEntry(&row);
+	if (status != NO_ERROR)
+	{
+		DBG1(DBG_KNL, "creating IPH address entry failed: %lu", status);
+		remove_addr(this, vip);
+		return FAILED;
+	}
+	return SUCCESS;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Code für del_ip]
+METHOD(kernel_net_t, del_ip, status_t,
+	private_kernel_iph_net_t *this, host_t *vip, int prefix, bool wait)
+{
+        if (!this->install_virtual_ip)
+	{	/* disabled by config */
+		return SUCCESS;
+	}
+
+	MIB_UNICASTIPADDRESS_ROW row;
+	u_long status;
+
+	host2unicast(vip, prefix, &row);
+
+	row.InterfaceIndex = remove_addr(this, vip);
+	if (!row.InterfaceIndex)
+	{
+		DBG1(DBG_KNL, "virtual IP %H not found", vip);
+		return NOT_FOUND;
+	}
+
+	status = DeleteUnicastIpAddressEntry(&row);
+	if (status != NO_ERROR)
+	{
+		DBG1(DBG_KNL, "deleting IPH address entry failed: %lu", status);
+		return FAILED;
+	}
+
+	return SUCCESS;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Ergänzung zu kernel_iph_net_create()]
+*
+ * Described in header.
+ */
+kernel_iph_net_t *kernel_iph_net_create()
+{
+        [...}
+		.install_virtual_ip = lib->settings->get_bool(lib->settings,
+						"%s.install_virtual_ip", TRUE, lib->ns),
+		.install_virtual_ip_on = lib->settings->get_str(lib->settings,
+						"%s.install_virtual_ip_on", NULL, lib->ns),
+	   [...]
+}
+\end{lstlisting}
 
 \subsection{Portierung}
 \subsubsection{Überlegungen zur Portierung}
