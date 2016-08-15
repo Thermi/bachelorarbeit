@@ -41,7 +41,7 @@ oder \ac{CP} empfangen wird auf dem ausgehenden Interface (Linux, Kernelspace pr
 was für die Kommunikation mit dem Peer genutzt wird,
 oder auf dem loopback-Adapter (Windows).
 Um die IP-Adresse für TUN-Geräte korrekt zu setzen, nutzt libipsec den Parameter
-"charon.install_virtual_ip_on" von strongswan.conf, der während der Initialisierung
+"charon.install\_virtual\_ip\_on" von strongswan.conf, der während der Initialisierung
 des Plugins gesetzt wird.
 % route installation
 % queues
@@ -542,7 +542,7 @@ Ursprünglich war das Verwalten von IP-Adressen im Master-Zweig nicht implementi
 Eine vollständige Implementierung existiert im Zweig "win-vip", die in den Zweig 'windows-libipsec'
 gemerged wurde, um eine vollständige Implementierung dort zu erhalten.
 %TODO: Codebeispiele?
-Nachgerüstet werden musste Code zum Beachten des "charon.install_virtual_ip_on" Parameters
+Nachgerüstet werden musste Code zum Beachten des "charon.install\_virtual\_ip\_on" Parameters
 der in der Datei "strongswan.conf" definiert werden kann und den libipsec nutzt um
 die Installation der empfangenen IP-Adresse(n) auf den richtigen Adapter zu erzwingen.
 Der Code kopiert den Adapternamen während der Initialisierung des Plugins, daher
@@ -554,7 +554,7 @@ um sie schnell nachschlagen zu können und Berechnungen zu tätigen. Die Struktu
 wird einerseits durch manuelles Einfügen und Entfernen von selbstinstallierten Adressen
 bewerkstelligt, als auch durch Events, die der Kernel per 
 
-\begin{lstlisting}[caption=Ergänzung zu private_kernel_iph_net_t]
+\begin{lstlisting}[caption=Ergänzung zu private\_kernel\_iph\_net\_t]
 /**
  * Private data of kernel_iph_net implementation.
  */
@@ -573,7 +573,7 @@ struct private_kernel_iph_net_t {
 };
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Code für add_ip]
+\begin{lstlisting}[caption=Code für add\_ip]
 METHOD(kernel_net_t, add_ip, status_t,
 	private_kernel_iph_net_t *this, host_t *vip, int prefix, char *name)
 {
@@ -622,7 +622,7 @@ METHOD(kernel_net_t, add_ip, status_t,
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Code für del_ip]
+\begin{lstlisting}[caption=Code für del\_ip]
 METHOD(kernel_net_t, del_ip, status_t,
 	private_kernel_iph_net_t *this, host_t *vip, int prefix, bool wait)
 {
@@ -654,7 +654,7 @@ METHOD(kernel_net_t, del_ip, status_t,
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Ergänzung zu kernel_iph_net_create()]
+\begin{lstlisting}[caption=Ergänzung zu kernel\_iph\_net\_create()]
 *
  * Described in header.
  */
