@@ -835,26 +835,7 @@ METHOD(tun_device_t, up, bool,
             return FALSE;
         }
 #else
-	struct ifreq ifr;
-
-	memset(&ifr, 0, sizeof(ifr));
-	strncpy(ifr.ifr_name, this->if_name, IFNAMSIZ);
-
-	if (ioctl(this->sock, SIOCGIFFLAGS, &ifr) < 0)
-	{
-		DBG1(DBG_LIB, "failed to get interface flags for %s: %s", this->if_name,
-			 strerror(errno));
-		return FALSE;
-	}
-
-	ifr.ifr_flags |= IFF_RUNNING | IFF_UP;
-
-	if (ioctl(this->sock, SIOCSIFFLAGS, &ifr) < 0)
-	{
-		DBG1(DBG_LIB, "failed to set interface flags on %s: %s", this->if_name,
-			 strerror(errno));
-		return FALSE;
-	}
+        [...]
 #endif /* WIN32 */
 	return TRUE;
 }
