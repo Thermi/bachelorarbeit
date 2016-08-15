@@ -817,9 +817,52 @@ static bool init_tun(private_tun_device_t *this, const char *name_tmpl)
 }
 \end{lstlisting}
 
+Für das Setzen des Geräts auf ''up'' wurde der entsprechende Aufruf per IoControl
+implementiert:
+\begin{lstlisting}[caption=Code für das Setzen des Geräts auf ''up'']
+/* Fix for WIN32 */
+METHOD(tun_device_t, up, bool,
+	private_tun_device_t *this)
+{
+#ifdef WIN32
+        ULONG status = TRUE;
+        DWORD len;
+        if (!DeviceIoControl (this->tunhandle, TAP_WIN_IOCTL_SET_MEDIA_STATUS,
+			  &status, sizeof (status),
+			  &status, sizeof (status), &len, NULL))
+        {
+            DBG1(DBG_LIB, "failed to set the interface %s to up", this->if_name);
+            return FALSE;
+        }
+#else
+	struct ifreq ifr;
+
+	memset(&ifr, 0, sizeof(ifr));
+	strncpy(ifr.ifr_name, this->if_name, IFNAMSIZ);
+
+	if (ioctl(this->sock, SIOCGIFFLAGS, &ifr) < 0)
+	{
+		DBG1(DBG_LIB, "failed to get interface flags for %s: %s", this->if_name,
+			 strerror(errno));
+		return FALSE;
+	}
+
+	ifr.ifr_flags |= IFF_RUNNING | IFF_UP;
+
+	if (ioctl(this->sock, SIOCSIFFLAGS, &ifr) < 0)
+	{
+		DBG1(DBG_LIB, "failed to set interface flags on %s: %s", this->if_name,
+			 strerror(errno));
+		return FALSE;
+	}
+#endif /* WIN32 */
+	return TRUE;
+}
+\end{lstlisting}
+
 Folgend der Code für das Erstellen eines Objects vom Typ ''tun\_device\_t''.
 
-\begin{lstlisting}[caption=Erstellen von tun\_device\_t]
+\begin{lstlisting}[caption=Code für das Erstellen von tun\_device\_t]
 /*
  * Described in header
  */
