@@ -549,7 +549,351 @@ Das Handle kann nun genutzt werden um Pakete vom TAP-Gerät zu lesen und zu schr
 Mittels DeviceIoControl kann die Konfiguration des Geräts geändert werden,
 wie die IP des virtuellen Routers, den Status des Geräts sowie der Modus des Geräts.
 
+Für die Portierung wurden die \acp{FD} für Handles ausgetauscht und für das Benachrichtigen
+über Änderungen in der Liste der TUN-Geräte wurde ein Event verwendet.
 
+Da Eventbasiertes IO-Multiplexing genutzt wird, werden verschiedene Events zum Lesen
+und Schreiben verwendet.
+Die Namen der Events werden als Attribut des Objekts in ''tun\_device\_t->read\_event\_name''
+''tun\_device\_t->write\_event\_name'' gespeichert. Sie können mittles ''tun\_device\_t->get\_read\_event\_name()'
+und ''tun\_device\_t->get\_read\_event\_name()'' gelesen werden.
+
+\begin{lstlisting}[caption=Code für das Suchen eines TAP-Geräts]
+/*
+ * Searches through the registry for suitable TAP driver interfaces
+ * On Windows, the TAP interface metadata is stored and described in the registry.
+ * It returns a linked list that contains all found guids. The guids describe the interfaces.
+ */
+
+linked_list_t *get_tap_reg()
+{
+    HKEY adapter_key;
+    LONG status;
+    DWORD len;
+    linked_list_t *list = linked_list_create();
+    int i = 0;
+
+    /*
+     * Open parent key. It contains all other keys that
+     * describe any possible interfaces.
+     */
+    status = RegOpenKeyEx(
+            HKEY_LOCAL_MACHINE,
+            ADAPTER_KEY,
+            0,
+            KEY_READ,
+            &adapter_key);
+
+    if (status != ERROR_SUCCESS)
+    {
+        DBG2(DBG_LIB, "Error opening registry key: %s", ADAPTER_KEY);
+    }
+
+    while (true)
+    {
+        char enum_name[256];
+        char unit_string[256];
+        HKEY unit_key;
+        char component_id_string[] = "ComponentId";
+        char component_id[256];
+        char net_cfg_instance_id_string[] = "NetCfgInstanceId";
+        char net_cfg_instance_id[256];
+        DWORD data_type;
+
+        len = sizeof (enum_name);
+        status = RegEnumKeyEx(
+                adapter_key,
+                i,
+                enum_name,
+                &len,
+                NULL,
+                NULL,
+                NULL,
+                NULL);
+        if (status == ERROR_NO_MORE_ITEMS)
+        {
+            break;
+        }
+        else if (status != ERROR_SUCCESS)
+        {
+            DBG2(DBG_LIB, "Error enumerating registry subkeys of key: %s",
+                    ADAPTER_KEY);
+        }
+
+        snprintf(unit_string, sizeof (unit_string), "%s\\%s",
+                ADAPTER_KEY, enum_name);
+
+        status = RegOpenKeyEx(
+                HKEY_LOCAL_MACHINE,
+                unit_string,
+                0,
+                KEY_READ,
+                &unit_key);
+
+        if (status != ERROR_SUCCESS)
+        {
+            DBG2(DBG_LIB, "Error opening registry key: %s", unit_string);
+        }
+        else
+        {
+            len = sizeof (component_id);
+            status = RegQueryValueEx(
+                    unit_key,
+                    component_id_string,
+                    NULL,
+                    &data_type,
+                    component_id,
+                    &len);
+
+            if (status != ERROR_SUCCESS || data_type != REG_SZ)
+            {
+                DBG2(DBG_LIB, "Error opening registry key: %s\\%s",
+                        unit_string, component_id_string);
+            }
+            else
+            {
+                len = sizeof (net_cfg_instance_id);
+                status = RegQueryValueEx(
+                        unit_key,
+                        net_cfg_instance_id_string,
+                        NULL,
+                        &data_type,
+                        net_cfg_instance_id,
+                        &len);
+
+                if (status == ERROR_SUCCESS && data_type == REG_SZ)
+                {
+                    if (!strcmp(component_id, TAP_WIN_COMPONENT_ID))
+                    {
+                        /* That thing is a valid interface key */
+                        /* link into return list */
+                        char *guid = malloc(sizeof(net_cfg_instance_id));
+                        memcpy(guid, net_cfg_instance_id, sizeof(net_cfg_instance_id));
+                        list->insert_last(list, guid);
+                    }
+                }
+            }
+            RegCloseKey(unit_key);
+        }
+        ++i;
+    }
+
+    RegCloseKey(adapter_key);
+    return list;
+}
+\end{lstlisting}
+
+Folgend ist der Code für das Konfigurieren eines TAP-Geräts:
+\begin{lstlisting}[caption=Konfiguration eines TAP-Geräts]
+/**
+ * Initialize the tun device
+ */
+static bool init_tun(private_tun_device_t *this, const char *name_tmpl)
+[...]
+#elif defined(WIN32)
+        /* WIN32 TAP driver stuff*/
+        /* Check if there is an unused tun device following the IPsec name scheme*/
+        enumerator_t *enumerator;
+        char *guid;
+        BOOL success = FALSE;
+        linked_list_t *possible_devices = get_tap_reg();
+        memset(this->if_name, 0, sizeof(this->if_name));
+
+        this->read_event_name = malloc(WIN32_TUN_EVENT_LENGTH);
+        this->write_event_name = malloc(WIN32_TUN_EVENT_LENGTH);
+        /* Iterate over list */
+        enumerator = possible_devices->create_enumerator(possible_devices);
+        /* Try to open that device */
+        while(enumerator->enumerate(enumerator, &guid))
+        {
+            if (!success){
+                /* Set mode */
+                char device_path[256];
+                /* Translate dev name to guid */
+                /* TODO: Fix. device_guid should be */
+                snprintf (device_path, sizeof(device_path), "%s%s%s", USERMODEDEVICEDIR, guid, TAP_WIN_SUFFIX);
+
+                this->tunhandle = CreateFile(device_path, GENERIC_READ | GENERIC_WRITE, 0,
+                    0, OPEN_EXISTING, FILE_ATTRIBUTE_SYSTEM | FILE_FLAG_OVERLAPPED, 0);
+                if (this->tunhandle == INVALID_HANDLE_VALUE)
+                {
+                    DBG1(DBG_LIB, "could not create TUN device %s", device_path);
+                }
+                else
+                {
+                    memcpy(this->if_name, guid, strlen(guid));
+                    success = TRUE;
+                }
+            }
+            else
+            {
+                break;
+            }
+            /* device has been examined or used, free it */
+            free(guid);
+        }
+
+        /* possible_devices has been freed while going over the enumerator.
+         * Therefore it is not necessary to free the elements in the list now.
+         */
+        enumerator->destroy(enumerator);
+        possible_devices->destroy(possible_devices);
+        if (!success)
+        {
+            return FALSE;
+        }
+        /* set correct mode */
+        /* We set a fake gateway of 169.254.254.128 that we route packets over
+         The TAP driver strips the Ethernet header and trailer of the Ethernet frames
+         before sending them back to the application that listens on the handle */
+	struct in_addr ep[3];
+        ULONG status = TRUE;
+        DWORD len;
+        /* Local address (just fake one): 169.254.128.127 */
+	ep[0].S_un.S_un_b.s_b1 = 169;
+        ep[0].S_un.S_un_b.s_b2 = 254;
+        ep[0].S_un.S_un_b.s_b3 = 128;
+        ep[0].S_un.S_un_b.s_b4 = 127;
+        /*
+         * Remote network. The tap driver validates it by masking it with the remote_netmask
+         * and then comparing hte result against the remote network (this value here).
+         * If it does not match, an error is logged and initialization fails.
+         * (local & remote_netmask ? local)
+         * The driver does proxy arp for this network and the local address.
+         */
+        /* We need to integrate support for IPv6, too. */
+        /* Just fake a link local address for now (169.254.128.128) */
+	ep[1].S_un.S_un_b.s_b1 = 169;
+        ep[1].S_un.S_un_b.s_b2 = 254;
+        ep[1].S_un.S_un_b.s_b3 = 128;
+        ep[1].S_un.S_un_b.s_b4 = 128;
+        /* Remote netmask (255.255.255.255) */
+	ep[2].S_un.S_un_b.s_b1 = 255;
+        ep[2].S_un.S_un_b.s_b2 = 255;
+        ep[2].S_un.S_un_b.s_b3 = 255;
+        ep[2].S_un.S_un_b.s_b4 = 255;
+
+        if(!DeviceIoControl (this->tunhandle, TAP_WIN_IOCTL_CONFIG_TUN,
+		    ep, sizeof (ep),
+		    ep, sizeof (ep), &len, NULL))
+        {
+            DBG1 (DBG_LIB, "WARNING: The TAP-Windows driver rejected a TAP_WIN_IOCTL_CONFIG_TUN DeviceIoControl call.");
+        }
+
+        ULONG disable_src_check = FALSE;
+        if(!DeviceIoControl(this->tunhandle, TAP_WIN_IOCTL_CONFIG_SET_SRC_CHECK,
+                    &disable_src_check, sizeof(disable_src_check),
+                    &disable_src_check, sizeof(disable_src_check), &len, NULL))
+        {
+            DBG1 (DBG_LIB, "WARNING: The TAP-Windows driver rejected a TAP_WIN_IOCTL_CONFIG_SET_SRC_CHECK DeviceIoControl call.");
+        }
+        ULONG driverVersion[3] = {0 , 0, 0};
+        if(!DeviceIoControl(this->tunhandle, TAP_WIN_IOCTL_GET_VERSION,
+                    &driverVersion, sizeof(driverVersion),
+                    &driverVersion, sizeof(driverVersion), &len, NULL))
+        {
+            DBG1(DBG_LIB, "WARNING: The TAP-Windows driver rejected a TAP_WIN_IOCTL_GET_VERSION DeviceIoControl call.");
+        }
+        else
+        {
+            DBG1(DBG_LIB, "TAP-Windows driver version %d.%d available.", driverVersion[0], driverVersion[1]);
+        }
+        /* Set device to up */
+
+        if (!DeviceIoControl (this->tunhandle, TAP_WIN_IOCTL_SET_MEDIA_STATUS,
+  			  &status, sizeof (status),
+                            &status, sizeof (status), &len, NULL))
+        {
+            DBG1 (DBG_LIB, "WARNING: The TAP-Windows driver rejected a TAP_WIN_IOCTL_SET_MEDIA_STATUS DeviceIoControl call.");
+        }
+
+            /* Give the adapter 2 seconds to come up */
+        /* Create event with special template */
+        snprintf(this->read_event_name, WIN32_TUN_EVENT_LENGTH, WIN32_TUN_READ_EVENT_TEMPLATE, this->if_name);
+        snprintf(this->write_event_name, WIN32_TUN_EVENT_LENGTH, WIN32_TUN_WRITE_EVENT_TEMPLATE, this->if_name);
+        sleep(2);
+        return TRUE;
+        [...]
+}
+\end{lstlisting}
+
+Folgend der Code für das Erstellen eines Objects vom Typ ''tun\_device\_t''.
+
+\begin{lstlisting}[caption=Erstellen von tun\_device\_t]
+/*
+ * Described in header
+ */
+tun_device_t *tun_device_create(const char *name_tmpl)
+{
+	private_tun_device_t *this;
+
+	INIT(this,
+		.public = {
+			.read_packet = _read_packet,
+			.write_packet = _write_packet,
+			.get_mtu = _get_mtu,
+			.set_mtu = _set_mtu,
+			.get_name = _get_name,
+                        /* For WIN32, that's a handle. */
+#ifdef WIN32
+                        .get_handle = _get_handle,
+                        .get_write_event_name = _get_write_event_name,
+                        .get_read_event_name = _get_read_event_name,
+#else
+			.get_fd = _get_fd,
+#endif /* WIN32 */
+			.set_address = _set_address,
+			.get_address = _get_address,
+			.up = _up,
+			.destroy = _destroy,
+		},
+#ifdef WIN32
+                .tunhandle = NULL,
+#else
+		.tunfd = -1,
+		.sock = -1,
+#endif /* WIN32 */
+	);
+
+	if (!init_tun(this, name_tmpl))
+	{
+		free(this);
+		return NULL;
+	}
+	DBG1(DBG_LIB, "created TUN device: %s", this->if_name);
+
+#ifdef WIN32
+#else
+	this->sock = socket(AF_INET, SOCK_DGRAM, 0);
+	if (this->sock < 0)
+	{
+		DBG1(DBG_LIB, "failed to open socket to configure TUN device");
+		destroy(this);
+		return NULL;
+	}
+#endif /* WIN32 */
+	return &this->public;
+}
+
+#endif /* TUN devices supported */
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Relevanter code für tun\_device\_t->destroy()]
+METHOD(tun_device_t, destroy, void,
+	private_tun_device_t *this)
+{
+#ifdef WIN32
+        /* close file handle, destroy interface */
+        CloseHandle(this->tunhandle);
+        free(this->read_event_name);
+        free(this->write_event_name);
+#else
+        [...]
+#endif
+    	DESTROY_IF(this->address);
+    	free(this);
+}
+\end{lstlisting}
 % callbacks
 % synchronous
 % WaitForMultipleObjects
