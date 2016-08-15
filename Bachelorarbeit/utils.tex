@@ -1,0 +1,76 @@
+% utils.tex
+
+ for crossing out cells. :(
+% from https://tex.stackexchange.com/questions/156162/strike-out-a-table-cell
+\pagestyle{empty}% for cropping
+\usepackage{colortbl}
+\usepackage{pgf}
+\usepackage{zref-savepos}
+
+\newcounter{NoTableEntry}
+\renewcommand*{\theNoTableEntry}{NTE-\the\value{NoTableEntry}}
+
+\newcommand*{\notableentry}{%
+  \multicolumn{1}{@{}c@{}|}{%
+    \stepcounter{NoTableEntry}%
+    \vadjust pre{\zsavepos{\theNoTableEntry t}}% top
+    \vadjust{\zsavepos{\theNoTableEntry b}}% bottom
+    \zsavepos{\theNoTableEntry l}% left
+    %
+    \begin{pgfpicture}%
+      \pgfsetlinewidth{.4pt}%
+      \pgfsetstrokecolor{red}%
+      \edef\llx{0sp}%
+      \edef\urx{%
+        \the\numexpr
+          \zposx{\theNoTableEntry r}%
+          -\zposx{\theNoTableEntry l}%
+        \relax sp%
+      }%
+      \edef\lly{%
+        \the\numexpr
+          \zposy{\theNoTableEntry b}%
+          -\zposy{\theNoTableEntry l}%
+        \relax sp%
+      }%
+      \edef\ury{%
+        \the\numexpr
+          \zposy{\theNoTableEntry t}%
+          -\zposy{\theNoTableEntry l}%
+        \relax sp%
+      }%
+      \pgfpathmoveto{\pgfpoint{\llx}{\lly}}%
+      \pgfpathlineto{\pgfpoint{\urx}{\ury}}%
+      \pgfpathmoveto{\pgfpoint{\llx}{\ury}}%
+      \pgfpathlineto{\pgfpoint{\urx}{\lly}}%
+      \pgfusepath{stroke}%
+      \pgfresetboundingbox
+    \end{pgfpicture}%
+    %
+    \hspace{0pt plus 1filll}%
+    \zsavepos{\theNoTableEntry r}% right
+  }%
+}
+
+% End of the stuff for crossing out tables
+
+% start of code for coloring boxes in bytefield
+
+\newcommand{\colorbitbox}[3]{%
+\rlap{\bitbox{#2}{\color{#1}\rule{\width}{\height}}}%
+\bitbox{#2}{#3}}
+\definecolor{lightcyan}{rgb}{0.84,1,1}
+\definecolor{lightgreen}{rgb}{0.64,1,0.71}
+\definecolor{lightred}{rgb}{1,0.7,0.71}
+\definecolor{lightgray}{gray}{0.8}
+
+% example code for usage:
+% \begin{bytefield}[bitheight=\widthof{~Sign~},
+% boxformatting={\centering\small}]{32}
+% \bitheader[endianness=big]{31,23,0} \\
+% \colorbitbox{lightcyan}{1}{\rotatebox{90}{Sign}} &
+% \colorbitbox{lightgreen}{8}{Exponent} &
+% \colorbitbox{lightred}{23}{Mantissa}
+% \end{bytefield}
+
+% end of code for coloring boxes in bytefield
