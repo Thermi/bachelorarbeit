@@ -26,11 +26,32 @@ Bei der Portierung wurde für das verwalten von Speicherabschnitten
 primär alloca() genutzt, statt malloc() und seine Unterarten. Der Unterschied hierbei ist die
 Speicherdauer. Mit alloca() allokierter Speicher ist nur bis zum Verlassen der Funktion gültig
 und wird automatisch freigegeben. Mit malloc() allokierter Speicher muss manuell freigegeben werden.
+alloca() ist ein Feature, welches nicht standardisiert ist.
+Daher lässt sich strongSwan nicht mit allen C-Bibliotheken übersetzen.
+Auf der Wiki-Seite über den Windows-Port steht explizit geschrieben, dass nur die Kompilierung
+mittels MinGW-W64 unterstützt wird.
+
 
 \subsection{Bestehende Implementierung}
 Die bestehende Implementierung umfasst die eigentliche Bibliothek, eine Implementierung
 eines Kernel-Interface zwischen libipsec und charon, sowie Code in libstrongswan
-um TUN-Geräte zu öffnen.
+um TUN-Geräte zu öffnen. Martin Willi hat 2014 bereits die gesamte Portierungsarbeit
+für version 5.2.0 von strongSwan gemacht. Der Port unterstützt Windows 7 / server 2008 R2
+und neuer.
+
+\subsection{Unterstützte Kryptographie}
+Die unterstützte Kryptographie ist notwendigerweise von den deklarierten Identifikatoren
+für IKE beschränkt. strongSwan unterstützt mehr Verschlüsselungsalgorithmen als
+in den \acp{RFC} deklariert wurde. Aus diesem Grund nutzt strongSwan Identifikatoren
+teilweise aus dem privaten Bereich, wenn die Identifikatoren für den eingesetzten Algorithmus
+nicht standardisiert sind.
+
+strongSwan unterstützt eine große Anzahl von Algorithmen im Vergleich zu anderen Implementierungen,
+wie in den Tabellen in \autoref{sec:appendix} dagelegt wird. Wenn libipsec genutzt wird,
+so können alle Algorithmen, die im Userspace implementiert sind, für die Absicherung
+von Verkehr genutzt werden.
+
+\subsection{Portierung}
 \subsubsection{libipsec}
 libipsec implementiert die Verarbeitung von Paketen, das Erzwingen der \acp{SP},
 das Verwalten der \acp{SP}, \acp{SA}, Routen und der TUN-Geräte.
@@ -669,17 +690,6 @@ kernel_iph_net_t *kernel_iph_net_create()
 }
 \end{lstlisting}
 
-\subsection{Portierung}
-\subsubsection{Überlegungen zur Portierung}
-\subsection{Unterstützte Kryptographie}
-Die unterstützte Kryptographie ist notwendigerweise von den deklarierten Identifikatoren
-für IKE beschränkt. strongSwan unterstützt mehr Verschlüsselungsalgorithmen als
-in den \acp{RFC} deklariert wurde. Aus diesem Grund nutzt strongSwan Identifikatoren
-teilweise aus dem privaten Bereich, wenn die Identifikatoren für den eingesetzten Algorithmus
-nicht standardisiert sind.
-
-strongSwan unterstützt eine große Anzahl von Algorithmen\footnote{\url{https://wiki.strongswan.org/projects/strongswan/wiki/IKEv1CipherSuites} \url{https://wiki.strongswan.org/projects/strongswan/wiki/IKEv2CipherSuites}}. Diese sind auch für den Einsatz im ESP-Protokoll nutzbar,
-wenn libipsec benutzt wird.
 \subsection{Tun-Treiber}
 % openvpn
 % kompatibilität
