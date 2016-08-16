@@ -16,20 +16,20 @@
 bitwidth=1.1em,
 endianness=big]{32}
 \bitheader{0-31}\\
-\bitbox{4}{Version}
-\bitbox{4}{IHL}
+\colorbitbox{lightgray}{4}{Version}
+\colorbitbox{lightgray}{4}{IHL}
 \bitbox{6}{DSCP}
 \bitbox{2}{ECN}
-\bitbox{16}{Total Length}\\
-\bitbox{16}{Identification}
+\colorbitbox{lightgray}{16}{Total Length}\\
+\colorbitbox{lightgray}{16}{Identification}
 \bitbox{4}{Flags}
 \bitbox{12}{Fragment Offset}\\
 \bitbox{8}{Time To Live}
-\bitbox{8}{Protocol}
+\colorbitbox{lightgray}{8}{Protocol}
 \bitbox{16}{Header Checksum}\\
-\bitbox{32}{Source Address}\\
-\bitbox{32}{Destination Address} \\
-\bitbox{24}{Options}
-\bitbox{8}{Padding}\\
+\colorbitbox{lightgray}{32}{Source Address}\\
+\colorbitbox{lightgray}{32}{Destination Address} \\
+\colorbitbox{lightgray}{24}{Options}
+\colorbitbox{lightgray}{8}{Padding}\\
 \end{bytefield}
 
