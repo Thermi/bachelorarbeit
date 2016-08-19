@@ -1143,9 +1143,67 @@ das IO-Multiplexen dort abgelegt.
 Im Zuge der \ac{BA} wurde ein Patch für den TAP-Windows-Treiber entwicklelt, um die
 Prüfung der Quell-IP der ARP-Requests zu deaktivieren. Das ist erforderlich, um mit der
 virtuellen IP des Clients mit dem entfernten IP-Netzwerk kommunizieren zu können.
+\subsubsection{Bauen und Installieren des Treibers}
+Um den Treiber zu bauen, wird zuallererst der Quellcode benötigt, sowie die
+Vorraussetzungen, welche auf der Github-Seite dort aufgelistet sind.
+Die aktuellen Minimalvorraussetzungen sind Python 2.7, das Microsoft Windows 7 WDK (Windows Driver Kit)
+und ein Windows Code signing certificate.
+Das Zertifikat muss nicht valid sein, wenn der Treiber nicht produktiv ausgerollt
+werden soll. Der Grund ist, dass unter Windows das Überprüfen der Treibersignatur deaktiviert
+werden kann, aber der Treiber muss trotzdem signiert sein. Der Trust-path muss aber nicht
+zu einem öffentlichen Trust Anchor (eine CA) führen. Um den Treiber signieren zu können,
+wird die gesamte Trust Chain benötigt, sowie der private Schlüssel des Zertifikats.
+Um ein Zertifikat mit dem dazugehörigen privaten Schlüssel importieren zu können,
+müssen die Dateien in einen PKCS\#12-Container gepackt werden. Dieser kann mit 
+OpenSSL erstellt werden, zum Beispiel mit diesem Befehl:
+\begin{lstlisting}[caption=OpenSSL PKCS\#12]
+openssl pkcs12 -export -in key key.key -in certificate.pem -out pkcs12.p12
+\end{lstlisting}
+Die mit diesem Befehl erstellte Datei pkcs12.p12 kann dann durch einen Doppelklick auf sie
+in den Windows importiert werden.
+
+Der Befehl um den Treiber dann zu bauen kann so aussehen:
+\begin{lstlisting}[caption=TAP-Windows bauen]
+python buildtap.py -c -b -d --cert="csc" --sign --crosscert="C:\Users\Noel\certs\rootca.pem"
+\end{lstlisting}
+Wie zu sehen ist, muss das Root-CA-Zertifikat als Datei vorhanden sein.
+Das Code Signing certificate wird nur mit seinem Common Name angegeben.
+Damit das WDK es findet, muss es in "Eigene Zertifikate" zu finden sein.
+\begin{figure}
+\includegraphics[scale=0.33]{/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/Bachelorarbeit/Bilder/Eigene_Zertifikate.png}
+\caption{Eigene-Zertifikate-Menü}
+\label{fig:Eigene-Zertifikate-Menue}
+\end{figure}
+
+Mit Windows im Testmodus kann der Treiber geladen werden und TAP-Geräte konnen
+mittels tapinstall.exe (Was eigentlich devcon.exe ist). Die Datei ist im Quellcode des
+Treibers nicht mitenthalten. Sie kann jedoch durch die Installation des Treiber-Pakets
+von der OpenVPN-Webseite erhalten werden. Nach der Installation des Pakets
+ist die Datei unter \textit{C:\textbackslash{}Program Files\textbackslash{}TAP-Windows\textbackslash{}bin\textbackslash{}tapinstall.exe}
+zu finden und kann zur Erstellung und zum Löschen von TAP-Geräten genutzt werden.
+
+Der erste Parameter ist offensichtlich ''install'' oder ''remove''. Der Pfad zur .inf-Datei
+über den Treiber muss beim Erstellen eines Geräts angegeben werden. Hier im Beispiel
+ist es die Datei, die mittels des Python-Skripts erstellt wurde. Bei der Installation
+dieses Treibers wird der von mir kompilierte Treiber installiert, welcher sich unter 
+''C:\textbackslash{}Users\textbackslash{}Noel\textbackslash{}tap-driver\textbackslash{}dist\textbackslash{}amd64\textbackslash{}OemVista.inf''
+befindet.
+
+\begin{lstlisting}[caption=Erstellung eines TAP-Geraets]
+"C:\Program Files\TAP-Windows\bin\tapinstall.exe" install "C:\Users\Noel\tap-driver\dist\amd64\OemVista.inf" tap0901
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Löschung aller TAP-Geraete]
+"C:\Program Files\TAP-Windows\bin\tapinstall.exe" remove tap0901
+\end{lstlisting}
+
 
 \paragraph{Patch}
-Der entwickelte Patch deaktiviert die Überprüfung der Quell-IP der ARP-Requests, die
+Bei der Entwicklung des Patchs wurde viel Zeit darauf verwendet die funktionalen
+Komponenten zu finden, die bei der Verarbeitung von \ac{ARP}-Requests ausgeführt werden,
+sowie die Codepfade zu finden, die bei der Verarbeitung von Daten abgelaufen werden.
+
+Der entwickelte Patch deaktiviert die Überprüfung der Quell-IP der \ac{ARP}-Requests, die
 vom Treiber verarbeitet werden. Wenn die Überprüfung erfolgreich war, so wird der ARP-Request
 beantwortet und dem Kernel wird damit mitgeteilt, wie die MAC-Adresse des virtuellen Routers lautet.
 
@@ -1156,6 +1214,7 @@ mehr gefüllt hätte und eine \ac{ARP}-Adressabfrage bei jeder Kommunikation mit
 
 Er wurde 2016-08-15 in der OpenVPN Community auf freenode im Kanale \#openvpn-meeting besprochen
 und bekam ein feature-ack. Ein Code-ack steht noch aus.
+% https://community.openvpn.net/openvpn/ticket/721
 
 Im folgenden ist der Patch zu finden:
 \begin{lstlisting}[caption=Patch für TAP-Windows6]
