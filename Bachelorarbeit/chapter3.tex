@@ -1166,6 +1166,8 @@ Der Befehl um den Treiber dann zu bauen kann so aussehen:
 \begin{lstlisting}[caption=TAP-Windows bauen]
 python buildtap.py -c -b -d --cert="csc" --sign --crosscert="C:\Users\Noel\certs\rootca.pem"
 \end{lstlisting}
+Die Ausgabe des Befehls listet die Kompilierung, sowie das Signieren der Dateien auf.
+% Hier noch Ausgabe der Kompilierung aufführen, sowie welche Teile kritisch sind.
 Wie zu sehen ist, muss das Root-CA-Zertifikat als Datei vorhanden sein.
 Das Code Signing certificate wird nur mit seinem Common Name angegeben.
 Damit das WDK es findet, muss es in "Eigene Zertifikate" zu finden sein.
@@ -1197,6 +1199,30 @@ befindet.
 "C:\Program Files\TAP-Windows\bin\tapinstall.exe" remove tap0901
 \end{lstlisting}
 
+\paragraph{ABI}
+Die \ac{ABI} des Treibers ist undokumentiert. Im Folgenden ist eine Auflistung
+der Funktionen der \ac{ABI}.
+
+\begin{table}
+\tiny
+\begin{tabularx}{\textwidth}{|c|c|c|c|X|X|}\firsthline
+IOCtl & Makro & Eingabe & Ausgabe & Zweck & Kommentar \\ \hline
+1 & TAP\_WIN\_IOCTL\_GET\_MAC & NULL & char[6] & Gibt die MAC-Adresse des Geräts zurück & \\ \hline
+2 & TAP\_WIN\_IOCTL\_GET\_VERSION & NULL & ULONG[3] & Gibt die Version des Treibers zurück & \\ \hline
+3 & TAP\_WIN\_IOCTL\_GET\_MTU & NULL & ULONG & Gibt die MTU des Geräts zurück & \\ \hline
+4 & TAP\_WIN\_IOCTL\_GET\_INFO & NULL & N/A & Gibt Informationen über den Adapter zurück
+& Ist laut Code für NDIS6 nicht implementiert \\ \hline 
+5 & TAP\_WIN\_IOCTL\_CONFIG\_POINT\_TO\_POINT & IPADDR[2] (2*4 CHAR) & NULL & Setzt das Gerät in den Point-To-Point-Modus
+& \\ \hline
+6 & TAP\_WIN\_IOCTL\_SET\_MEDIA\_STATUS & ULONG & NULL & Setzt das Gerät in den "Up" or "Down"-Zustand & \\ \hline
+7 & TAP\_WIN\_IOCTL\_CONFIG\_DHCP\_MASQ & IPADDR[4] (4*4 CHAR) & NULL & Aktiviert den internen DHCP-Server, DHCP-IP-Adresse, DHCP-Netzmaske, DHCP-Server-IP, Leasetime & \\ \hline
+8 & TAP\_WIN\_IOCTL\_GET\_LOG\_LINE & allokierter String (char *) & NULL & Gibt eine Debug-Log-Zeile zurück & \\ \hline
+9 & TAP\_WIN\_IOCTL\_CONFIG\_DHCP\_SET\_OPT & char[256] & NULL & Setzt die DHCP-Optionen & \\ \hline
+10 & TAP\_WIN\_IOCTL\_CONFIG\_TUN & IPADDR[3] (3*4 char) & NULL & Setzt das Gerät in den TUN-Modus, lokale IP, entferntes Netzwerk, entfernte Netzmaske & \\ \hline
+11 & TAP\_WIN\_IOCTL\_CONFIG\_SET\_SRC\_CHECK & ULONG & NULL & Deaktiviert oder Aktiviert den ARP-Source-Check. ''0'' deaktiviert ihn. ''1'' aktiviert ihn (Standard) & \\ \hline
+\end{tabularx}
+\caption{TAP-Windows-Treiber IOCtls}
+\end{table}
 
 \paragraph{Patch}
 Bei der Entwicklung des Patchs wurde viel Zeit darauf verwendet die funktionalen
@@ -1348,6 +1374,10 @@ index f627934..8af5f21 100644
          && src->m_ARP_IP_Destination != adapter_ip)
      {
 \end{lstlisting}
+
+\subsection{Test des Codes}
+\subsection{Test der Verbindung}
+
 \subsection{Maßnahmen gegen Buffer Bloat}
 libipsec speichert die empfangenen Pakete vor- und nach der Verarbeitung in einer 
 Wartschleife (Queue).
