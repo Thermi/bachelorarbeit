@@ -28,7 +28,7 @@ Speicherdauer. Mit alloca() allokierter Speicher ist nur bis zum Verlassen der F
 und wird automatisch freigegeben. Mit malloc() allokierter Speicher muss manuell freigegeben werden.
 alloca() ist ein Feature, welches nicht standardisiert ist.
 Daher lässt sich strongSwan nicht mit allen C-Bibliotheken übersetzen.
-Auf der Wiki-Seite über den Windows-Port steht explizit geschrieben, dass nur die Kompilierung
+Auf der Wiki-Seite über den Windows-Port wird erwähnt, dass nur die Kompilierung
 mittels MinGW-W64 unterstützt wird.
 
 
@@ -516,6 +516,26 @@ static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
 }
 \end{lstlisting}
 
+libipsec setzt für die von ihr installierten Routen standardmäßig das ''Gateway''
+oder ''Next Hop''Feld nicht. Der Grund dafür ist, dass libipsec bisher nur auf
+Betriebssytemen genutzt wurde, die echte Layer-3-Geräte implementieren und
+daher keine Kollisionsdomäne über das Gerät erreichbar ist. Daher ergibt es keinen
+Sinn das ''next hop''-Feld zu setzen.
+Auf Windows ist dies jedoch, wie zuvor erläutert, nicht der Fall, da der TAP-Windows-Treiber
+TUN-Geräte als Ethernet-Gerät emuliert.
+\begin{lstlisting}[caption=Patch für die Routen-Installation von libipsec]
+#ifdef __linux__
+#elif defined(WIN32)
+        /* TODO: Complete */
+        /* Set out special gateway */
+        /* We also need to add a route to 169.254.0.0/16 via all our tun devices */
+        host_t *gw = host_create_from_string("169.254.128.128", 0);
+        route->gateway = gw;
+#else
+	/* on Linux we cant't install a gateway */
+	route->gateway = charon->kernel->get_nexthop(charon->kernel, dst, -1, src);
+#endif
+\end{lstlisting}
 % libipsec router
 % handle_plain
 % notification event
