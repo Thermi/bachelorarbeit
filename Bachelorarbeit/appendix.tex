@@ -53,36 +53,36 @@ und hat keinen Anspruch auf Vollständigkeit.
 \item bintec Secure IPsec Client\footcite[][]{_bintec_2016-1}
 \end{itemize}
 
-
+\begin{center}
 \begin{table}[h]
-\begin{tabular*}{\textwidth}{|c|c|}\firsthline
+\begin{tabularx}{250pt}{|X|X|}\firsthline
 Software & IKE-Versionen \\ \hline
 strongSwan & IKEv1, IKEv2\\ \hline
 Windows Agile VPN Client & IKEv1+L2TP, IKEv2 \\ \hline
 Shrewsoft VPN Client & IKEv1 \\ \hline
 NCP Secure Entry Client & IKEv1, IKEv2 \\ \hline
 bintec Secure IPsec Client & IKEv1, IKEv2 \\ \hline
-\end{tabular*}
+\end{tabularx}
 \label{tab:IPsec-Implementierungen-IKE-Versionen}
 \caption{Unterstützte IKE-Versionen der IPsec-Implementierungen}
 \end{table}
 
 
 \begin{table}[h]
-\begin{tabular*}{\textwidth}{|c|c|}\firsthline
+\begin{tabularx}{250pt}{|X|X|}\firsthline
 Software & Lizenz \\ \hline
 strongSwan & MIT/GPLv2\footcite[][]{_contributions_2014} \\ \hline
 Windows Agile VPN Client & Proprietär \\ \hline
 Shrewsoft VPN Client & Shareware\footcite[][]{_shrew_2007} \\ \hline
 NCP Secure Entry Client & Proprietär \\ \hline
 bintec Secure IPsec Client & Proprietär \\ \hline
-\end{tabular*}
+\end{tabularx}
 \label{tab:IPsec-Implementierungen-Lizenzen}
 \caption{Lizenzen der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
-\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 AES-128-CBC          &  x  & x & x & x & x \\  \hline
 AES-192-CBC          &  x  & x & x & x & x \\  \hline
@@ -136,13 +136,13 @@ twofish-192-CBC      &  x  & o & o & o & o \\  \hline
 twofish-256-CBC      &  x  & o & o & o & o \\  \hline
 CAST-128-CBC         &  x  & o & x & o & o \\  \hline
 chacha20poly1305     &  x  & o & o & o & o \\  \hline
-\end{tabular*}
+\end{tabularx}
 \label{tab:IPsec-Implementierungen-Vertraulichkeit-Algorithmen}
 \caption{Unterstützte Algorithmen für Vertraulichkeit der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
-\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 MD5                                                     & x & o & x & x & x \\  \hline
 SHA-1                                                   & x & x & x & o & x \\  \hline
@@ -154,13 +154,13 @@ AES-XCBC                                                & x & o & o & o & o \\  
 AES-128-GMAC                                            & x & o & o & o & o \\  \hline
 AES-192-GMAC                                            & x & o & o & o & o \\  \hline
 AES-256-GMAC                                            & x & o & o & o & o \\  \hline
-\end{tabular*}
+\end{tabularx}
 \label{tab:IPsec-Implementierungen-Authentizitaet-Algorithmen}
 \caption{Unterstützte Algorithmen für Authentizität der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
-\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 MODP-768       & x & o & x & x & x \\  \hline
 MODP-1024      & x & x & x & x & x \\  \hline
@@ -187,13 +187,13 @@ NTRU-128       & x & o & o & o & o \\  \hline
 NTRU-192       & x & o & o & o & o \\  \hline
 NTRU-256       & x & o & o & o & o \\  \hline
 NEWHOPE-128    & x & o & o & o & o \\  \hline
-\end{tabular*}
+\end{tabularx}
 \label{tab:IPsec-Implementierungen-DH-Algorithmen}
 \caption{Unterstützte Schlüsselaustauschprotokolle der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
-\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec                  \\ \hline
 Hybrid\footnote{Client mit XAUTH, Server mittels X.509}  & x & x & x & x & x  \\ \hline
 PSK                                                      & x & o & x & x & o  \\ \hline
@@ -210,47 +210,47 @@ EAP-AKA                                                  & x & o & o & o & o  \\
 EAP-TNC                                                  & x & o & o & o & o  \\ \hline
 TNC-IMC                                                  & x & o & o & o & o  \\ \hline
 TNC-IMV                                                  & x & o & o & o & o  \\ \hline
-\end{tabular*}
+\end{tabularx}
 \label{tab:IPsec-Implementierungen-Authentifizierungs-Modi}
 \caption{Unterstützte Authentifizierungsmethoden der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
-\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 CRL  & x & x & o & x & x \\ \hline
 OCSP & x & ? & o & x & x \\ \hline
-\end{tabular*}
+\end{tabularx}
 \label{tab:IPsec-Implementierungen-CRL-Support}
 \caption{Unterstützte Mechanismen zum Zurückziehen von Zertifikaten der IPsec-Implementierungen}
 \end{table}
 
 
 \begin{table}[h]
-\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 Tunnel-Modus     & x & x & x & x & x \\  \hline
 Transport-Modus  & x & x & o & o & o \\  \hline
 BEET-Modus       & x & o & o & o & o \\  \hline
-\end{tabular*}
+\end{tabularx}
 \label{tab:IPsec-Implementierungen-Tunnel-Modi}
 \caption{Unterstützte Tunnel-Modi der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
-\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 Main Mode       & x & x & x & x & ? \\ \hline
 Aggressive Mode & x & x & x & x & ? \\ \hline 
 Quick Mode      & x & o & x & x & ? \\ \hline
 Config Mode     & x & x & x & x & x \\ \hline
-\end{tabular*}
+\end{tabularx}
 \label{tab:IPsec-Implementierungen-IKE-Modi}
 \caption{Unterstützte IKE-Modi der IPsec-Implementierungen}
 \end{table}
 
 \begin{table}[h]
-\begin{tabular*}{\textwidth}{|c|c|c|c|c|c|}\firsthline
+\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Feature}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 NAT-T                 & x & x                     & x & x & x \\ \hline
 DPD                   & x & x                     & x & x & x \\ \hline
@@ -262,7 +262,8 @@ Attribut-Zertifikate  & x & ?                     & o & o & ? \\ \hline
 PFS                   & x & o                     & x & x & x \\ \hline
 IKE-Fragmentierung    & x & ?\footnote{Nur IKEv1} & x & o & o \\ \hline
 Komprimierung         & x & o                     & o & x & o \\ \hline
-\end{tabular*}
+\end{tabularx}
 \label{tab:IPsec-Implementierungen-Features}
 \caption{Unterstützte Features der IPsec-Implementierungen}
 \end{table}
+\end{center}
