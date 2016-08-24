@@ -102,7 +102,7 @@ In verschiedenen Implementierungen wird das Rekeyen von CHILD\_SAs mit IKEv1 unt
 Für IKEv2 ist das Verhalten standardisiert\footcite[][16]{charlie_kaufman_rfc_2014}.
 
 In der Regel werden unterschiedliche Schlüssel für jede einzelne SA einer CHILD\_SA
-und jeden einzelnen eingesetzten kryptografischen Algorithmus.
+und jeden einzelnen eingesetzten kryptografischen Algorithmus gesetzt.
 
 
 \paragraph{PFS}
@@ -153,12 +153,14 @@ Route based \acp{VPN} werden für gewöhnlich dann genutzt, wenn dynamisches Rou
 wie zum Beispiel \ac{BGP}, \ac{ISIS} oder \ac{OSPF}, da beim Verändern der Routen die \acp{SP} nicht verändert
 und damit keine neuen CHILD\_SAs ausgehandelt werden müssen. Ein weiterer Vorteil ist, dass Neulinge es leichter haben
 den Paketfluss zu verfolgen.
+
 \subsubsection{Policy Based}
 \label{subsec:policybased}
 Policy based bedeutet, dass die \ac{IPsec}-\acp{SP}, die ausgehandelt wurden, direkt genutzt werden welche Pakete geschützt werden.
 Eine solche Implementierung ermöglicht es, \ac{IPsec} zur Absicherung von sehr genau spezifiziertem
 Verkehr zu nutzen, wie zum Beispiel nur \ac{ICMP}-Pakete mit Typ 0, Code 0 (Echo Reply), sowie Typ 8 und Code 0 (Echo Request).
 Policy based \ac{IPsec} ermöglicht es \ac{IPsec} direkt in den Stack zu integrieren, ohne notwendigerweise die Routen zu verändern.
+
 \subsubsection{IPsec unter Linux}
 Unter Linux gibt es zwei verschiedene \ac{IPsec}-Stacks.
 Es existiert einerseits der KLIPS-Stack, der vom FreeS/WAN-Projekt entwickelt wurde
@@ -173,11 +175,11 @@ Beide Stacks sind konform zu RFC 2367\footcite[][]{daniel_l._mcdonald_rfc_1998}.
 Microsoft hat im Laufe der Entwicklungsgeschichte von Windows drei verschiedene
 \ac{IPsec}-Implementierungen implementiert, die teilweise parallel existierten.
 Seit Windows 7 existiert in Windows eine Implementierung von \ac{IPsec} im Netzwerkmnanager,
-der den Config-Modus implementiert, sodass Windows als Roadwarrior-Client operieren kann.
+der den Config-Modus implementiert, sodass Windows als \ac{RW} operieren kann.
 Diese Implementierung nutzt eine Route-based-Implementierung, wie in \autoref{subsec:routebased}
 erklärt.
 
 In der Firewall von Windows existiert eine Implementierung, die Policy-based ist
 und daher flexibler ist und es erlaubt Firewall-Regeln zu schreiben, die abhängig davon sind,
 ob ein Paket mit \ac{IPsec} geschützt war. Des weiteren unterstützt diese Implementierung
-den Config-Modus nicht, daher ist sie nicht für die Benutzung als Roadwarrior geeignet.
+den Config-Modus nicht, daher ist sie nicht für die Benutzung als \ac{RW} geeignet.
