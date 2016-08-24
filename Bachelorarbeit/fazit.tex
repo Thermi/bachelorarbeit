@@ -15,7 +15,16 @@
 \section{Fazit}
 
 In der Arbeit wurden die nötigen Änderungen für strongSwan präsentiert, um
-libipsec auf Windows lauffähig zu machen.
+libipsec auf Windows lauffähig zu machen. Dies inkludiert die Implementierung
+der Routinen für das Öffnen und Konfigurieren von TAP-Geräten, die vom TAP-Windows-Treiber
+bereitgestellt werden. Des weiteren wurde die Installation von IP-Adressen getestet
+und erweitert, sowie Code zum Lesen und Schreiben von Paketen auf Handles.
+
+Die Lösung ist unvollständig, da das Empfangen und Senden von Paketen noch nicht funktioniert.
+Nichtsdestotrotz wurde mit der \ac{BA} ein Großteil der Basis geschaffen um strongSwan
+dazu zu befähigen TAP-Geräte zu nutzen.
+
+
 
 Lorem ipsum
 
