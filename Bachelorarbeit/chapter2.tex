@@ -37,11 +37,34 @@ Er arbeitet parallel und wurde in objektorientiertem C geschrieben, so wie die S
 Intern werden verschiedene Bibliotheken genutzt, angefangen von libstrongswan bis zu libcharon.
 Es existieren verschiedene Versionen von charon für verschiedene Zwecke, zum Beispiel
 charon-svc. charon-svc ist eine Version von charon, die als Dienst auf Windows genutzt werden kann.
+
+Jegliche Funktionalität von strongSwan ist in Form einer Bibliothek untergebracht und in objektorientiertem
+C geschrieben. Das ermöglicht es die Namensräume in strongSwan relativ frei zu halten
+und Objekte gleichen Typs gleich zu behandeln, sowie die Duplikation von kurzem Code
+zu vermeiden.
+
+Ein Beispiel dafür ist libstrongswan, welche unter anderem 
+allgemeine Datenstrukturen wie Linked Lists, Arrays und Hashtables, sowie Code für TUN-Geräte und
+Multithreading implementiert.
+
 % Mehr Informationen?
 \subsubsection{Userspace processing}
 Userspace processing wurde in charon von Guiliano Grassi und Ralf Sager für Android implementiert,
 um die Entwicklung der strongSwan-App für Android zu ermöglichen. Auf Android ist kernelspace processing
 von \ac{IPsec}-Paketen nicht möglich, da die Privilegien der Anwendung das nicht erlauben.
+
+Um Userspace Processing von \ac{IPsec}-Paketen zu implementieren benötigt
+die Anwendung, die die Pakete verarbeiten soll, Zugriff auf die Pakete und muss,
+damit die darin enthaltenen Pakete an den Zielort weitergeleitet werden können,
+eine Möglichkeit haben sie an den Kernel zum Routing zu übergeben. In der Regel wird
+dies mit TUN- oder TAP-Geräten bewerkstelligt, die einen virtuellen Netzwerkadapter
+darstellen. Am einen Ende hängt der Kernel mit seiner Routing-Engine und den Firewallregeln,
+am anderen Ende hängt die Anwendung, die Pakete auf einen \ac{FD} oder ein Handle schreibt
+und davon liest.
+
+Pakete, die in den Adapter gesendet werden werden von der Anwendung empfangen
+und Pakete, die in das Handle geschrieben werden, tauchen auf dem Adapter auf Seiten
+des Betriebssystems auf.
 
 \paragraph{OpenVPNTAP-Treiber}
 Der OpenVPN-Tap-Treiber ist unter den Namen ''TAP-Windows'' bekannt und wurde von
