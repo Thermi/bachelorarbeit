@@ -275,13 +275,58 @@ Komprimierung         & x & o                     & o & x & o \\ \hline
 \begin{center}
 \label{lst:swanctl.conf}
 \begin{lstlisting}[caption=Testkonfiguration - swanctl.conf]
+connections {
+        foo {
+            version = 2
+            dpd_delay = 10
+            dpd_timeout = 60
+            fragmentation = yes
+            send_cert = always
+            remote_addrs = 37.120.161.220
+            proposals = aes256gcm16-prfsha256-modp4096
+            vips = 0.0.0.0
+			mobike = no
+			encap = yes
+            local {
+                auth = eap-tls
+                certs = certificate.pem
+            }
+            remote {
+                auth = pubkey
+                id = thermi.strangled.net
+                cacerts = serverca.pem
+            }
+            children {
+                    bar {
+                        dpd_action = restart
+                        start_action = none
+                        esp_proposals = aes256-sha256-ecp521
+                        remote_ts = 172.16.25.2/32
+                    }
+            }
+        }
 
+}
 \end{lstlisting}
 \end{center}
 
 \begin{center}
 \label{lst:strongswan.conf}
 \begin{lstlisting}[caption=Testkonfiguration - strongswan.conf]
+charon-svc {
+
+	filelog {
+		this_log.txt{
+			default=3
+			flush_line = yes
+			ike_name = yes
+			append = no
+		}
+		
+	
+	}
+
+}
 \end{lstlisting}
 \end{center}
 
