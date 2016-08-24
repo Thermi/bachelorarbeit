@@ -662,7 +662,7 @@ OpenVPN, spezifisch in Datei /src/openvpn/tun.c.
 Um das TAP-Gerät zu nutzen versucht der Code zuerst nach Netzwerkgeräten mit der ID "tap0901" zu suchen,
 welche die ID für TAP-Geräte ist.
 
-anach wird versucht eine Datei in \\.\\Global\/GUID.tap mittels 
+Danach wird versucht eine Datei in \\.\\Global\/GUID.tap mittels 
 \begin{lstlisting}
 CreateFile(device_path, GENERIC_READ \| GENERIC_WRITE, 0,
                     0, OPEN_EXISTING, FILE_ATTRIBUTE_SYSTEM | FILE_FLAG_OVERLAPPED, 0);
@@ -1528,6 +1528,17 @@ Dabei wird durch Dumpen der Pakete mit tcpdump und Wireshark überprüft, ob die
 ARP requests auf dem TUN-Adapter beantwortet werden und ob das Paket auf dem
 anderen Endpunkt auftaucht. Des weiteren werden die Traffic-Counter der \acp{SA} überprüft,
 um zu überprüfen, ob die Pakete jemals verarbeitet wurden.
+
+\subsection{Notwendige Features für Nutzung als RW auf Windows}
+Um strongSwan als \ac{RW} auf Windows benutzbar zu machen werden neben dem Implementieren
+der Unterstützung von TAP-Geräten unter anderem die Unterstützung der Installation von DNS-Resolvereinträgen
+benötigt, da in der Regel interne DNS-Server an die \acp{RW} über Config Mode oder \acp{CP}
+gesendet werden, die sie nutzen sollen.
+
+Des weiteren wird eine Möglichkeit benötigt, um über \ac{VICI} nach Daten für dynamisch auftretende
+Passwortaufforderungen, die bei der Authentifizierung mittels XAUTH oder EAP auftreten können,
+zu fragen. Dies wird für die vollständige Unterstützen von \ac{MFA} benötigt.
+
 
 \subsection{Maßnahmen gegen Buffer Bloat}
 libipsec speichert die empfangenen Pakete vor- und nach der Verarbeitung in einer 
