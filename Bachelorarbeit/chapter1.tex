@@ -213,6 +213,9 @@ ergänzt, sodass das Paket an eine lokale Anwendung ausgeliefert werden kann.
 \paragraph{ESP}
 \ac{ESP} ist das Standardprotokoll zum Absichern von \ac{IPsec}-basierten \acp{VPN},
 da es Vertraulichkeit, Integrität und Replay-Schutz für die übertragenen Pakete unterstützt.
+Dabei wird optional ein Verschlüsselungsalgorithmus, sowie ein \ac{HMAC} eingesetzt oder
+ein \ac{AEAD}-Algorithmus.\footcite[][]{stephen_kent_rfc_2005-2}
+\ac{ESP} 
 \begin{figure}
     \label{fig:ESP}
     \centering
@@ -223,7 +226,7 @@ da es Vertraulichkeit, Integrität und Replay-Schutz für die übertragenen Pake
 
 \paragraph{UDP Encapsulation}
 UDP Encapsulation ist \ac{ESP} in einer UDP-Hülle. Es wird standardmäßig eingesetzt, wenn
-erkannt wurde, dass zwischen den Teilnehmern \ac{NAT} eingesetzt wird.
+erkannt wurde, dass zwischen den Teilnehmern \ac{NAT} eingesetzt wird.\footcite[][]{markus_stenberg_rfc_2005}
 \begin{figure}
     \label{fig:UDP-Encapsulation}
     \centering
@@ -235,7 +238,8 @@ erkannt wurde, dass zwischen den Teilnehmern \ac{NAT} eingesetzt wird.
 \paragraph{AH}
 \ac{AH} ist ein Protokoll, welches den Header des darunterliegenden \ac{IP}-Pakets absichert,
 sowie die darin eingebetteten Daten. Im Header des darunterliegenden Pakets werden nur die statischen Felder
-abgesichert.
+abgesichert. \ac{AH} bieter Integrität und Replay-Schutz. Es unterstützt keine Vertraulichkeit, da
+der Verkehr nur mittels eines \ac{HMAC} abgesichert wird.\footcite[][]{stephen_kent_rfc_2005-}
 \begin{figure}
     \label{fig:AH}
     \centering
