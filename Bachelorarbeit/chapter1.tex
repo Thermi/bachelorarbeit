@@ -169,6 +169,42 @@ auch für Route based IPsec genutzt werden kann.
 
 Beide Stacks sind konform zu RFC 2367\footcite[][]{daniel_l._mcdonald_rfc_1998}.
 
+\subsubsection{Modi}
+\ac{IPsec} unterstützt verschiedene Modi wie Daten über das VPN versendet werden.
+Die Modi unterscheiden sich hinsichtlich der Tatsache wie sie die \ac{IP}-Pakete übertragen
+\paragraph{Transport-Modus}
+Im Transport-Modus wird der \ac{IP}-Header des zu schützenden Pakets nicht übertragen.
+Der IP-Header wird auf Basis der eingetragenen IP-Adressen der genutzten \ac{IPsec}-\acp{SA}
+bestimmt und nach der Überprüfung des empfangenen Pakets ergänzt. Der Sinn dahinter ist, dass
+der Overhead der \acp{SA} verringert wird, wenn die Quell- oder Zieladressen der getunnelten Pakete
+sich nicht von denen der \acp{SA} unterscheiden.
+\begin{figure}
+    \caption{fig:Transport-Modus}
+    \label{fig:Transport-Modus}
+    \centering
+    \def\svgwidth{\columnwidth}
+    \input{transport.tex}
+\end{figure}
+
+\paragraph{Tunnel-Modus}
+Im Tunnel-Modus werden die kompletten \ac{IP}-Pakete übertragen und mittels des ausgehandelten
+Protokolls geschützt.
+
+\begin{figure}
+    \caption{fig:Tunnel-Modus}
+    \label{fig:Tunnel-Modus}
+    \centering
+    \def\svgwidth{\columnwidth}
+    \input{tunnel.tex}
+\end{figure}
+
+\paragraph{BEET}
+\ac{BEET} ist ein spezieller Modus, bei dem ''virtuelle'' \ac{IP}-Adressen für die Endpunkte
+ausgehandelt werden. Die \ac{IP}-Header der übertragenen Pakete werden jedoch nicht mitgesendet,
+sodass eine Struktur wie im Transport-Modus entsteht. Die Quell- und Zieladressen
+werden nach dem Empfang des \ac{IPsec}-Pakets durch Suchen der \ac{SPI} in der \ac{SAD}
+ergänzt, sodass das Paket an eine lokale Anwendung ausgeliefert werden kann.
+
 \subsubsection{IPsec unter Windows}
 Microsoft hat im Laufe der Entwicklungsgeschichte von Windows drei verschiedene
 \ac{IPsec}-Implementierungen implementiert, die teilweise parallel existierten.
