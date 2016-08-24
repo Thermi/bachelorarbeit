@@ -104,6 +104,9 @@ Für IKEv2 ist das Verhalten standardisiert\footcite[][16]{charlie_kaufman_rfc_2
 In der Regel werden unterschiedliche Schlüssel für jede einzelne SA einer CHILD\_SA
 und jeden einzelnen eingesetzten kryptografischen Algorithmus gesetzt.
 
+Das Zuordnen von \ac{IPsec}-Paketen zu \ac{IPsec}-\acp{SA} wird bewerkstelligt,
+indem nach dem \ac{SPI} des Pakets in der \ac{SAD} gesucht wird.
+
 
 \paragraph{PFS}
 \ac{PFS} disjunkt die Schlüssel für die CHILD\_SAs von den Schlüsseln
@@ -179,7 +182,7 @@ bestimmt und nach der Überprüfung des empfangenen Pakets ergänzt. Der Sinn da
 der Overhead der \acp{SA} verringert wird, wenn die Quell- oder Zieladressen der getunnelten Pakete
 sich nicht von denen der \acp{SA} unterscheiden.
 \begin{figure}
-    \caption{fig:Transport-Modus}
+    \caption{Transport-Modus}
     \label{fig:Transport-Modus}
     \centering
     \def\svgwidth{\columnwidth}
@@ -191,7 +194,7 @@ Im Tunnel-Modus werden die kompletten \ac{IP}-Pakete übertragen und mittels des
 Protokolls geschützt.
 
 \begin{figure}
-    \caption{fig:Tunnel-Modus}
+    \caption{Tunnel-Modus}
     \label{fig:Tunnel-Modus}
     \centering
     \def\svgwidth{\columnwidth}
@@ -204,6 +207,42 @@ ausgehandelt werden. Die \ac{IP}-Header der übertragenen Pakete werden jedoch n
 sodass eine Struktur wie im Transport-Modus entsteht. Die Quell- und Zieladressen
 werden nach dem Empfang des \ac{IPsec}-Pakets durch Suchen der \ac{SPI} in der \ac{SAD}
 ergänzt, sodass das Paket an eine lokale Anwendung ausgeliefert werden kann.
+
+\subsubsection{Protokolle}
+
+\paragraph{ESP}
+\ac{ESP} ist das Standardprotokoll zum Absichern von \ac{IPsec}-basierten \acp{VPN},
+da es Vertraulichkeit, Integrität und Replay-Schutz für die übertragenen Pakete unterstützt.
+\begin{figure}
+    \label{fig:ESP}
+    \centering
+    \def\svgwidth{\columnwidth}
+    \input{esp.tex}
+    \caption{\ac{ESP}}
+\end{figure}
+
+\paragraph{NAT-T}
+\ac{NAT-T} ist \ac{ESP} in einer UDP-Hülle. Es wird standardmäßig eingesetzt, wenn
+erkannt wurde, dass zwischen den Teilnehmern NAT eingesetzt wird.
+\begin{figure}
+    \label{fig:NAT-T}
+    \centering
+    \def\svgwidth{\columnwidth}
+    \input{natt.tex}
+    \caption{\ac{NAT-T}}
+\end{figure}
+
+\paragraph{AH}
+\ac{AH} ist ein Protokoll, welches den Header des darunterliegenden \ac{IP}-Pakets absichert,
+sowie die darin eingebetteten Daten. Im Header des darunterliegenden Pakets werden nur die statischen Felder
+abgesichert.
+\begin{figure}
+    \label{fig:AH}
+    \centering
+    \def\svgwidth{\columnwidth}
+    \input{ah.tex}
+    \caption{\ac{AH}}
+\end{figure}
 
 \subsubsection{IPsec unter Windows}
 Microsoft hat im Laufe der Entwicklungsgeschichte von Windows drei verschiedene
