@@ -57,7 +57,7 @@ und hat keinen Anspruch auf Vollständigkeit.
 
 \begin{center}
 \begin{table}[h]
-\begin{tabularx}{250pt}{|X|X|}\firsthline
+\begin{tabularx}{\textwidth}{|X|X|}\firsthline
 Software & IKE-Versionen \\ \hline
 strongSwan & IKEv1, IKEv2\\ \hline
 Windows Agile VPN Client & IKEv1+L2TP, IKEv2 \\ \hline
@@ -71,7 +71,7 @@ bintec Secure IPsec Client & IKEv1, IKEv2 \\ \hline
 
 
 \begin{table}[h]
-\begin{tabularx}{250pt}{|X|X|}\firsthline
+\begin{tabularx}{\textwidth}{|X|X|}\firsthline
 Software & Lizenz \\ \hline
 strongSwan & MIT/GPLv2\footcite[][]{_contributions_2014} \\ \hline
 Windows Agile VPN Client & Proprietär \\ \hline
@@ -84,7 +84,7 @@ bintec Secure IPsec Client & Proprietär \\ \hline
 \end{table}
 
 \begin{table}[h]
-\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 AES-128-CBC          &  x  & x & x & x & x \\  \hline
 AES-192-CBC          &  x  & x & x & x & x \\  \hline
@@ -110,9 +110,6 @@ AES-192-CCM-16       &  x  & o & o & o & o \\  \hline
 AES-256-CCM-8        &  x  & o & o & o & o \\  \hline
 AES-256-CCM-12       &  x  & o & o & o & o \\  \hline
 AES-256-CCM-16       &  x  & o & o & o & o \\  \hline
-AES-128-GMAC         &  x  & o & o & o & o \\  \hline
-AES-192-GMAC         &  x  & o & o & o & o \\  \hline
-AES-256-GMAC         &  x  & o & o & o & o \\  \hline
 DES-CBC              &  o  & o & x & o & o \\  \hline
 3DES-CBC             &  x  & x & x & x & x \\  \hline
 BLOWFISH-128-CBC     &  x  & o & x & x & x \\  \hline
@@ -144,7 +141,7 @@ chacha20poly1305     &  x  & o & o & o & o \\  \hline
 \end{table}
 
 \begin{table}[h]
-\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 MD5                                                     & x & o & x & x & x \\  \hline
 SHA-1                                                   & x & x & x & o & x \\  \hline
@@ -162,7 +159,7 @@ AES-256-GMAC                                            & x & o & o & o & o \\  
 \end{table}
 
 \begin{table}[h]
-\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 MODP-768       & x & o & x & x & x \\  \hline
 MODP-1024      & x & x & x & x & x \\  \hline
@@ -195,7 +192,7 @@ NEWHOPE-128    & x & o & o & o & o \\  \hline
 \end{table}
 
 \begin{table}[h]
-\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec                  \\ \hline
 Hybrid\footnote{Client mit XAUTH, Server mittels X.509}  & x & x & x & x & x  \\ \hline
 PSK                                                      & x & o & x & x & o  \\ \hline
@@ -218,7 +215,7 @@ TNC-IMV                                                  & x & o & o & o & o  \\
 \end{table}
 
 \begin{table}[h]
-\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 CRL  & x & x & o & x & x \\ \hline
 OCSP & x & ? & o & x & x \\ \hline
@@ -229,7 +226,7 @@ OCSP & x & ? & o & x & x \\ \hline
 
 
 \begin{table}[h]
-\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 Tunnel-Modus     & x & x & x & x & x \\  \hline
 Transport-Modus  & x & x & o & o & o \\  \hline
@@ -240,7 +237,7 @@ BEET-Modus       & x & o & o & o & o \\  \hline
 \end{table}
 
 \begin{table}[h]
-\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 Main Mode       & x & x & x & x & ? \\ \hline
 Aggressive Mode & x & x & x & x & ? \\ \hline 
@@ -252,7 +249,7 @@ Config Mode     & x & x & x & x & x \\ \hline
 \end{table}
 
 \begin{table}[h]
-\begin{tabularx}{350pt}{|X|c|c|c|c|c|}\firsthline
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Feature}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 NAT-T                 & x & x                     & x & x & x \\ \hline
 DPD                   & x & x                     & x & x & x \\ \hline
