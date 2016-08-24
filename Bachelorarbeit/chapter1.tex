@@ -221,15 +221,15 @@ da es Vertraulichkeit, Integrität und Replay-Schutz für die übertragenen Pake
     \caption{\ac{ESP}}
 \end{figure}
 
-\paragraph{NAT-T}
-\ac{NAT-T} ist \ac{ESP} in einer UDP-Hülle. Es wird standardmäßig eingesetzt, wenn
-erkannt wurde, dass zwischen den Teilnehmern NAT eingesetzt wird.
+\paragraph{UDP Encapsulation}
+UDP Encapsulation ist \ac{ESP} in einer UDP-Hülle. Es wird standardmäßig eingesetzt, wenn
+erkannt wurde, dass zwischen den Teilnehmern \ac{NAT} eingesetzt wird.
 \begin{figure}
-    \label{fig:NAT-T}
+    \label{fig:UDP-Encapsulation}
     \centering
     \def\svgwidth{\columnwidth}
-    \input{natt.tex}
-    \caption{\ac{NAT-T}}
+    \input{udpencap.tex}
+    \caption{UDP Encapsulation}
 \end{figure}
 
 \paragraph{AH}
