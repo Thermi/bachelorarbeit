@@ -100,11 +100,21 @@ auch die dazugehörige \ac{SA} in der Gegenrichtung nd die \acp{SP} gelöscht.
 Um die kryptografischen Schlüssel von CHILD\_SAs zu erneuern muss sie komplett neu ausgehandelt werden.
 In verschiedenen Implementierungen wird das Rekeyen von CHILD\_SAs mit IKEv1 unterschiedlich gehandhabt.
 Für IKEv2 ist das Verhalten standardisiert\footcite[][16]{charlie_kaufman_rfc_2014}.
+
+In der Regel werden unterschiedliche Schlüssel für jede einzelne SA einer CHILD\_SA
+und jeden einzelnen eingesetzten kryptografischen Algorithmus.
+
+
 \paragraph{PFS}
 \ac{PFS} disjunkt die Schlüssel für die CHILD\_SAs von den Schlüsseln
 für die \ac{IPsec}-\acp{SA}, indem beim Aushandeln einer CHILD\_SA ein weiterer
 \ac{DH}-Schlüsselaustausch stattfindet\footcite[13]{charlie_kaufman_rfc_2014}.
-Ohne \ac{PFS} werden die Schlüssel für die CHILD\_SAs vom Schlüssel der
+Ohne \ac{PFS} werden die Schlüssel für die CHILD\_SAs vom Schlüssel der IKE\_SA
+abgeleitet. Wenn ein kryptografischer Schlüssel für den Verschlüsselungsalgorithmus
+einer \ac{IPsec} \ac{SA} kompromitiert wird, so kann ein Angreifer nur den Verkehr entschlüsseln,
+der mit dieser \ac{SA} verschlüsselt wurde.
+
+%TODO: Complete
 
 \paragraph{Rekeying und Reauthentication}
 Beide IKE-Versionen unterstützen das Reauthentifizieren von IKE SAs und das Rekeyen
