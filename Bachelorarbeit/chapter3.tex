@@ -11,7 +11,11 @@
 
 % You should have received a copy of the GNU General Public License
 % along with Foobar. If not, see <http://www.gnu.org/licenses/>.
-\section{Portierung von libipsec auf Windows}
+
+\section{Vorgehensweise}
+
+
+\subsection{Portierung von libipsec auf Windows}
 Die Portierung von libipsec auf Windows, sodass sie dort lauffähig ist, ist das Ziel
 der Bachelorarbeit. Die zu portierenden Teile des Programmcodes betreffen nur
 die Codesegmente, die Plattformspezifische \acp{API} oder \acp{ABI} verwenden,
@@ -60,7 +64,7 @@ und fehlende Teile ergänz.
 Spezifisch wurde aus dem Quellcode von GLIBC die Definition eines \ac{IP}-Headers kopiert
 und die fehlenden Protokollkonstanten per Hand ergänzt.
 
-Folgend ist die HEaderdatei
+Folgend ist die Headerdatei
 
 \begin{lstlisting}[caption=Header für libipsec]
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
@@ -288,6 +292,13 @@ static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
 	return JOB_REQUEUE_DIRECT;
 }
 \end{lstlisting}
+
+Wie aus dem Code hervorgeht, wird im Prinzip nur ein Array mit Strukturen des Typs
+''pollfd'' erstellt, dann mit einem Notification-\ac{FD} und den \acp{FD} der TUN-Geräte befüllt
+und als gewünschte Events ''POLLIN'' gesetzt. Das heißt, dass der Aufruf von poll() ohne
+Fehler beendet wird, wenn Daten auf dem \acp{FD} zur Verfügung stehen.
+Danach wird poll() auf die ''pollfd''-Datenstruktur ausgeführt und analysiert,
+auf welchen \acp{FD} Daten zur Verfügung stehen.
 
 Folgend die Implementierung mit WaitForMultipleObjects()
 \begin{lstlisting}[caption=Code für handle\_plain auf Windows]
