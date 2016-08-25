@@ -245,14 +245,24 @@ den Netlink-Sockel. Die notwendigen Funktionen in charon sind im Plugin ''kernel
 \subsubsection{IPsec unter Windows}
 Microsoft hat im Laufe der Entwicklungsgeschichte von Windows drei verschiedene
 \ac{IPsec}-Implementierungen implementiert, die teilweise parallel existierten.
-Seit Windows 7 existiert in Windows eine Implementierung von \ac{IPsec} im Netzwerkmnanager,
-der den Config-Modus implementiert, sodass Windows als \ac{RW} operieren kann.
-Diese Implementierung nutzt eine Route-based-Implementierung, wie in \autoref{subsec:routebased}
-erklärt.
+
 
 In der Firewall von Windows existiert eine Implementierung, die Policy-based ist
 und daher flexibler ist und es erlaubt Firewall-Regeln zu schreiben, die abhängig davon sind,
-ob ein Paket mit \ac{IPsec} geschützt war. Windows wird mit einem Dienst namens ''IKEEXT'' ausgeliefert,
+ob ein Paket mit \ac{IPsec} geschützt war.
+
+\paragraph{Windows Agile VPN Client}
+Seit Windows 7 existiert in Windows eine Implementierung von \ac{IPsec} im Netzwerkmnanager,
+der den Config-Modus implementiert, sodass Windows als \ac{RW} operieren kann.
+Diese Implementierung nutzt eine Route-based-Implementierung, wie in \autoref{subsec:routebased}
+erklärt. Diese Implementierung heißt offiziell ''Windows Agile VPN Client'' und
+implementiert \ac{PPTP}, \ac{IPsec}+\ac{L2TP}, \ac{SSTP} und \ac{IKE}v2. Sie existiert seit Windows 7.
+
+Die Fähigkeiten dieser Implementierung lässt sich aus den Tabellen im Appendix unter ~\autoref{subsec:featurematrix} ablesen.
+
+
+\paragraph{IKEEXT}
+Windows wird mit einem Dienst namens ''IKEEXT'' ausgeliefert,
 welcher genutzt werden kann, um IKE\_SAs und CHILD\_SAs auszuhandeln. Standardmäßig
 ist dieser Dienst aktiv und lauscht auf \ac{UDP} Port 500 und 4500.
 Diese Implementierung unterstütz den Config-Modus nicht und ist daher nicht für die Benutzung als \ac{RW} geeignet.\footcite[][]{_ipsec_2016}
@@ -262,6 +272,15 @@ Diese Implementierung unterstütz den Config-Modus nicht und ist daher nicht fü
 der \ac{IPsec} im Kernel, sowie die Firewall dort implementiert wurde.
 charon kann mit \ac{WFP} mithilfe des ''kernel-wfp''-Plugins kommunizieren
 und \acp{SA} und \acp{SP} in die jeweiligen Datenbanken einfügen.
+
+\ac{WFP} hat mehrere Probleme, unter anderem mit virtuellen IP-Adressen,
+UDP encapsulation, sowie mit mehreren Traffic Selectors im Transport-Modus.
+Des weiteren stellt \ac{WFP} keine Statistiken über die einzelnen \acp{SA} bereit,
+was verhindert, dass volumenbasiertes Rekeying und das Auslesen von Nutzungsstatistiken
+der \acp{SA} implementiert werden kann.
+
+Aufgrund der Problematik bezüglich virtueller IPs ist es nicht sinnvoll einen \ac{RW}-Client
+auf Basis von \ac{WFP} zu erstellen.
 
 \paragraph{IPH}
 Windows bietet die \ac{IPH}-Funktionen an, die das Verwalten von
