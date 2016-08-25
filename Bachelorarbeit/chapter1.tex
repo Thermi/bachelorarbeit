@@ -206,7 +206,7 @@ Protokolls geschützt.
 ausgehandelt werden. Die \ac{IP}-Header der übertragenen Pakete werden jedoch nicht mitgesendet,
 sodass eine Struktur wie im Transport-Modus entsteht. Die Quell- und Zieladressen
 werden nach dem Empfang des \ac{IPsec}-Pakets durch Suchen der \ac{SPI} in der \ac{SAD}
-ergänzt, sodass das Paket an eine lokale Anwendung ausgeliefert werden kann.
+ergänzt, sodass das Paket an eine lokale Anwendung ausgeliefert werden kann.\footcite[Appendix B][]{petri_jokela_rfc_2015}
 
 \subsubsection{Protokolle}
 
@@ -239,7 +239,7 @@ erkannt wurde, dass zwischen den Teilnehmern \ac{NAT} eingesetzt wird.\footcite[
 \ac{AH} ist ein Protokoll, welches den Header des darunterliegenden \ac{IP}-Pakets absichert,
 sowie die darin eingebetteten Daten. Im Header des darunterliegenden Pakets werden nur die statischen Felder
 abgesichert. \ac{AH} bieter Integrität und Replay-Schutz. Es unterstützt keine Vertraulichkeit, da
-der Verkehr nur mittels eines \ac{HMAC} abgesichert wird.\footcite[][]{stephen_kent_rfc_2005-}
+der Verkehr nur mittels eines \ac{HMAC} abgesichert wird.\footcite[][]{stephen_kent_rfc_2005-1}
 \begin{figure}
     \label{fig:AH}
     \centering
