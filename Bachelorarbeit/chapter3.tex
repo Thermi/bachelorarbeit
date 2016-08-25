@@ -207,9 +207,12 @@ I/O-Operationen warten.
 Die Nachteile dieser Methode sind, dass jegliche Operationen auf den Handles eine Benachrichtigung
 an GetQueuedCompletionStatus() generieren, obwohl Schreib-Vorgänge nicht von Interesse sind.
 
+Des weiteren ähnelt die Nutzung von WaitForMultipleObjects() deren von poll()
+insoweit, dass die Handles/\acp{FD} auch nach der Benutzung mit der Funktion
+weiterhin einzeln genutzt werden können.
 % Mehr Erläuterung benötigt
 
-Da es relativ einfach ist WaitForMultipleObjects() zu nutzen, habe ich diese Methode
+Da es relativ einfach ist WaitForMultipleObjects() zu nutzen, wurde diese Methode
 für die Implementierung von handle\_plain() genutzt.
 
 Folgend die originale Implementierung für Linux und Unix mit poll()
