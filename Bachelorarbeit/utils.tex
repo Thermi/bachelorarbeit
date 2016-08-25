@@ -87,3 +87,21 @@
 % \end{bytefield}
 
 % end of code for coloring boxes in bytefield
+
+
+% start of utility code for nice handling of SVG files
+% manually typed out because the source PDF's text is obfuscated. What a massive giant cuntosaurus.
+% http://tug.ctan.org/tex-archive/info/svg-inkscape/InkscapePDFLaTeX.pdf
+\newcommand{\executeiffilenewer}[3] {%
+\ifnum\pdfstrcmp{\pdffilemoddate{#1}}%
+{\pdffilemoddate{#2}}>0%
+{\immediate\write18{#3}}\fi%
+}
+\newcommand{\includesvg}[1]{%
+\executeiffilenewer{#1.svg}{#1.pdf}%
+{inkscape -z -D --file=#1.svg %
+--export-pdf=#1.pdf --export-latex}%
+\input{#1.pdf_tex}%
+}
+
+% end of utility code for nice handling of SVG files
