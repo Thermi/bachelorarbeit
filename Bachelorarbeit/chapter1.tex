@@ -258,9 +258,10 @@ erklärt.
 
 In der Firewall von Windows existiert eine Implementierung, die Policy-based ist
 und daher flexibler ist und es erlaubt Firewall-Regeln zu schreiben, die abhängig davon sind,
-ob ein Paket mit \ac{IPsec} geschützt war. Des weiteren unterstützt diese Implementierung
-den Config-Modus nicht, daher ist sie nicht für die Benutzung als \ac{RW} geeignet.
-
+ob ein Paket mit \ac{IPsec} geschützt war. Windows wird mit einem Dienst namens ''IKEEXT'' ausgeliefert,
+welcher genutzt werden kann, um IKE\_SAs und CHILD\_SAs auszuhandeln. Standardmäßig
+ist dieser Dienst aktiv und lauscht auf \ac{UDP} Port 500 und 4500.
+Diese Implementierung unterstütz den Config-Modus nicht und ist daher nicht für die Benutzung als \ac{RW} geeignet.\footcite[][]{_ipsec_2016}
 
 \subsubsection{TUN und TAP-Geräte}
 TUN- und TAP-Geräte sind virtuelle Netzwerkadapter, die von lokalen Anwendungen
