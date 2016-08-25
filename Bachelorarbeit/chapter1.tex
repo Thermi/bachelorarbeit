@@ -79,6 +79,19 @@ Zertifikatsauthentifizierung, RSA- oder ECDSA-Schlüssel oder \ac{EAP} unter Ben
 des Oakley-Protokols\footcite{hilarie_k._orman_rfc_1998} abgesichert, welches mithilfe des \ac{DH}-Schlüsselaustauschprotokolls
 geheime Schlüssel zwischen den Teilnehmern aushandelt.\footcite[][50]{charlie_kaufman_rfc_2014}\footcite[][8]{douglas_maughan_rfc_1998}
 
+\subsubsection{IKE}
+\paragraph{IKEv1/ISAKMP}
+IKEv1 wird oft als equivalent zu \ac{ISAKMP} verwendet, wobei es auch keinen für diese Arbeit bedeutsamen
+Unterschied gibt. Daher werden die Begriffe hier auch equivalent genutzt.
+IKEv1 ist die erste, älteste Version des \ac{IKE}-Protokolls, welches zum Aushandeln
+von CHILD\_SAs genutzt wird.
+\paragraph{IKEv2}
+IKEv2 ist die logische Weiterentwicklung von IKEv1 und beinhaltet Verbesserungen
+im Bezug auf den Verbindungsaufbau, Robustheit, Sicherheit und Flexibilität\footcite[136, 137]{charlie_kaufman_rfc_2014}.
+Mit der neuen Version wurde XAUTH durch \ac{EAP} ersetzt, was die Delegation der
+Authentifizierung zu einem oder mehreren RADIUS-Servern ermöglicht und weitere Authentifizierungsmodi ermöglicht.
+Des weiteren wurde der unsichere ''Agressive Mode entfern'' und der Standard klarer formuliert.
+
 \paragraph{IKE\_SA}
 Eine IKE\_SA bezeichnet eine Verbindung, die zwei Teilnehmer mittels IKE ausgehandelt haben.
 Eine IKE\_SA wird durch die \ac{IP}-Adressen, sowie durch \acp{SPI} identifiziert.
@@ -135,68 +148,6 @@ zum Beispiel alle 6 Stunden, oder wenn 4 GB übertragen wurden oder wenn eine ge
 Pakete übertragen wurde. Dies wird getan, damit die Menge an Daten, die bei einer Kompromitierung
 eines Schlüssels offengelegt wird, begrenzt ist.
 
-\subsubsection{IKE}
-\paragraph{IKEv1/ISAKMP}
-IKEv1 wird oft als equivalent zu \ac{ISAKMP} verwendet, wobei es auch keinen für diese Arbeit bedeutsamen
-Unterschied gibt. Daher werden die Begriffe hier auch equivalent genutzt.
-IKEv1 ist die erste, älteste Version des \ac{IKE}-Protokolls, welches zum Aushandeln
-von CHILD\_SAs genutzt wird.
-\paragraph{IKEv2}
-IKEv2 ist die logische Weiterentwicklung von IKEv1 und beinhaltet Verbesserungen
-im Bezug auf den Verbindungsaufbau, Robustheit, Sicherheit und Flexibilität\footcite[136, 137]{charlie_kaufman_rfc_2014}.
-Mit der neuen Version wurde XAUTH durch \ac{EAP} ersetzt, was die Delegation der
-Authentifizierung zu einem oder mehreren RADIUS-Servern ermöglicht und weitere Authentifizierungsmodi ermöglicht.
-Des weiteren wurde der unsichere ''Agressive Mode entfern'' und der Standard klarer formuliert.
-
-\subsubsection{Route Based}
-\label{subsec:routebased}
-Route based heißt, dass Pakete, die über das VPN
-gesendet werden sollen, in eine virtuelle Netzwerkschnittstelle geroutet werden.
-Da gewöhnliches Routing auf Basis der Zieladresse geschieht, unterstützt solche eine solche Implementierung
-in der Regel keine \acp{SP}, die nur bestimmte Protokolle oder Ports schützen oder wenn das der Fall ist,
-so ist die Kommunikation mit den anderen Ports oder Protokollen nicht mehr möglich,
-da jegliche Pakete, die in die Schnittstelle gelangen und von den \acp{SP} nicht zugelassen sind, verworfen werden.
-
-Implementierungen von IPsec auf Endgeräten sind in der Regel Route based, gleichzeitig werden
-die ausgehandelten \acp{SP} jedoch weiterhin erzwungen.
-Route based \acp{VPN} werden für gewöhnlich dann genutzt, wenn dynamisches Routen genutzt wird,
-wie zum Beispiel \ac{BGP}, \ac{ISIS} oder \ac{OSPF}, da beim Verändern der Routen die \acp{SP} nicht verändert
-und damit keine neuen CHILD\_SAs ausgehandelt werden müssen. Ein weiterer Vorteil ist, dass Neulinge es leichter haben
-den Paketfluss zu verfolgen.
-
-Um zu verhindern, dass der \ac{IKE}-Verkehr über das \ac{VPN} geleitet wird, wird
-eine Route für die \ac{IP}-Adresse des Peers in den Routing Table installiert,
-die den Verkehr am \ac{VPN} vorbei leitet. Aus diesem Grund ist es auch nicht möglich
-mit route based \ac{IPsec} mit der \ac{IP} des Peers unter der Nutzung von \ac{IPsec} zu kommunizieren.
-
-Eine Möglichkeit Pakete, die nicht von den Policies geschützt werden, nicht ins \ac{VPN} zu leiten und
-damit die Kommunikation mit ihnen zu ermöglichen ist \ac{PBR} anzuwenden und ebendiese Pakete
-speziell zu markieren und eine andere Routing-Entscheidung zu treffen.
-
-\subsubsection{Policy Based}
-\label{subsec:policybased}
-Policy based bedeutet, dass die \ac{IPsec}-\acp{SP}, die ausgehandelt wurden, direkt genutzt werden welche Pakete geschützt werden.
-Eine solche Implementierung ermöglicht es, \ac{IPsec} zur Absicherung von sehr genau spezifiziertem
-Verkehr zu nutzen, wie zum Beispiel nur \ac{ICMP}-Pakete mit Typ 0, Code 0 (Echo Reply), sowie Typ 8 und Code 0 (Echo Request).
-Policy based \ac{IPsec} ermöglicht es \ac{IPsec} direkt in den Stack zu integrieren, ohne notwendigerweise die Routen zu verändern.
-Um sicherzustellen, dass der \ac{IKE}-Verkehr des \ac{IKE}-Daemons nicht mittels einer \ac{IPsec}-\ac{SA} geschützt wird, was
-unter Umständen die Kommunikation zwischen den \ac{IKE}-Daemons verschiedener Systeme verhindern kann, werden bestimmte
-Optionen auf dem jeweiligen Netzwerksockel gesetzt, die Pakete, die von diesem Sockel kommen, von den \acp{SP} und \acp{SA}
-nicht bearbeitet werden.
-
-\subsubsection{IPsec unter Linux}
-Unter Linux gibt es zwei verschiedene \ac{IPsec}-Stacks.
-Es existiert einerseits der KLIPS-Stack, der vom FreeS/WAN-Projekt entwickelt wurde
-und auf Route based IPsec basiert.
-
-Des weiteren gibt es den XFRM-Stack, welcher auf Policy based IPsec basiert, jedoch mithilfe eines \ac{VTI}
-auch für Route based IPsec genutzt werden kann.
-
-Beide Stacks sind konform zu RFC 2367\footcite[][]{daniel_l._mcdonald_rfc_1998}.
-
-Die Kommunikation mit dem Kernel bezüglich Netzwerkfunktionen geschieht über
-den Netlink-Sockel. Die notwendigen Funktionen in charon sind im Plugin ''kernel-netlink'' implementiert.
-Über Netlink werden auch die \ac{SAD} und \ac{SPD} verwaltet.
 
 \subsubsection{Modi}
 \ac{IPsec} unterstützt verschiedene Modi wie Daten über das VPN versendet werden.
@@ -274,6 +225,20 @@ der Verkehr nur mittels eines \ac{HMAC} abgesichert wird.\footcite[][]{stephen_k
     \caption{\ac{AH}}
 \end{figure}
 
+\subsubsection{IPsec unter Linux}
+Unter Linux gibt es zwei verschiedene \ac{IPsec}-Stacks.
+Es existiert einerseits der KLIPS-Stack, der vom FreeS/WAN-Projekt entwickelt wurde
+und auf Route based IPsec basiert.
+
+Des weiteren gibt es den XFRM-Stack, welcher auf Policy based IPsec basiert, jedoch mithilfe eines \ac{VTI}
+auch für Route based IPsec genutzt werden kann.
+
+Beide Stacks sind konform zu RFC 2367\footcite[][]{daniel_l._mcdonald_rfc_1998}.
+
+Die Kommunikation mit dem Kernel bezüglich Netzwerkfunktionen geschieht über
+den Netlink-Sockel. Die notwendigen Funktionen in charon sind im Plugin ''kernel-netlink'' implementiert.
+Über Netlink werden auch die \ac{SAD} und \ac{SPD} verwaltet.
+
 \subsubsection{IPsec unter Windows}
 Microsoft hat im Laufe der Entwicklungsgeschichte von Windows drei verschiedene
 \ac{IPsec}-Implementierungen implementiert, die teilweise parallel existierten.
@@ -300,6 +265,44 @@ Windows bietet die \ac{IPH}-Funktionen an, die das Verwalten von
 \ac{IP}-Adressen, Routen und Geräten erleichtert. strongSwan
 nutzt diese Funktionen im ''kernel-iph''-Plugin, um ein Kernel-Interface
 für Windows mit diesen Funktionen zu implementieren.
+
+
+\subsubsection{Route Based}
+\label{subsec:routebased}
+Route based heißt, dass Pakete, die über das VPN
+gesendet werden sollen, in eine virtuelle Netzwerkschnittstelle geroutet werden.
+Da gewöhnliches Routing auf Basis der Zieladresse geschieht, unterstützt solche eine solche Implementierung
+in der Regel keine \acp{SP}, die nur bestimmte Protokolle oder Ports schützen oder wenn das der Fall ist,
+so ist die Kommunikation mit den anderen Ports oder Protokollen nicht mehr möglich,
+da jegliche Pakete, die in die Schnittstelle gelangen und von den \acp{SP} nicht zugelassen sind, verworfen werden.
+
+Implementierungen von IPsec auf Endgeräten sind in der Regel Route based, gleichzeitig werden
+die ausgehandelten \acp{SP} jedoch weiterhin erzwungen.
+Route based \acp{VPN} werden für gewöhnlich dann genutzt, wenn dynamisches Routen genutzt wird,
+wie zum Beispiel \ac{BGP}, \ac{ISIS} oder \ac{OSPF}, da beim Verändern der Routen die \acp{SP} nicht verändert
+und damit keine neuen CHILD\_SAs ausgehandelt werden müssen. Ein weiterer Vorteil ist, dass Neulinge es leichter haben
+den Paketfluss zu verfolgen.
+
+Um zu verhindern, dass der \ac{IKE}-Verkehr über das \ac{VPN} geleitet wird, wird
+eine Route für die \ac{IP}-Adresse des Peers in den Routing Table installiert,
+die den Verkehr am \ac{VPN} vorbei leitet. Aus diesem Grund ist es auch nicht möglich
+mit route based \ac{IPsec} mit der \ac{IP} des Peers unter der Nutzung von \ac{IPsec} zu kommunizieren.
+
+Eine Möglichkeit Pakete, die nicht von den Policies geschützt werden, nicht ins \ac{VPN} zu leiten und
+damit die Kommunikation mit ihnen zu ermöglichen ist \ac{PBR} anzuwenden und ebendiese Pakete
+speziell zu markieren und eine andere Routing-Entscheidung zu treffen.
+
+\subsubsection{Policy Based}
+\label{subsec:policybased}
+Policy based bedeutet, dass die \ac{IPsec}-\acp{SP}, die ausgehandelt wurden, direkt genutzt werden welche Pakete geschützt werden.
+Eine solche Implementierung ermöglicht es, \ac{IPsec} zur Absicherung von sehr genau spezifiziertem
+Verkehr zu nutzen, wie zum Beispiel nur \ac{ICMP}-Pakete mit Typ 0, Code 0 (Echo Reply), sowie Typ 8 und Code 0 (Echo Request).
+Policy based \ac{IPsec} ermöglicht es \ac{IPsec} direkt in den Stack zu integrieren, ohne notwendigerweise die Routen zu verändern.
+Um sicherzustellen, dass der \ac{IKE}-Verkehr des \ac{IKE}-Daemons nicht mittels einer \ac{IPsec}-\ac{SA} geschützt wird, was
+unter Umständen die Kommunikation zwischen den \ac{IKE}-Daemons verschiedener Systeme verhindern kann, werden bestimmte
+Optionen auf dem jeweiligen Netzwerksockel gesetzt, die Pakete, die von diesem Sockel kommen, von den \acp{SP} und \acp{SA}
+nicht bearbeitet werden.
+
 
 
 \subsubsection{TUN und TAP-Geräte}
