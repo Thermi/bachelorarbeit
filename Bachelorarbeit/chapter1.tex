@@ -194,6 +194,10 @@ auch für Route based IPsec genutzt werden kann.
 
 Beide Stacks sind konform zu RFC 2367\footcite[][]{daniel_l._mcdonald_rfc_1998}.
 
+Die Kommunikation mit dem Kernel bezüglich Netzwerkfunktionen geschieht über
+den Netlink-Sockel. Die notwendigen Funktionen in charon sind im Plugin ''kernel-netlink'' implementiert.
+Über Netlink werden auch die \ac{SAD} und \ac{SPD} verwaltet.
+
 \subsubsection{Modi}
 \ac{IPsec} unterstützt verschiedene Modi wie Daten über das VPN versendet werden.
 Die Modi unterscheiden sich hinsichtlich der Tatsache wie sie die \ac{IP}-Pakete übertragen
