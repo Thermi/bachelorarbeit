@@ -260,3 +260,27 @@ In der Firewall von Windows existiert eine Implementierung, die Policy-based ist
 und daher flexibler ist und es erlaubt Firewall-Regeln zu schreiben, die abhängig davon sind,
 ob ein Paket mit \ac{IPsec} geschützt war. Des weiteren unterstützt diese Implementierung
 den Config-Modus nicht, daher ist sie nicht für die Benutzung als \ac{RW} geeignet.
+
+
+\subsubsection{TUN und TAP-Geräte}
+TUN- und TAP-Geräte sind virtuelle Netzwerkadapter, die von lokalen Anwendungen
+genutzt werden können um vom Kernel \ac{IP}-Pakete oder Ethernet-Rahmen zu empfangen.
+Pakete und Rahmen, die der Kernel über ein TUN- oder TAP-Gerät erhält
+werden gleich behandelt als wären sie über eine physikalische Schnittstelle empfangen worden.
+Sie werden auch gleich verwaltet, so können ihnen zum Beispiel \ac{IP}-Adressen zugewiesen
+und Routen über so eine virtuelle Schnittstelle angelegt werden.
+
+\paragraph{TUN-Geräte}
+TUN-Geräte sind virtuelle Netzwerkschnittstellen, die auf der Netzwerkschicht arbeiten.
+Das heißt, dass sie IP-Pakete senden und empfangen ohne einen darunterliegenden Ethernet-Rahmen.
+Das heißt im Umkerschluss das über ein TUN-Gerät keine Kollisionsdomäne erreichbar ist,
+ARP nicht benutzbar ist und das ''next hop''-Feld einer Route in der Routing-Tabelle
+keine Bedeutung hat, wenn die Route über ein TUN-Gerät führt.
+
+\paragraph{TAP-Geräte}
+TAP-Geräte verhalten sich wie physikalische Ethernet-Schnittstellen.
+Das heißt, dass Prinzipiell über sie ARP und Ethernet gesprochen werden können
+und eine Kollisionsdomäne erreichbar ist. TAP-Geräte können genutzt werden
+um eine Brücke zwischen einem lokalen Netzwerk und einem entfernten
+Netzwerk über einen \ac{VPN}-Dienst mithilfe eines virtuellen Brückengeräts
+zu bauen.
