@@ -145,8 +145,10 @@ Des weiteren wurde der unsichere ''Agressive Mode entfern'' und der Standard kla
 \label{subsec:routebased}
 Route based heißt, dass Pakete, die über das VPN
 gesendet werden sollen, in eine virtuelle Netzwerkschnittstelle geroutet werden.
-Da gewöhnliches Routing auf Basis der Zieladresse geschieht, ermöglicht eine solche Implementierung
-keine Protokol- oder Port-Selektoren.
+Da gewöhnliches Routing auf Basis der Zieladresse geschieht, unterstützt solche eine solche Implementierung
+in der Regel keine \acp{SP}, die nur bestimmte Protokolle oder Ports schützen oder wenn das der Fall ist,
+so ist die Kommunikation mit den anderen Ports oder Protokollen nicht mehr möglich,
+da jegliche Pakete, die in die Schnittstelle gelangen und von den \acp{SP} nicht zugelassen sind, verworfen werden.
 
 Implementierungen von IPsec auf Endgeräten sind in der Regel Route based, gleichzeitig werden
 die ausgehandelten \acp{SP} jedoch weiterhin erzwungen.
@@ -155,12 +157,21 @@ wie zum Beispiel \ac{BGP}, \ac{ISIS} oder \ac{OSPF}, da beim Verändern der Rout
 und damit keine neuen CHILD\_SAs ausgehandelt werden müssen. Ein weiterer Vorteil ist, dass Neulinge es leichter haben
 den Paketfluss zu verfolgen.
 
+Um zu verhindern, dass der \ac{IKE}-Verkehr über das \ac{VPN} geleitet wird, wird
+eine Route für die \ac{IP}-Adresse des Peers in den Routing Table installiert,
+die den Verkehr am \ac{VPN} vorbei leitet. Aus diesem Grund ist es auch nicht möglich
+mit route based \ac{IPsec} mit der \ac{IP} des Peers unter der Nutzung von \ac{IPsec} zu kommunizieren.
+
 \subsubsection{Policy Based}
 \label{subsec:policybased}
 Policy based bedeutet, dass die \ac{IPsec}-\acp{SP}, die ausgehandelt wurden, direkt genutzt werden welche Pakete geschützt werden.
 Eine solche Implementierung ermöglicht es, \ac{IPsec} zur Absicherung von sehr genau spezifiziertem
 Verkehr zu nutzen, wie zum Beispiel nur \ac{ICMP}-Pakete mit Typ 0, Code 0 (Echo Reply), sowie Typ 8 und Code 0 (Echo Request).
 Policy based \ac{IPsec} ermöglicht es \ac{IPsec} direkt in den Stack zu integrieren, ohne notwendigerweise die Routen zu verändern.
+Um sicherzustellen, dass der \ac{IKE}-Verkehr des \ac{IKE}-Daemons nicht mittels einer \ac{IPsec}-\ac{SA} geschützt wird, was
+unter Umständen die Kommunikation zwischen den \ac{IKE}-Daemons verschiedener Systeme verhindern kann, werden bestimmte
+Optionen auf dem jeweiligen Netzwerksockel gesetzt, die Pakete, die von diesem Sockel kommen, von den \acp{SP} und \acp{SA}
+nicht bearbeitet werden.
 
 \subsubsection{IPsec unter Linux}
 Unter Linux gibt es zwei verschiedene \ac{IPsec}-Stacks.
