@@ -204,6 +204,9 @@ ein \ac{AEAD}-Algorithmus.\footcite[][]{stephen_kent_rfc_2005-2}
 \paragraph{UDP Encapsulation}
 UDP Encapsulation ist \ac{ESP} in einer UDP-Hülle. Es wird standardmäßig eingesetzt, wenn
 erkannt wurde, dass zwischen den Teilnehmern \ac{NAT} eingesetzt wird.\footcite[][]{markus_stenberg_rfc_2005}
+Es wird auch eingesetzt, wenn einer der Teilnehmer keine reinen \ac{ESP}-Pakete versenden kann,
+wie zum Beispiel wenn \ac{IPsec} im Userspace implementiert ist und aus einem beliebigen Grund
+kein Sockel implementiert wurde, der es ermöglicht reine \ac{ESP}-Pakete zu versenden.
 \begin{figure}
     \label{fig:UDP-Encapsulation}
     \centering
