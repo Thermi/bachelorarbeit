@@ -167,6 +167,10 @@ eine Route für die \ac{IP}-Adresse des Peers in den Routing Table installiert,
 die den Verkehr am \ac{VPN} vorbei leitet. Aus diesem Grund ist es auch nicht möglich
 mit route based \ac{IPsec} mit der \ac{IP} des Peers unter der Nutzung von \ac{IPsec} zu kommunizieren.
 
+Eine Möglichkeit Pakete, die nicht von den Policies geschützt werden, nicht ins \ac{VPN} zu leiten und
+damit die Kommunikation mit ihnen zu ermöglichen ist \ac{PBR} anzuwenden und ebendiese Pakete
+speziell zu markieren und eine andere Routing-Entscheidung zu treffen.
+
 \subsubsection{Policy Based}
 \label{subsec:policybased}
 Policy based bedeutet, dass die \ac{IPsec}-\acp{SP}, die ausgehandelt wurden, direkt genutzt werden welche Pakete geschützt werden.
