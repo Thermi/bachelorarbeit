@@ -285,6 +285,19 @@ welcher genutzt werden kann, um IKE\_SAs und CHILD\_SAs auszuhandeln. Standardm�
 ist dieser Dienst aktiv und lauscht auf \ac{UDP} Port 500 und 4500.
 Diese Implementierung unterstütz den Config-Modus nicht und ist daher nicht für die Benutzung als \ac{RW} geeignet.\footcite[][]{_ipsec_2016}
 
+\paragraph{WFP}
+\ac{WFP} ist die grundlegende Technologie im Netzwerkstack von Windows, mit
+der \ac{IPsec} im Kernel, sowie die Firewall dort implementiert wurde.
+charon kann mit \ac{WFP} mithilfe des ''kernel-wfp''-Plugins kommunizieren
+und \acp{SA} und \acp{SP} in die jeweiligen Datenbanken einfügen.
+
+\paragraph{IPH}
+Windows bietet die \ac{IPH}-Funktionen an, die das Verwalten von
+\ac{IP}-Adressen, Routen und Geräten erleichtert. strongSwan
+nutzt diese Funktionen im ''kernel-iph''-Plugin, um ein Kernel-Interface
+für Windows mit diesen Funktionen zu implementieren.
+
+
 \subsubsection{TUN und TAP-Geräte}
 TUN- und TAP-Geräte sind virtuelle Netzwerkadapter, die von lokalen Anwendungen
 genutzt werden können um vom Kernel \ac{IP}-Pakete oder Ethernet-Rahmen zu empfangen.
