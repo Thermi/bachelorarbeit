@@ -219,6 +219,17 @@ weiterhin einzeln genutzt werden können.
 Da es relativ einfach ist WaitForMultipleObjects() zu nutzen, wurde diese Methode
 für die Implementierung von handle\_plain() genutzt.
 
+Die originale Implementierung mittels poll() hatte die Zustände, wie in ~\autoref{fig:poll_fd}
+dargestellt.
+
+\begin{figure}
+\caption{Zustände in handle\_plain() mittels poll()}
+\label{fig:poll_fd}
+\centering
+\def\svgwidth{\columnwidth}
+\includegraphics[width=\textwidth]{poll_fd.eps}
+\end{figure}
+
 Folgend die originale Implementierung für Linux und Unix mit poll()
 % Stattdessen Pseudocode?
 \begin{lstlisting}[caption=Code für handle\_plain auf Unix/Linux]
