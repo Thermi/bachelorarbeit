@@ -5,10 +5,6 @@
 all: clean build
 
 build:
-	rm -f bachelorarbeit.aux
-	rm -f bachelorarbeit.bcf
-	rm -f bachelorarbeit.blg
-	rm -f bachelorarbeit.bbl
 	pdflatex -8bit bachelorarbeit.tex
 	biber bachelorarbeit
 	pdflatex -8bit bachelorarbeit.tex
