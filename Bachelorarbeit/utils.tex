@@ -92,6 +92,8 @@
 % start of utility code for nice handling of SVG files
 % manually typed out because the source PDF's text is obfuscated. What a massive giant cuntosaurus.
 % http://tug.ctan.org/tex-archive/info/svg-inkscape/InkscapePDFLaTeX.pdf
+% Sadly, the export-latex feature of inkscape is totally broken right now and unusable.
+
 \newcommand{\executeiffilenewer}[3] {%
 \ifnum\pdfstrcmp{\pdffilemoddate{#1}}%
 {\pdffilemoddate{#2}}>0%
