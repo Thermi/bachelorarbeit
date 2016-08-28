@@ -1505,9 +1505,20 @@ Befehle verwendet: ''swanctl.exe --load-all'' und ''swanctl --i --child bar''.
 Nach dem Testen wurde der Tunnel, sollte ''charon-svc.exe'' nicht gecrasht sein, mit ''swanctl -t --ike foo''
 beendet, sodass keine virtuellen IP-Adressen oder Routen für den nächsten Test zurückbleiben.
 
+Wenn charon-svc.exe getötet wird, während ein Tunnel mit Routen und \ac{IP}-Adressen
+aufgebaut ist, so verbleiben IP-Adressen und Routen auf dem Adapter, was verhindern kann dass
+dieselben Routen und \ac{IP}-Adressen wieder installiert werden. Das führt dazu, dass der
+Aufbau der CHILD\_SA fehlschlägt und ein neuer Tunnel nicht aufgebaut werden kann.
+In diesem Fall müssen sie manuell über die Nutzung von ''route delete'' oder ''netsh''
+gelöscht werden oder Windows neu gestartet werden.
+
 OpenSSL auf Windows wird für die Kryptographie benötigt und liegt nicht in den Standardsuchpfaden
 für Bibliotheken und Header. Aus diesem Grund werden die Header und Bibliotheken
 über LDFLAGs in Include-Pfade auf der Kommandozeile übergeben.
+
+Die Bibliotheken von OpenSSL wurden durch die Installation von OpenVPN beschafft.
+Bei der Installation von OpenVPN werden direkt die Bibliotheken von openssl mitinstalliert.
+
 
 \begin{lstlisting}[caption=./configure und make]
 ./configure --host=x86_64-w64-mingw32 --prefix=/ --libdir=/bin --bindir=/bin --sbindir=/bin --disable-defaults --enable-monolithic --enable-static --enable-svc --enable-ikev2 
@@ -1518,10 +1529,6 @@ CFLAGS=-g -O2 -Wall -Werror -Wno-pointer-sign -Wno-format-security -Wno-format -
 LDFLAGS=-L/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/win32-headers/files/lib/ -L/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/win32-headers/files/bin/
 make clean && make
 \end{lstlisting}
-
-Um die Programmdateien dann schlussendlich in die korrekten Ordner zu kopieren, wurde ein
-geteiltes Verzeichnis zwischen der VM und dem Gast
-
 
 
 Der Befehl konfiguriert den strongSwan Quellcode zum Bauen der benötigten Plugins, sowie einiger
