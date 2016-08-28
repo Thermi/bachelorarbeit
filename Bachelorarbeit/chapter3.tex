@@ -14,6 +14,17 @@
 
 \section{Vorgehensweise}
 
+Zuerst wurden alle nötigen Änderungen ausfindig gemacht. Dies beinhaltete
+die Migrierung von Code von UNIX/Linux-spezifischem IO-Multiplexing
+mittels poll() zu anderen Verfahren.
+
+Des weiteren mussten fehlende Features gefunden werden. Einen Hinweis
+darauf ließ sich bereits auf den Wiki-Seiten über die Plugins für Windows finden.
+Dieser ergab, dass die Verwaltung von virtuellen IPs unter Windows momentan
+nicht unterstützt wurde.
+
+Weitere Punkte wurden nach dem ersten Kompilierungsversuch, sowie der Beobachtung
+des Verhaltens während dem Tunnelaufbau herausgefunden.
 
 \subsection{Portierung von libipsec auf Windows}
 Die Portierung von libipsec auf Windows, sodass sie dort lauffähig ist, ist das Ziel
@@ -185,7 +196,7 @@ für Windows anzupassen, da hier ein Gateway verwendet wird auf einem TAP-Gerät
 statt ein echtes TUN-Gerät, sowie die Anpassung des Codes für die Ein- und Ausgabe 
 und einige Methoden in
 ''kernel\_libipsec\_router.c'', da das Multiplexen der Handles, sowie die Benachrichtigung
-von anderen Threads auf Windows anders abläuft als auf Linux und Unix.
+von anderen Threads auf Windows anders abläuft als auf Linux und UNIX.
 
 Für das Multiplexen der Eingabe stehen unter Windows zwei Verfahren zur Verfügung:
 \begin{itemize}
@@ -219,7 +230,7 @@ weiterhin einzeln genutzt werden können.
 Da es relativ einfach ist WaitForMultipleObjects() zu nutzen, wurde diese Methode
 für die Implementierung von handle\_plain() genutzt.
 
-Die originale Implementierung mittels poll() hatte die Zustände, wie in ~\autoref{fig:poll_fd}
+Die Zustände der Originalimplementierung sind in ~\autoref{fig:poll_fd}
 dargestellt.
 
 \begin{figure}
@@ -230,86 +241,23 @@ dargestellt.
 \includegraphics[width=\textwidth]{poll_fd.eps}
 \end{figure}
 
-Folgend die originale Implementierung für Linux und Unix mit poll()
-% Stattdessen Pseudocode?
-\begin{lstlisting}[caption=Code für handle\_plain auf Unix/Linux]
-/**
- * Job handling outbound plaintext packets
- */
-static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
-{
-	enumerator_t *enumerator;
-	tun_entry_t *entry;
-	bool oldstate;
-	int count = 0;
-	char buf[1];
-	struct pollfd *pfd;
 
-	this->lock->read_lock(this->lock);
-
-	pfd = alloca(sizeof(*pfd) * (this->tuns->get_count(this->tuns) + 2));
-	pfd[count].fd = this->notify[0];
-	pfd[count].events = POLLIN;
-	count++;
-	pfd[count].fd = this->tun.fd;
-	pfd[count].events = POLLIN;
-	count++;
-
-	enumerator = this->tuns->create_enumerator(this->tuns);
-	while (enumerator->enumerate(enumerator, NULL, &entry))
-	{
-		pfd[count].fd = entry->fd;
-		pfd[count].events = POLLIN;
-		count++;
-	}
-	enumerator->destroy(enumerator);
-	this->lock->unlock(this->lock);
-
-	oldstate = thread_cancelability(TRUE);
-	if (poll(pfd, count, -1) <= 0)
-	{
-		thread_cancelability(oldstate);
-		return JOB_REQUEUE_FAIR;
-	}
-	thread_cancelability(oldstate);
-
-	if (pfd[0].revents & POLLIN)
-	{
-		/* list of TUN devices changed, read notification data, rebuild FDs */
-		while (read(this->notify[0], &buf, sizeof(buf)) == sizeof(buf))
-		{
-			/* nop */
-		}
-		return JOB_REQUEUE_DIRECT;
-	}
-
-	if (pfd[1].revents & POLLIN)
-	{
-		process_plain(this->tun.tun);
-	}
-
-	this->lock->read_lock(this->lock);
-	enumerator = this->tuns->create_enumerator(this->tuns);
-	while (enumerator->enumerate(enumerator, NULL, &entry))
-	{
-		if (find_revents(pfd, count, entry->fd) & POLLIN)
-		{
-			process_plain(entry->tun);
-		}
-	}
-	enumerator->destroy(enumerator);
-	this->lock->unlock(this->lock);
-
-	return JOB_REQUEUE_DIRECT;
-}
-\end{lstlisting}
-
-Wie aus dem Code hervorgeht, wird im Prinzip nur ein Array mit Strukturen des Typs
+Wie aus dem Diagramm hervorgeht, wird im Prinzip nur ein Array mit Strukturen des Typs
 ''pollfd'' erstellt, dann mit einem Notification-\ac{FD} und den \acp{FD} der TUN-Geräte befüllt
 und als gewünschte Events ''POLLIN'' gesetzt. Das heißt, dass der Aufruf von poll() ohne
 Fehler beendet wird, wenn Daten auf dem \acp{FD} zur Verfügung stehen.
 Danach wird poll() auf die ''pollfd''-Datenstruktur ausgeführt und analysiert,
-auf welchen \acp{FD} Daten zur Verfügung stehen.
+auf welchen \acp{FD} Daten zur Verfügung stehen. Dieser Code ist relativ kurz im
+Vergleich zum Analogon mit WaitFor*Objects() Funktionen unter Windows.
+Dies geht aus den vergleichbaren Implementierungsmöglichkeiten, die sich aus den
+WaitFor*Objects()-Funktionen ergeben. Dies wird im Diagramm \autoref{fig:WaitForMultipleObjects}
+und \autoref{fig:WaitForMultipleObjects2} hervor. Diese Diagramme haben weitaus
+mehr Zustände als \autoref{poll_fd}.
+% TODO: Arrays beschreiben
+
+In handle\_plain werden drei verschiedene Arrays benutzt.
+% TODO: Vervollständigen
+
 
 Folgend die Implementierung mit WaitForMultipleObjects()
 \begin{lstlisting}[caption=Code für handle\_plain auf Windows]
@@ -644,6 +592,22 @@ static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
 }
 \end{lstlisting}
 
+\begin{figure}
+\label{fig:WaitForMultipleObjects}
+\centering
+\def\svgwidth{\columnwidth}
+\includegraphics[width=\textwidth]{WaitForMultipleObjects.eps}
+\caption{Zustände in handle\_plain() mittels WaitForMultipleObjects(), Variante 1}
+\end{figure}
+
+\begin{figure}
+\label{fig:WaitForMultipleObjects2}
+\centering
+\def\svgwidth{\columnwidth}
+\includegraphics[width=\textwidth]{WaitForMultipleObjects2.eps}
+\caption{Zustände in handle\_plain() mittels WaitForMultipleObjects(), Variante 2}
+\end{figure}
+
 libipsec setzt für die von ihr installierten Routen standardmäßig das ''Gateway''
 oder ''Next Hop''Feld nicht. Der Grund dafür ist, dass libipsec bisher nur auf
 Betriebssytemen genutzt wurde, die echte Layer-3-Geräte implementieren und
@@ -682,17 +646,34 @@ Der Treiber ist kompiliert auf der OpenVPN-Seite
 verfügbar\footnote{\url{https://openvpn.net/index.php/open-source/downloads.html}}
 und der Quellcode auf Github\footnote{\url{https://github.com/OpenVPN}}.
 Die Basis für die Implementierung war hier der existierende Programmcode in
-OpenVPN, spezifisch in Datei /src/openvpn/tun.c.
+OpenVPN, spezifisch in  der Datei ''src/openvpn/tun.c.''.
 
+
+\paragraph{TAP-Geräte suchen}
 Um das TAP-Gerät zu nutzen versucht der Code zuerst nach Netzwerkgeräten mit der ID "tap0901" zu suchen,
-welche die ID für TAP-Geräte ist.
+welche die ID für TAP-Geräte ist. Dies wird über die Registry getan. Hierbei wird
+im Pfad ''HKEY\_LOCAL\_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}''
+nach Verbindungen gesucht, wessen component\_id den Wert ''tap0901'' besitzen.
+Bei passenden Schlüsseln wird der Wert ''NetCfgInstanceId'' an eine linked list
+angehängt. Die NetCfgInstanceId identifiziert jeden Netzwerkadapter unter Windows
+mittels einer einzigartigen ID.
+Vor dem Beenden der Funktion wird die linked list zurückgegeben.
+Diese Funktionalität ist in der Funktion get\_tap\_reg() in der Datei
+''src/libstrongswan/networking/tun\_device.c'' gekapselt.
 
-Danach wird versucht eine Datei in \\.\\Global\/GUID.tap mittels 
+
+\paragraph{TAP-Geräte öffnen}
+TAP-Geräte sind im Usermode über den Globalen Addressraum für Userspaceadapter
+unter ''\\.\\Global\/GUID.tap'' erreichbar.
 \begin{lstlisting}
 CreateFile(device_path, GENERIC_READ \| GENERIC_WRITE, 0,
                     0, OPEN_EXISTING, FILE_ATTRIBUTE_SYSTEM | FILE_FLAG_OVERLAPPED, 0);
 \end{lstlisting}
-zu öffnen.
+
+\paragraph{TAP-Geräte erstellen}
+Das Erstellen von TAP-Geräten ist im Moment nicht unterstützt. Der Grund dafür ist,
+dass die Funktionalität von ''devcon.exe'' dafür nachgebaut werden müsste, was
+sehr zeitaufwendig ist.
 Das Handle kann nun genutzt werden um Pakete vom TAP-Gerät zu lesen und zu schreiben.
 Mittels DeviceIoControl kann die Konfiguration des Geräts geändert werden,
 wie die IP des virtuellen Routers, den Status des Geräts sowie der Modus des Geräts.
@@ -831,6 +812,9 @@ linked_list_t *get_tap_reg()
 }
 \end{lstlisting}
 
+\paragraph{Konfiguration eines TAP-Geräts}
+Die Konfiguration eines TAP-Geräts geschieht mit den IOCTL-Werten aus ~/autoref{fig:tap-ioctls}.
+
 Folgend ist der Code für das Konfigurieren eines TAP-Geräts:
 \begin{lstlisting}[caption=Konfiguration eines TAP-Geräts]
 /**
@@ -966,29 +950,10 @@ static bool init_tun(private_tun_device_t *this, const char *name_tmpl)
 \end{lstlisting}
 
 Für das Setzen des Geräts auf ''up'' wurde der entsprechende Aufruf per IoControl
-implementiert:
-\begin{lstlisting}[caption=Code für das Setzen des Geräts auf ''up'']
-/* Fix for WIN32 */
-METHOD(tun_device_t, up, bool,
-	private_tun_device_t *this)
-{
-#ifdef WIN32
-        ULONG status = TRUE;
-        DWORD len;
-        if (!DeviceIoControl (this->tunhandle, TAP_WIN_IOCTL_SET_MEDIA_STATUS,
-			  &status, sizeof (status),
-			  &status, sizeof (status), &len, NULL))
-        {
-            DBG1(DBG_LIB, "failed to set the interface %s to up", this->if_name);
-            return FALSE;
-        }
-#else
-        [...]
-#endif /* WIN32 */
-	return TRUE;
-}
-\end{lstlisting}
+implementiert. Hierbei wird der Wert ''TAP\_WIN\_IOCTL\_SET\_MEDIA\_STATUS'' mit eiinem
+ULONG-Wert benutzt, der auf TRUE gesetzt wurde.
 
+\paragraph{tun\_device\_t}
 Folgend der Code für das Erstellen eines Objects vom Typ ''tun\_device\_t''.
 
 \begin{lstlisting}[caption=Code für das Erstellen von tun\_device\_t]
@@ -1349,7 +1314,9 @@ befindet.
 
 \paragraph{ABI}
 Die \ac{ABI} des Treibers ist undokumentiert. Im Folgenden ist eine Auflistung
-der Funktionen der \ac{ABI}.
+der Funktionen der \ac{ABI}. Sie wurden aus der Datei ''src/device.c'' extrahiert
+und aufgeschlüsselt. Für mehr Informationen bezüglich des Verhaltens und der
+genauen Eingabeparameter sollte die Datei konsultiert werden.
 
 \begin{table}
 \tiny
@@ -1369,6 +1336,7 @@ IOCtl & Makro & Eingabe & Ausgabe & Zweck & Kommentar \\ \hline
 10 & TAP\_WIN\_IOCTL\_CONFIG\_TUN & IPADDR[3] (3*4 char) & NULL & Setzt das Gerät in den TUN-Modus, lokale IP, entferntes Netzwerk, entfernte Netzmaske & \\ \hline
 11 & TAP\_WIN\_IOCTL\_CONFIG\_SET\_SRC\_CHECK & ULONG & NULL & Deaktiviert oder Aktiviert den ARP-Source-Check. ''0'' deaktiviert ihn. ''1'' aktiviert ihn (Standard) & \\ \hline
 \end{tabularx}
+\label{fig:tap-ioctls}
 \caption{TAP-Windows-Treiber IOCtls}
 \end{table}
 
@@ -1564,6 +1532,10 @@ Des weiteren wird eine Möglichkeit benötigt, um über \ac{VICI} nach Daten fü
 Passwortaufforderungen, die bei der Authentifizierung mittels XAUTH oder EAP auftreten können,
 zu fragen. Dies wird für die vollständige Unterstützen von \ac{MFA} benötigt.
 
+\subsection{Probleme}
+Die implementierte Lösung funktioniert im Moment noch nicht. Das Problem ist, dass
+die Windows-eigenen Funktionen nicht wie dokumentiert funktionieren.
+% TODO: Genauer beschreiben
 
 \subsection{Maßnahmen gegen Buffer Bloat}
 libipsec speichert die empfangenen Pakete vor- und nach der Verarbeitung in einer 
