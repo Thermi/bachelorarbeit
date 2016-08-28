@@ -1173,90 +1173,21 @@ kernel_iph_net_t *kernel_iph_net_create()
 \end{lstlisting}
 
 Für das Implementieren des Codes für den TAP-Treiber werden Magic Numbers benötigt,
-welche sich im Quellcode von OpenVPN finden lassen. Ich habe diese feig übernommen.
-Teilweise habe ich auch Konstanten für die Erzeugung der Namen der Events für
-das IO-Multiplexen dort abgelegt.
-\begin{lstlisting}[caption=Code von win32.h]
-/*
- * Copyright (C) 2016 Noel Kuntze
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
+welche sich im Quellcode von OpenVPN finden lassen. Diese wurden übernommen
+und in einer Header-Datei angelegt.
+Teilweise wurden auch die Konstanten für die Erzeugung der Namen der Events für
+das IO-Multiplexen dort abgelegt. Die Datei ist im Appendix unter \autoref{lst:libstrongswan-win32.h}
+zu finden.
 
-#ifndef WIN32_H
-#define WIN32_H
-
-#define WIN32_TUN_READ_EVENT_TEMPLATE "WIN32-libipsec-read-device-%d"
-#define WIN32_TUN_WRITE_EVENT_TEMPLATE "WIN32-libipsec-write-device-%d"
-#define WIN32_TUN_EVENT_LENGTH 80
-#define TAP_WIN_COMPONENT_ID "tap0901"
-
-#define ADAPTER_KEY "SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}"
-#define NETWORK_CONNECTIONS_KEY "SYSTEM\\CurrentControlSet\\Control\\Network\\{4D36E972-E325-11CE-BFC1-08002BE10318}"
-
-/*
- * ======================
- * Filesystem prefixes
- * ======================
- */
-
-#define USERMODEDEVICEDIR "\\\\.\\Global\\"
-#define SYSDEVICEDIR      "\\Device\\"
-#define USERDEVICEDIR     "\\DosDevices\\Global\\"
-#define TAP_WIN_SUFFIX    ".tap"
-
-/*
- * TAP IOCTL constants and macros.
- *
- */
-#define TAP_WIN_CONTROL_CODE(request,method) \
-  CTL_CODE (FILE_DEVICE_UNKNOWN, request, method, FILE_ANY_ACCESS)
-
-/* Present in 8.1 */
-
-#define TAP_WIN_IOCTL_GET_MAC               TAP_WIN_CONTROL_CODE (1, METHOD_BUFFERED)
-#define TAP_WIN_IOCTL_GET_VERSION           TAP_WIN_CONTROL_CODE (2, METHOD_BUFFERED)
-#define TAP_WIN_IOCTL_GET_MTU               TAP_WIN_CONTROL_CODE (3, METHOD_BUFFERED)
-#define TAP_WIN_IOCTL_GET_INFO              TAP_WIN_CONTROL_CODE (4, METHOD_BUFFERED)
-#define TAP_WIN_IOCTL_CONFIG_POINT_TO_POINT TAP_WIN_CONTROL_CODE (5, METHOD_BUFFERED)
-#define TAP_WIN_IOCTL_SET_MEDIA_STATUS      TAP_WIN_CONTROL_CODE (6, METHOD_BUFFERED)
-#define TAP_WIN_IOCTL_CONFIG_DHCP_MASQ      TAP_WIN_CONTROL_CODE (7, METHOD_BUFFERED)
-#define TAP_WIN_IOCTL_GET_LOG_LINE          TAP_WIN_CONTROL_CODE (8, METHOD_BUFFERED)
-#define TAP_WIN_IOCTL_CONFIG_DHCP_SET_OPT   TAP_WIN_CONTROL_CODE (9, METHOD_BUFFERED)
-
-/* Added in 8.2 */
-
-/* obsoletes TAP_WIN_IOCTL_CONFIG_POINT_TO_POINT */
-#define TAP_WIN_IOCTL_CONFIG_TUN            TAP_WIN_CONTROL_CODE (10, METHOD_BUFFERED)
-#define TAP_WIN_IOCTL_CONFIG_SET_SRC_CHECK  TAP_WIN_CONTROL_CODE (11, METHOD_BUFFERED)
-
-
-#endif /* WIN32_H */
-\end{lstlisting}
-
-\subsection{Tun-Treiber}
+\subsection{TAP-Treiber}
 % openvpn
 % kompatibilität
 % Treiber-patches upstream
 Im Zuge der \ac{BA} wurde ein Patch für den TAP-Windows-Treiber entwicklelt, um die
 Prüfung der Quell-IP der ARP-Requests zu deaktivieren. Das ist erforderlich, um mit der
 virtuellen IP des Clients mit dem entfernten IP-Netzwerk kommunizieren zu können.
+
+
 \subsubsection{Bauen und Installieren des Treibers}
 Um den Treiber zu bauen, wird zuallererst der Quellcode benötigt, sowie die
 Vorraussetzungen, welche auf der Github-Seite dort aufgelistet sind.
@@ -1355,142 +1286,28 @@ da das Routen aller \ac{IP}-Adressen über das Gerät die \ac{ARP}-Tabelle des C
 mehr gefüllt hätte und eine \ac{ARP}-Adressabfrage bei jeder Kommunikation mit einer neuen
 \ac{IP}-Adresse zu Folge hätte.
 
+Der Patch wurde entwickelt, indem nach der Behandlung von \ac{ARP}-Paketen im
+Quellcode des Treibers gesucht wurde. Dafür wurde nach "ARP" und "arp" mittels
+''grep'' im Quelltext gesucht. Dabei wurde die Funktion ''ProcessARP'' in ''src/txpath.c''
+gefunden, in der \ac{ARP}-Requests verarbeitet werden. In dieser Funktion
+werden verschiedene Felder des Pakets überprüft, unter anderem das ''Sender protocol address''-Feld.
+Wenn dieses Feld nicht die konfigurierte Client-IP ist, so wird der \ac{ARP}-Request nicht
+beantwortet, auch wenn alle anderen Felder, wie die Zieladresse korrekt sind.
+Das führt in diesem Szenario dazu, dass die Requests von der virtuellen \ac{IP}-Adresse
+nicht beantwortet werden, da die konfigurierte Client-\ac{IP}-Adresse im Treiber
+eine andere ist als die virtuelle \ac{IP}-Adresse, die vom \ac{IPsec}-Responder zugewiesen wurde.
+
+Um diesen Defekt zu beheben wurde die Überprüfung des ''Sender protocol address''-Felds
+optional gemacht, wobei es standardmäßig aktiviert ist. Die Kontrolle dieses
+Feldes kann über ein IOCTL-Wert gesteuert werden. Der momentane Zustand der Option
+wird im Adapter-Kontext des TAP-Adapters gespeichert.
+
 Er wurde 2016-08-15 in der OpenVPN Community auf freenode im Kanale \#openvpn-meeting besprochen
 und bekam ein feature-ack. Ein Code-ack steht noch aus. Das Ticket ist unter
 \url{https://community.openvpn.net/openvpn/ticket/721} zu finden.
 
-Im folgenden ist der Patch zu finden:
-\begin{lstlisting}[caption=Patch für TAP-Windows6]
-diff --git a/src/adapter.c b/src/adapter.c
-index 2883b79..fd575f9 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -222,6 +222,9 @@ tapReadConfiguration(
-     Adapter->MediaStateAlwaysConnected = FALSE;
-     Adapter->LogicalMediaState = FALSE;
-     Adapter->AllowNonAdmin = FALSE;
-+    // source check can not be set in the registry yet. This has to be set each
-+    // time the adapter is opened.
-+    Adapter->m_source_check = TRUE;
-     //
-     // Open the registry for this adapter to read advanced
-     // configuration parameters stored by the INF file.
-diff --git a/src/adapter.h b/src/adapter.h
-index 2f09d12..70a394d 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -4,6 +4,7 @@
-  *
-  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
-  * 
-+ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
-  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
-  *  and is released under the GPL version 2 (see below).
-  *
-@@ -251,6 +252,10 @@ typedef struct _TAP_ADAPTER_CONTEXT
-   BOOLEAN m_CalledAdapterFreeResources;
-   BOOLEAN m_RegisteredAdapterShutdownHandler;
- 
-+   // This variable is initialised as TRUE. If it is set to FALSE, the adapter does
-+   // not check the source IP field of the ARP requests it receives on the adapter.
-+  BOOLEAN m_source_check;
-+
- } TAP_ADAPTER_CONTEXT, *PTAP_ADAPTER_CONTEXT;
- 
- FORCEINLINE
-diff --git a/src/device.c b/src/device.c
-index 2b7ba9b..85897b6 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4,6 +4,7 @@
-  *
-  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
-  *
-+ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
-  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
-  *  and is released under the GPL version 2 (see below).
-  *
-@@ -692,7 +693,20 @@ Return Value:
-             }
-         }
-         break;
--
-+    case TAP_WIN_IOCTL_CONFIG_SET_SRC_CHECK:
-+        {
-+            if (inBufLength >= sizeof(ULONG))
-+            {
-+                adapter->m_source_check = (BOOLEAN) ((PULONG) (Irp->AssociatedIrp.SystemBuffer))[0];
-+                Irp->IoStatus.Information = 1;
-+            }
-+            else
-+            {
-+                NOTE_ERROR();
-+                Irp->IoStatus.Status = ntStatus = STATUS_INVALID_PARAMETER;
-+            }
-+        }
-+        break;
-     default:
- 
-         //
-diff --git a/src/tap-windows.h b/src/tap-windows.h
-index d546a5b..0809c2e 100644
---- a/src/tap-windows.h
-+++ b/src/tap-windows.h
-@@ -4,6 +4,7 @@
-  *
-  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
-  *
-+ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
-  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
-  *  and is released under the GPL version 2 (see below).
-  *
-@@ -49,7 +50,7 @@
- 
- /* obsoletes TAP_WIN_IOCTL_CONFIG_POINT_TO_POINT */
- #define TAP_WIN_IOCTL_CONFIG_TUN            TAP_WIN_CONTROL_CODE (10, METHOD_BUFFERED)
--
-+#define TAP_WIN_IOCTL_CONFIG_SET_SRC_CHECK  TAP_WIN_CONTROL_CODE (11, METHOD_BUFFERED)
- /*
-  * =================
-  * Registry keys
-diff --git a/src/txpath.c b/src/txpath.c
-index f627934..8af5f21 100644
---- a/src/txpath.c
-+++ b/src/txpath.c
-@@ -4,6 +4,7 @@
-  *
-  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
-  * 
-+ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
-  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
-  *  and is released under the GPL version 2 (see below).
-  *
-@@ -216,6 +217,15 @@ ProcessARP(
-     //-----------------------------------------------
-     // Is this the kind of packet we are looking for?
-     //-----------------------------------------------
-+    BOOLEAN source_check = FALSE;
-+    if (Adapter->m_source_check)
-+    {
-+        source_check = (src->m_ARP_IP_Source == adapter_ip);
-+    }
-+    else
-+    {
-+        source_check = TRUE;
-+    }
-     if (src->m_Proto == htons (NDIS_ETH_TYPE_ARP)
-         && MAC_EQUAL (src->m_MAC_Source, Adapter->PermanentAddress)
-         && MAC_EQUAL (src->m_ARP_MAC_Source, Adapter->PermanentAddress)
-@@ -225,7 +235,7 @@ ProcessARP(
-         && src->m_MAC_AddressSize == sizeof (MACADDR)
-         && src->m_PROTO_AddressType == htons (NDIS_ETH_TYPE_IPV4)
-         && src->m_PROTO_AddressSize == sizeof (IPADDR)
--        && src->m_ARP_IP_Source == adapter_ip
-+        && source_check
-         && (src->m_ARP_IP_Destination & ip_netmask) == ip_network
-         && src->m_ARP_IP_Destination != adapter_ip)
-     {
-\end{lstlisting}
+Der komplette Patch ist im Appendix unter \autoref{lst:tap-windows-patch} zu finden.
+
 
 \subsection{Test des Codes}
 Zum Konfigurieren und Bauen des Quellcodes wurde der folgende Befehl verwendet.
