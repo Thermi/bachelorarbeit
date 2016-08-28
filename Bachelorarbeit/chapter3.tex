@@ -1494,7 +1494,17 @@ index f627934..8af5f21 100644
 
 \subsection{Test des Codes}
 Zum Konfigurieren und Bauen des Quellcodes wurde der folgende Befehl verwendet.
-Im Testszenario wurde der Quellcode auf Linux für Windows 8.1 64-Bit cross compiled.
+Im Testszenario wurde der Quellcode auf Linux für Windows 64-Bit cross kompiliert
+und in einer \ac{VM} mit Windows 8.1 ausgeführt.
+Die gebauten Binärdateien wurden über ein geteiltes Verzeichnis der \ac{VM}
+zugänglich gemacht. Danach wurden sie in ''C:\textbackslash{}\textbackslash{}Users\textbackslash{}\textbackslash{}Thermi\textbackslash{}\textbackslash{}bin
+kopiert und in 'cmd' mit Administratorrechten ausgeführt. Hierbei wurde zuerst ''charon-svc.exe''
+in einem ersten Fenster ausgeführt. In einem zweiten Fenster wurde die Konfiguration geladen
+und der Tunnelaufbau mittels ''swanctl.exe'' gestartet. Hierbei wurden die folgenden
+Befehle verwendet: ''swanctl.exe --load-all'' und ''swanctl --i --child bar''.
+Nach dem Testen wurde der Tunnel, sollte ''charon-svc.exe'' nicht gecrasht sein, mit ''swanctl -t --ike foo''
+beendet, sodass keine virtuellen IP-Adressen oder Routen für den nächsten Test zurückbleiben.
+
 OpenSSL auf Windows wird für die Kryptographie benötigt und liegt nicht in den Standardsuchpfaden
 für Bibliotheken und Header. Aus diesem Grund werden die Header und Bibliotheken
 über LDFLAGs in Include-Pfade auf der Kommandozeile übergeben.
@@ -1506,8 +1516,14 @@ für Bibliotheken und Header. Aus diesem Grund werden die Header und Bibliotheke
 --enable-eap-dynamic --enable-eap-identity --enable-md4 --enable-ipseckey --enable-dnscert --enable-files --enable-sha3 host_alias=x86_64-w64-mingw32 CC=x86_64-w64-mingw32-gcc 
 CFLAGS=-g -O2 -Wall -Werror -Wno-pointer-sign -Wno-format-security -Wno-format -mno-ms-bitfields -I/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/win32-headers/files/include/ 
 LDFLAGS=-L/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/win32-headers/files/lib/ -L/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/win32-headers/files/bin/
-make clean && make all
+make clean && make
 \end{lstlisting}
+
+Um die Programmdateien dann schlussendlich in die korrekten Ordner zu kopieren, wurde ein
+geteiltes Verzeichnis zwischen der VM und dem Gast
+
+
+
 Der Befehl konfiguriert den strongSwan Quellcode zum Bauen der benötigten Plugins, sowie einiger
 Extras für die Authentifizierung und dazu den 64-Bit Compiler des MINGW32-Projekts zu nutzen.
 Als Zielhost
