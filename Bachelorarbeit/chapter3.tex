@@ -657,8 +657,8 @@ weshalb es Lizensierungsprobleme damit geben könnte.
 \paragraph{TAP-Geräte suchen}
 Um das TAP-Gerät zu nutzen versucht der Code zuerst nach Netzwerkgeräten mit der ID "tap0901" zu suchen,
 welche die ID für TAP-Geräte ist. Dies wird über die Registry getan. Hierbei wird
-im Pfad ''HKEY\_LOCAL\_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}''
-nach Verbindungen gesucht, wessen component\_id den Wert ''tap0901'' besitzen.
+im Pfad ''HKEY\_LOCAL\_MACHINE\textbackslash{}\textbackslash{}SYSTEM\textbackslash{}\textbackslash{}CurrentControlSet\textbackslash{}\textbackslash{}Control\textbackslash{}\textbackslash{}Class\textbackslash{}\textbackslash{}\{4D36E972-E325-11CE-BFC1-08002BE10318\}''
+nach Verbindungen gesucht, deren ''ComponentId''-Feld den Wert ''tap0901'' besitzen.
 Bei passenden Schlüsseln wird der Wert ''NetCfgInstanceId'' an eine linked list
 angehängt. Die NetCfgInstanceId identifiziert jeden Netzwerkadapter unter Windows
 mittels einer einzigartigen ID.

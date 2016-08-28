@@ -1,0 +1,45 @@
+TODO: 
+      Erklärung des Codes zum Handling von Lesen und Schreiben
+
+      Vorgehensweise bei der Problemlösung in Kurzform
+      Genauere Beschreibung der Testplattform mit Bibliotheken und Virtualisierung
+
+      Unterstützung für mehrere TAP-Adapter erwähnen.
+      
+      Grund für anpassung des Treibers erwähen
+      Überprüfung und restriktion des Treibers bez. ARP erwähnen (localIP, RemoteNetwork und Remote Netmask
+      Ordnerstruktur beschreiben
+      
+      Codeausschnitte im Text erneuern.
+      
+      Kompletter fehlschlag erwähnen
+      GetLastError() gibt falsche Werte zurück
+      WaitForMultipleObjects() getriggert, aber einzelne Events sind nicht getriggert.
+      Kopien der Konfiguration und der Befehle im Appendix ohne Zeilennummerierung
+      Text über Verhältnis zwischen IKE_SAs und CHILD_SAs korrigieren: https://wiki.strongswan.org/projects/strongswan/activity?from=2016-08-25
+      Ordnerstruktur und Helfer-Skripte
+      Quellcode auf CD beilegen
+      CD-Hülle?
+      Hinweis auf Erfahrungen im Support und Bedarf an sicherem freien Client      
+      Auf Kernel-Interfaces in charon eingehen
+
+      Grafiken nochmals kurz überarbeiten und Linienstärken korrigieren, Zustände zusammenfassen
+      
+
+
+
+      Korrekte Lizenz für das Logo der HSO - DONE
+      Hinweis auf freie Lizenz - DONE      
+      LaTex-Symbol - DONE
+      Hinweise auf Github-Repos, in denen der Quellcode liegt - DONE
+      Notiz dass IKE-Verkehr eine explizite Route benötigt - DONE
+      Notiz dass mit Policy based IPsec auf dem Socket eine bestimmte Option gesetzt wird, die ihn von den Policies ausnimmt - DONE
+      Beschreibung von TUN/TAP Geräten - DONE
+      Verwendung von der speziellen Bezeichnung von IKE_SA und CHILD_SA erklären - DONE
+      Fähigkeiten der Kernelimplementierung und von IKEEXT (Userspace) unterscheiden - DONE
+      Beschränkung von WFP bezüglich virtuellen IPs - DONE
+      Erwähnen, dass nur bereits existierende TAP-Geräte benutzt werden können. - DONE
+      Problematik: Puffer für Packete sind auf Stack allokiert -> Stacksize von ~ 1 MB auf WIndows - Fixed. Benutze nun Heap.
+      // https://msdn.microsoft.com/en-us/library/windows/desktop/ms686774(v=vs.85).aspx
+      Zustandsdiagramm des Codes zum Handling von Lesen und Schreiben - DONE
+      make -> make install -> prepare.sh -> charon-svc.exe -> swanctl.exe --load-all -> swanctl.exe -i --child bar - DONE
