@@ -648,6 +648,11 @@ und der Quellcode auf Github\footnote{\url{https://github.com/OpenVPN}}.
 Die Basis für die Implementierung war hier der existierende Programmcode in
 OpenVPN, spezifisch in  der Datei ''src/openvpn/tun.c.''.
 
+\paragraph{TAP-Geräte erstellen}
+Das Erstellen von TAP-Geräten ist im Moment nicht unterstützt. Der Grund dafür ist,
+dass die Funktionalität von ''devcon.exe'' dafür nachgebaut werden müsste, was
+sehr zeitaufwendig ist. Des weiteren ist der Quellcode von ''devcon.exe'' nicht offen,
+weshalb es Lizensierungsprobleme damit geben könnte.
 
 \paragraph{TAP-Geräte suchen}
 Um das TAP-Gerät zu nutzen versucht der Code zuerst nach Netzwerkgeräten mit der ID "tap0901" zu suchen,
@@ -670,10 +675,6 @@ CreateFile(device_path, GENERIC_READ \| GENERIC_WRITE, 0,
                     0, OPEN_EXISTING, FILE_ATTRIBUTE_SYSTEM | FILE_FLAG_OVERLAPPED, 0);
 \end{lstlisting}
 
-\paragraph{TAP-Geräte erstellen}
-Das Erstellen von TAP-Geräten ist im Moment nicht unterstützt. Der Grund dafür ist,
-dass die Funktionalität von ''devcon.exe'' dafür nachgebaut werden müsste, was
-sehr zeitaufwendig ist.
 Das Handle kann nun genutzt werden um Pakete vom TAP-Gerät zu lesen und zu schreiben.
 Mittels DeviceIoControl kann die Konfiguration des Geräts geändert werden,
 wie die IP des virtuellen Routers, den Status des Geräts sowie der Modus des Geräts.
@@ -1291,7 +1292,7 @@ Damit das WDK es findet, muss es in "Eigene Zertifikate" zu finden sein.
 \end{figure}
 
 Mit Windows im Testmodus kann der Treiber geladen werden und TAP-Geräte konnen
-mittels tapinstall.exe (Was eigentlich devcon.exe ist). Die Datei ist im Quellcode des
+mittels tapinstall.exe (Was eigentlich ''devcon.exe'' ist). Die Datei ist im Quellcode des
 Treibers nicht mitenthalten. Sie kann jedoch durch die Installation des Treiber-Pakets
 von der OpenVPN-Webseite erhalten werden. Nach der Installation des Pakets
 ist die Datei unter \textit{C:\textbackslash{}Program Files\textbackslash{}TAP-Windows\textbackslash{}bin\textbackslash{}tapinstall.exe}
