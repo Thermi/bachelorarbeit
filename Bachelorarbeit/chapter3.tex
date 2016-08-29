@@ -89,7 +89,7 @@ und fehlende Teile ergänz.
 Spezifisch wurde aus dem Quellcode von GLIBC die Definition eines \ac{IP}-Headers kopiert
 und die fehlenden Protokollkonstanten per Hand ergänzt.
 
-Folgend ist die Headerdatei
+Folgend ist die Headerdatei inklusive der Lizenzheader.
 
 \begin{lstlisting}[caption=Header für libipsec]
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
@@ -682,7 +682,8 @@ auf die die IP-Adresse installiert werden würde.
 Die bekannten IP-Adressen werden in kernel-iph in einer Datenstruktur gespeichert,
 um sie schnell nachschlagen zu können und Berechnungen zu tätigen. Die Struktur
 wird einerseits durch manuelles Einfügen und Entfernen von selbstinstallierten Adressen
-bewerkstelligt, als auch durch Events, die der Kernel per 
+bewerkstelligt, als auch durch Events, die die Anwendung über ein Handle
+vom Kernel empfängt.
 
 \begin{lstlisting}[caption=Ergänzung zu private\_kernel\_iph\_net\_t]
 /**
