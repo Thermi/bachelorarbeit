@@ -272,7 +272,7 @@ Komprimierung         & x & o                     & o & x & o \\ \hline
 \label{subsec:Testkonfiguration}
 \begin{center}
 \label{lst:swanctl.conf}
-\begin{lstlisting}[caption=Testkonfiguration - swanctl.conf,numbers=none]
+\begin{lstlisting}[caption=Testkonfiguration - swanctl.conf,]
 connections {
         foo {
             version = 2
@@ -303,27 +303,26 @@ connections {
                     }
             }
         }
-
 }
 \end{lstlisting}
 \end{center}
 
 \begin{center}
 \label{lst:strongswan.conf}
-\begin{lstlisting}[caption=Testkonfiguration - strongswan.conf,numbers=none]
+\begin{lstlisting}[caption=Testkonfiguration - strongswan.conf]
 charon-svc {
-
 	filelog {
 		this_log.txt{
-			default=3
+			default=2
+			job = 1
+			mgr = 0
+			enc = 0 
+			asn = 0
 			flush_line = yes
 			ike_name = yes
 			append = no
 		}
-		
-	
 	}
-
 }
 \end{lstlisting}
 \end{center}
