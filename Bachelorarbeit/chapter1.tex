@@ -120,7 +120,7 @@ und jeden einzelnen eingesetzten kryptografischen Algorithmus gesetzt.
 Das Zuordnen von \ac{IPsec}-Paketen zu \ac{IPsec}-\acp{SA} wird bewerkstelligt,
 indem nach dem \ac{SPI} des Pakets in der \ac{SAD} gesucht wird.
 
-\paragraph{Unterschiede in der Schreibweise von IKE\_SA und CHILD\_SA in der Bachelorarbeit und den RFCs}
+\paragraph{Unterschiede in Schreibweisen in dr Bachelorarbeit und den RFCs}
 Diese spezielle Begrifflichkeit stammt aus dem ''strongSwan''-Quellcode, in dem
 die Datenstrukturen für eine IKE SA und eine CHILD SA Unterstriche enthalten.
 Um die Begriffe einheitlich zu verwenden wird der Unterstrich immer mitgeschrieben.
@@ -158,7 +158,7 @@ Der IP-Header wird auf Basis der eingetragenen IP-Adressen der genutzten \ac{IPs
 bestimmt und nach der Überprüfung des empfangenen Pakets ergänzt. Der Sinn dahinter ist, dass
 der Overhead der \acp{SA} verringert wird, wenn die Quell- oder Zieladressen der getunnelten Pakete
 sich nicht von denen der \acp{SA} unterscheiden.
-\begin{figure}
+\begin{figure}[h!]
     \caption{Transport-Modus}
     \label{fig:Transport-Modus}
     \centering
@@ -170,7 +170,7 @@ sich nicht von denen der \acp{SA} unterscheiden.
 Im Tunnel-Modus werden die kompletten \ac{IP}-Pakete übertragen und mittels des ausgehandelten
 Protokolls geschützt.
 
-\begin{figure}
+\begin{figure}[h!]
     \caption{Tunnel-Modus}
     \label{fig:Tunnel-Modus}
     \centering
@@ -192,8 +192,7 @@ ergänzt, sodass das Paket an eine lokale Anwendung ausgeliefert werden kann.\fo
 da es Vertraulichkeit, Integrität und Replay-Schutz für die übertragenen Pakete unterstützt.
 Dabei wird optional ein Verschlüsselungsalgorithmus, sowie ein \ac{HMAC} eingesetzt oder
 ein \ac{AEAD}-Algorithmus.\footcite[][]{stephen_kent_rfc_2005-2}
-\ac{ESP} 
-\begin{figure}
+\begin{figure}[h!]
     \label{fig:ESP}
     \centering
     \def\svgwidth{\columnwidth}
@@ -207,7 +206,7 @@ erkannt wurde, dass zwischen den Teilnehmern \ac{NAT} eingesetzt wird.\footcite[
 Es wird auch eingesetzt, wenn einer der Teilnehmer keine reinen \ac{ESP}-Pakete versenden kann,
 wie zum Beispiel wenn \ac{IPsec} im Userspace implementiert ist und aus einem beliebigen Grund
 kein Sockel implementiert wurde, der es ermöglicht reine \ac{ESP}-Pakete zu versenden.
-\begin{figure}
+\begin{figure}[h!]
     \label{fig:UDP-Encapsulation}
     \centering
     \def\svgwidth{\columnwidth}
@@ -220,13 +219,54 @@ kein Sockel implementiert wurde, der es ermöglicht reine \ac{ESP}-Pakete zu ver
 sowie die darin eingebetteten Daten. Im Header des darunterliegenden Pakets werden nur die statischen Felder
 abgesichert. \ac{AH} bieter Integrität und Replay-Schutz. Es unterstützt keine Vertraulichkeit, da
 der Verkehr nur mittels eines \ac{HMAC} abgesichert wird.\footcite[][]{stephen_kent_rfc_2005-1}
-\begin{figure}
+\begin{figure}[h!]
     \label{fig:AH}
     \centering
     \def\svgwidth{\columnwidth}
     \input{ah.tex}
     \caption{\ac{AH}}
 \end{figure}
+
+\subsubsection{MTU und MSS}
+
+Das Tunneln von Paketen verändert die \ac{MTU} des Trägers, da die Größe des darunterliegenden
+Datenträgers (IP, (UDP), ESP/AH) beachtet werden muss, sowie die Blockgröße
+des eingesetzten Verschlüsselungsalgorithmus und der eingesetzte \ac{MAC}.
+Gewöhnliche Computer nehmen in der Regel eine \ac{MTU} von 1500 Byte an und 
+berechnen aus dieser \ac{MTU} die TCP-\ac{MSS} und geben diese beim Verbindugnsaufbau mit \ac{TCP}
+an. Da die daraus resultierenden Pakete jedoch dann zu groß sind, müssen diese fragmentiert werden.
+Dies wird mit einer \ac{ICMP}-Nachricht bewerkstelligt, die an den Sender geschickt wird.
+Es gibt jedoch leider viele \ac{TCP}-Implementierungen, die dann nicht fragmentieren und so
+keine Verbindung aufbauen können. Des weiteren gibt es viele \ac{ISP}, die ICMP-Nachrichten
+verwerfen. Dieses Problem kann umgangen werden, indem auf dem \ac{IPsec}-Router
+der \ac{MSS}-Wert von \ac{TCP}-Nachrichten heruntergesetzt wird, sodass eine niedrigere
+\ac{MSS} als die \ac{MTU} des Tunnels zuzüglich des \ac{TCP}-Overheads entsteht.
+Die Fragmentierung von \ac{IP}-Paketen auf dem \ac{IPsec}-Router sollte das eigentlich umgehen,
+aber es funktioniert in der Regel nicht. Dies kann auch aus Sicherheitsgründen so sein,
+da für die Überprüfung des Packets bezüglich der ausgehandelten \acp{SP} zwischen den Teilnehmern
+erst alle Fragmente gesammelt werden müssten, was bezüglich des Speicherbedarfs problematisch sein kann.\footcite[][Kapitel 3.4 Inbound Packet Processing]{stephen_kent_rfc_2005-2}
+
+\subsubsection{Standardszenarien für IPsec}
+\ac{IPsec} wird alltäglich für die Absicherung von Verkehr zwischen einem Router oder \ac{VPN}-Server
+und \ac{RW} genutzt. Ein weiteres Szenario ist die Absicherung von Verkehr zwischen zwei Routern
+über einen Site-to-Site-Tunnel.
+
+\begin{figure}[h!]
+    \centering
+    \def\svgwidth{\columnwidth}
+    \includegraphics{Diagram_LAN-LAN.eps}
+    \caption{Site-to-Site-Szenario}
+    \label{fig:site-to-site-szenario}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \def\svgwidth{\columnwidth}
+    \includegraphics{Diagram_LAN-ROADWARRIOR.eps}
+    \caption{Roadwarrior-Szenario}
+    \label{fig:roadwarrior-szenario}
+\end{figure}
+
 
 \subsubsection{IPsec unter Linux}
 Unter Linux gibt es zwei verschiedene \ac{IPsec}-Stacks.
