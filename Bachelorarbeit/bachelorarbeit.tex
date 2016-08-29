@@ -46,7 +46,10 @@
 \usepackage{rotating}
 \usepackage{epstopdf}
 
+\renewcommand{\footrulewidth}{0.4pt}
+
 \input{utils.tex}
+
 
 % Stuff for hvaing a diagonal line 
 % can be gotten here: https://ctan.org/tex-archive/macros/latex/contrib/slashbox
@@ -56,7 +59,7 @@
 
 % see makefile for compiling
 \usepackage{csquotes}
-\usepackage[backend=biber,style=alphabetic]{biblatex}
+\usepackage[backend=biber,style=alphabetic-verb]{biblatex}
 \addbibresource{bibliography.bib}
 
 \pgfplotsset{compat=1.5}
@@ -144,6 +147,7 @@ literate={ö}{{\"o}}1
 \newpage
 % use arabic numbering in the actual text of the thesis
 \pagenumbering{arabic}
+\input{eidesstattliche_erklaerung.tex}
 \input{einleitung.tex}
 \input{chapter1.tex}
 \input{chapter2.tex}
@@ -151,6 +155,5 @@ literate={ö}{{\"o}}1
 \newpage
 \input{fazit.tex}
 \input{bibliographie.tex}
-\input{eidesstattliche_erklaerung.tex}
 \input{appendix.tex}
 \end{document}
