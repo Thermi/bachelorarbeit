@@ -244,11 +244,11 @@ Die Zustände der Originalimplementierung sind in ~\autoref{fig:poll_fd}
 dargestellt.
 
 \begin{figure}
-\caption{Zustände in handle\_plain() mittels poll()}
-\label{fig:poll_fd}
 \centering
 \def\svgwidth{\columnwidth}
 \includegraphics[width=\textwidth]{poll_fd.eps}
+\caption{Zustände in handle\_plain() mittels poll()}
+\label{fig:poll_fd}
 \end{figure}
 
 
@@ -262,14 +262,25 @@ Vergleich zum Analogon mit WaitFor*Objects() Funktionen unter Windows.
 Dies geht aus den vergleichbaren Implementierungsmöglichkeiten, die sich aus den
 WaitFor*Objects()-Funktionen ergeben. Dies wird im Diagramm \autoref{fig:WaitForMultipleObjects}
 und \autoref{fig:WaitForMultipleObjects2} hervor. Diese Diagramme haben weitaus
-mehr Zustände als \autoref{poll_fd}.
+mehr Zustände als \autoref{fig:poll_fd}.
 % TODO: Arrays beschreiben
 
-In handle\_plain werden drei verschiedene Arrays benutzt.
+In handle\_plain werden zwei verschiedene Arrays benutzt.
+\begin{description}
+\item[bundle\_array] Ein Array aus Strukturen vom Typ ''handle\_overlapped\_buffer\_t''. 
+\item[event\_array] Ein Array aus Events (HANDLE).
+\end{description}
 
+Strukturen vom Typ ''handle\_overlapped\_buffer\_t'' beinhalten jeweils ein Objekt
+vom Typ HANDLE, ein Objekt vom Typ *OVERLAPPED und ein Objekt vom Typ chunk\_t.
+Das Handle gehört zu einem TUN-Handle, das OVERLAPPED-Objekt wird direkt für asynchrones
+IO benötigt und das Objekt vom Typ chunk\_t beinhaltet den Pufferspeicher und dessen Länge.
+
+Das ''event\_array'' Array zum Multiplexen mittels WaitForMultiplEvents() genutzt und
+beinhaltet die gleichen Events, wie die Strukturen des Typs OVERLAPPED.
 % TODO: Vervollständigen
 
-Der Code in \autoref{lst:handle_plain_windows} zeigt die Implementierung von handle\_plain()
+Der Code in auf Seite \pageref{lst:handle-plain-windows} zeigt die Implementierung von handle\_plain()
 auf Windows. Die Funktionen zum Starten von asynchronen Leseoperationen auf Handles
 wurden in start\_read() abgekapselt. Das Übersetzen von Fehlercodes in menschenlesbare
 Texte wurde in format\_error() abgekapselt. Bei Fehlern beim Lesen startet sich der Job
@@ -277,19 +288,19 @@ mit JOB\_REQUEUE\_FAIR neu, sodass der Job als letzter vom Job-Manager in ''char
 wenn hoffentlich der Fehler nicht erneut auftritt.
 
 \begin{figure}
-\label{fig:WaitForMultipleObjects}
 \centering
 \def\svgwidth{\columnwidth}
 \includegraphics[width=\textwidth]{WaitForMultipleObjects.eps}
 \caption{Zustände in handle\_plain() mittels WaitForMultipleObjects(), Variante 1}
+\label{fig:WaitForMultipleObjects}
 \end{figure}
 
 \begin{figure}
-\label{fig:WaitForMultipleObjects2}
 \centering
 \def\svgwidth{\columnwidth}
 \includegraphics[width=\textwidth]{WaitForMultipleObjects2.eps}
 \caption{Zustände in handle\_plain() mittels WaitForMultipleObjects(), Variante 2}
+\label{fig:WaitForMultipleObjects2}
 \end{figure}
 
 libipsec setzt für die von ihr installierten Routen standardmäßig das ''Gateway''
@@ -861,8 +872,8 @@ IOCtl & Makro & Eingabe & Ausgabe & Zweck & Kommentar \\ \hline
 10 & TAP\_WIN\_IOCTL\_CONFIG\_TUN & IPADDR[3] (3*4 char) & NULL & Setzt das Gerät in den TUN-Modus, lokale IP, entferntes Netzwerk, entfernte Netzmaske & \\ \hline
 11 & TAP\_WIN\_IOCTL\_CONFIG\_SET\_SRC\_CHECK & ULONG & NULL & Deaktiviert oder Aktiviert den ARP-Source-Check. ''0'' deaktiviert ihn. ''1'' aktiviert ihn (Standard) & \\ \hline
 \end{tabularx}
-\label{fig:tap-ioctls}
 \caption{TAP-Windows-Treiber IOCtls}
+\label{fig:tap-ioctls}
 \end{table}
 
 \paragraph{Patch}
@@ -904,7 +915,8 @@ und in einer \ac{VM} mit Windows 8.1 ausgeführt.
 Die gebauten Binärdateien wurden über ein geteiltes Verzeichnis der \ac{VM}
 zugänglich gemacht. Danach wurden sie in ''C:\textbackslash{}\textbackslash{}Users\textbackslash{}\textbackslash{}Thermi\textbackslash{}\textbackslash{}bin
 kopiert und in 'cmd' mit Administratorrechten ausgeführt. 
-Die nötige Dateistruktur sollte wie in \autoref{fig:Ordnerstruktur} aussehen.
+Die nötige Dateistruktur sollte wie in Abbildung \ref{fig:Ordnerstruktur} 
+auf Seite \pageref{fig:Ordnerstruktur} aussehen.
 
 Im Unterordner ''swanctl'' befindet sich die Dateien ''swanctl.conf'',
 sowie die Ordner ''bliss'', ''ecdsa'', ''pkcs8'', ''pkcs12'', ''pubkey'', ''rsa'', ''x509'',
@@ -917,8 +929,8 @@ sowie das Zertifikat der Server-\ac{CA}.
 \begin{figure}
 \def\svgwidth{\columnwidth}
 \includegraphics[width=\textwidth]{CA-Struktur.eps}
-\label{fig:CA-Struktur}
 \caption{Eine exemplarische CA-Struktur}
+\label{fig:CA-Struktur}
 \end{figure}
 
 Die Datei ''this\_log'' wurde von der Logger-Konfiguration des Dienstes erstellt.
@@ -946,16 +958,16 @@ Bei der Installation von OpenVPN werden direkt die Bibliotheken von openssl miti
 \begin{centering}
 \begin{figure}
 \includegraphics[width=\textwidth]{Bilder/Ordnerstruktur.png}
-\label{fig:Ordnerstuktur}
 \caption{Ordnerstruktur nach dem Kopieren der Dateien}
+\label{fig:Ordnerstruktur}
 \end{figure}
 \end{centering}
 
 \begin{centering}
 \begin{figure}
 \includegraphics[width=\textwidth]{Bilder/Aufbau_und_swanctl_-l.png}
-\label{fig:swanctl-l}
 \caption{Ausgabe des Tunnelaufbaus und swanctl -l}
+\label{fig:swanctl-l}
 \end{figure}
 \end{centering}
 
@@ -1027,8 +1039,8 @@ was bedeuted, dass das Event nicht signalisiert ist. Wenn der Rückgabewert
 ignoriert wird, dann befindet sich im Puffer kein valides IPv4-Packet.
 
 Das Problem ist besonders evident bei der Betrachtung des Debug-Logs,
-welches sich in \autoref{lst:debug-log} finden lässt. Es wird vom Code in \autoref{lst:handle_plain_windows}
-ausgegeben.
+welches sich auf Seite \pageref{lst:debug-log} finden lässt.
+Es wird vom Code in auf Seite \pageref{lst:handle-plain-windows} ausgegeben.
 
 Des weiteren gibt die Funktion ''GetLastError()'' den Fehlerwert 0 zurück, wenn sie nicht
 direkt nach dem Funktionsaufruf, der den Fehlerstatus setzte, aufgerufen wird.
