@@ -60,9 +60,9 @@ die Kernel-Schnittstellen implementieren sind ''kernel-pfroute'', ''kernel-netli
 und ''kernel-iph''.\footcite[][]{_pluginlist_2016}
 
 % Mehr Informationen?
-\subsubsection{Userspace processing}
-Userspace processing wurde in ''charon'' von Guiliano Grassi und Ralf Sager für Android implementiert,
-um die Entwicklung der strongSwan-App für Android zu ermöglichen. Auf Android ist kernelspace processing
+\subsubsection{Userspace Processing}
+Userspace Processing wurde in ''charon'' von Guiliano Grassi und Ralf Sager für Android implementiert,
+um die Entwicklung der strongSwan-App für Android zu ermöglichen. Auf Android ist Kernelspace Processing
 von \ac{IPsec}-Paketen nicht möglich, da die Privilegien der Anwendung das nicht erlauben.
 
 Um Userspace Processing von \ac{IPsec}-Paketen zu implementieren benötigt
@@ -134,7 +134,7 @@ für das Verwalten der \ac{SAD} und \ac{SPD} emuliert (kernel-libipsec).
 libipsec empfängt und sendet Pakete über die gleichen Sockets, den der restliche Teil
 des Daemons benutzt, um mit anderen IKE-Peers zu kommunizieren. Das sind Sockets,
 die auf UDP mit Port 500 und 4500 gebunden sind; die IKE-Standardports.
-libipsec unterstützt die Verarbeitung von ESPINUDP-Paketen, sowie von normalen ESP-Paketen,
+libipsec unterstützt die Verarbeitung von UDP-Encapsulation-Paketen, sowie von normalen ESP-Paketen,
 da sie sich strukturell nur gering unterscheiden. Jedoch wird aufgrund der Tatsache,
 dass mit den gegebenen Sockets kommuniziert wird, UDP-Encapsulation forciert.
 Um ESP-Pakete verschicken zu können, müsste ein Socket geöffnet werden der das
