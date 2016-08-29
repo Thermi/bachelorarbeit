@@ -57,7 +57,7 @@ und hat keinen Anspruch auf Vollständigkeit.
 \end{itemize}
 
 \begin{center}
-\begin{table}[h]
+\begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|X|}\firsthline
 Software & IKE-Versionen \\ \hline
 strongSwan & IKEv1, IKEv2\\ \hline
@@ -71,7 +71,7 @@ bintec Secure IPsec Client & IKEv1, IKEv2 \\ \hline
 \end{table}
 
 
-\begin{table}[h]
+\begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|X|}\firsthline
 Software & Lizenz \\ \hline
 strongSwan & MIT/GPLv2\footcite[][]{_contributions_2014} \\ \hline
@@ -84,7 +84,7 @@ bintec Secure IPsec Client & Proprietär \\ \hline
 \caption{Lizenzen der IPsec-Implementierungen}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 AES-128-CBC          &  x  & x & x & x & x \\  \hline
@@ -141,7 +141,7 @@ chacha20poly1305     &  x  & o & o & o & o \\  \hline
 \caption{Unterstützte Algorithmen für Vertraulichkeit der IPsec-Implementierungen}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 MD5                                                     & x & o & x & x & x \\  \hline
@@ -159,7 +159,7 @@ AES-256-GMAC                                            & x & o & o & o & o \\  
 \caption{Unterstützte Algorithmen für Authentizität der IPsec-Implementierungen}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 MODP-768       & x & o & x & x & x \\  \hline
@@ -192,7 +192,7 @@ NEWHOPE-128    & x & o & o & o & o \\  \hline
 \caption{Unterstützte Schlüsselaustauschprotokolle der IPsec-Implementierungen}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec                  \\ \hline
 Hybrid\footnote{Client mit XAUTH, Server mittels X.509}  & x & x & x & x & x  \\ \hline
@@ -215,7 +215,7 @@ TNC-IMV                                                  & x & o & o & o & o  \\
 \caption{Unterstützte Authentifizierungsmethoden der IPsec-Implementierungen}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 CRL  & x & x & o & x & x \\ \hline
@@ -226,7 +226,7 @@ OCSP & x & ? & o & x & x \\ \hline
 \end{table}
 
 
-\begin{table}[h]
+\begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 Tunnel-Modus     & x & x & x & x & x \\  \hline
@@ -237,7 +237,7 @@ BEET-Modus       & x & o & o & o & o \\  \hline
 \caption{Unterstützte Tunnel-Modi der IPsec-Implementierungen}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 Main Mode       & x & x & x & x & ? \\ \hline
@@ -249,7 +249,7 @@ Config Mode     & x & x & x & x & x \\ \hline
 \caption{Unterstützte IKE-Modi der IPsec-Implementierungen}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Feature}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
 NAT-T                 & x & x                     & x & x & x \\ \hline
@@ -394,138 +394,6 @@ charon-svc {
 
 
 #endif /* WIN32_H */
-\end{lstlisting}
-
-\begin{lstlisting}[caption=Patch für TAP-Windows6,label=lst:tap-windows-patch]
-diff --git a/src/adapter.c b/src/adapter.c
-index 2883b79..fd575f9 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -222,6 +222,9 @@ tapReadConfiguration(
-     Adapter->MediaStateAlwaysConnected = FALSE;
-     Adapter->LogicalMediaState = FALSE;
-     Adapter->AllowNonAdmin = FALSE;
-+    // source check can not be set in the registry yet. This has to be set each
-+    // time the adapter is opened.
-+    Adapter->m_source_check = TRUE;
-     //
-     // Open the registry for this adapter to read advanced
-     // configuration parameters stored by the INF file.
-diff --git a/src/adapter.h b/src/adapter.h
-index 2f09d12..70a394d 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -4,6 +4,7 @@
-  *
-  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
-  * 
-+ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
-  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
-  *  and is released under the GPL version 2 (see below).
-  *
-@@ -251,6 +252,10 @@ typedef struct _TAP_ADAPTER_CONTEXT
-   BOOLEAN m_CalledAdapterFreeResources;
-   BOOLEAN m_RegisteredAdapterShutdownHandler;
- 
-+   // This variable is initialised as TRUE. If it is set to FALSE, the adapter does
-+   // not check the source IP field of the ARP requests it receives on the adapter.
-+  BOOLEAN m_source_check;
-+
- } TAP_ADAPTER_CONTEXT, *PTAP_ADAPTER_CONTEXT;
- 
- FORCEINLINE
-diff --git a/src/device.c b/src/device.c
-index 2b7ba9b..85897b6 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4,6 +4,7 @@
-  *
-  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
-  *
-+ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
-  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
-  *  and is released under the GPL version 2 (see below).
-  *
-@@ -692,7 +693,20 @@ Return Value:
-             }
-         }
-         break;
--
-+    case TAP_WIN_IOCTL_CONFIG_SET_SRC_CHECK:
-+        {
-+            if (inBufLength >= sizeof(ULONG))
-+            {
-+                adapter->m_source_check = (BOOLEAN) ((PULONG) (Irp->AssociatedIrp.SystemBuffer))[0];
-+                Irp->IoStatus.Information = 1;
-+            }
-+            else
-+            {
-+                NOTE_ERROR();
-+                Irp->IoStatus.Status = ntStatus = STATUS_INVALID_PARAMETER;
-+            }
-+        }
-+        break;
-     default:
- 
-         //
-diff --git a/src/tap-windows.h b/src/tap-windows.h
-index d546a5b..0809c2e 100644
---- a/src/tap-windows.h
-+++ b/src/tap-windows.h
-@@ -4,6 +4,7 @@
-  *
-  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
-  *
-+ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
-  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
-  *  and is released under the GPL version 2 (see below).
-  *
-@@ -49,7 +50,7 @@
- 
- /* obsoletes TAP_WIN_IOCTL_CONFIG_POINT_TO_POINT */
- #define TAP_WIN_IOCTL_CONFIG_TUN            TAP_WIN_CONTROL_CODE (10, METHOD_BUFFERED)
--
-+#define TAP_WIN_IOCTL_CONFIG_SET_SRC_CHECK  TAP_WIN_CONTROL_CODE (11, METHOD_BUFFERED)
- /*
-  * =================
-  * Registry keys
-diff --git a/src/txpath.c b/src/txpath.c
-index f627934..8af5f21 100644
---- a/src/txpath.c
-+++ b/src/txpath.c
-@@ -4,6 +4,7 @@
-  *
-  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
-  * 
-+ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
-  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
-  *  and is released under the GPL version 2 (see below).
-  *
-@@ -216,6 +217,15 @@ ProcessARP(
-     //-----------------------------------------------
-     // Is this the kind of packet we are looking for?
-     //-----------------------------------------------
-+    BOOLEAN source_check = FALSE;
-+    if (Adapter->m_source_check)
-+    {
-+        source_check = (src->m_ARP_IP_Source == adapter_ip);
-+    }
-+    else
-+    {
-+        source_check = TRUE;
-+    }
-     if (src->m_Proto == htons (NDIS_ETH_TYPE_ARP)
-         && MAC_EQUAL (src->m_MAC_Source, Adapter->PermanentAddress)
-         && MAC_EQUAL (src->m_ARP_MAC_Source, Adapter->PermanentAddress)
-@@ -225,7 +235,7 @@ ProcessARP(
-         && src->m_MAC_AddressSize == sizeof (MACADDR)
-         && src->m_PROTO_AddressType == htons (NDIS_ETH_TYPE_IPV4)
-         && src->m_PROTO_AddressSize == sizeof (IPADDR)
--        && src->m_ARP_IP_Source == adapter_ip
-+        && source_check
-         && (src->m_ARP_IP_Destination & ip_netmask) == ip_network
-         && src->m_ARP_IP_Destination != adapter_ip)
-     {
 \end{lstlisting}
 
 \begin{lstlisting}[caption=Code für das Suchen eines TAP-Geräts,label=lst:get_tap_req]
