@@ -18,15 +18,15 @@ In der Arbeit wurden die nötigen Änderungen für strongSwan präsentiert, um
 libipsec auf Windows lauffähig zu machen. Dies inkludiert die Implementierung
 der Routinen für das Öffnen und Konfigurieren von TAP-Geräten, die vom TAP-Windows-Treiber
 bereitgestellt werden. Des weiteren wurde die Installation von IP-Adressen getestet
-und erweitert, sowie Code zum Lesen und Schreiben von Paketen auf Handles.
+und erweitert, sowie Code zum Lesen und Schreiben von Paketen auf Handles auf Windows.
 
 Die Lösung ist unvollständig, da das Empfangen und Senden von Paketen noch nicht funktioniert.
-Nichtsdestotrotz wurde mit der \ac{BA} ein Großteil der Basis geschaffen um strongSwan
-dazu zu befähigen TAP-Geräte zu nutzen.
+Nichtsdestotrotz wurde mit der \ac{BA} ein Großteil der Basis geschaffen um ''strongSwan''
+dazu zu befähigen TAP-Geräte zu nutzen und der TAP-Windows-Treiber in seiner Funktionalität
+erweitert.
 
-Die schlussendlichen Ergebnisse der \ac{BA} sind 1457 hinzugefügte Zeilen,
-sowie 66 gelöschte Zeilen. 10 Dateien wurden verändert.
-
-Der Patch für TAP-Windows fügt 61 Zeilen hinzu und löscht 28 Zeilen. 6 Dateien
-wurden verändert.
-
+Die Probleme, die die Implementierung schlussendlich scheitern ließen lassen es zu
+die Frage zu stellen, ob Anwendungen, die mit mingw64 kompiliert wurden überhaupt
+fehlerfrei auf Handles von Usermodedevice-Treiber zugreifen können und ob
+nicht weitere Fehler in mingw64 existieren, die das Implementieren der Kompatibilität
+mit TAP-Geräten verhindern.
