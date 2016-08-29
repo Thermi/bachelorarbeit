@@ -1317,6 +1317,12 @@ Das ist jedoch nicht der Fall. Der Aufruf beendet mit ''WAIT\_TIMEOUT'' (0x102, 
 was bedeuted, dass das Event nicht signalisiert ist. Wenn der Rückgabewert
 ignoriert wird, dann befindet sich im Puffer kein valides IPv4-Packet.
 
+Des weiteren gibt die Funktion ''GetLastError()'' den Fehlerwert 0 zurück, wenn sie nicht
+direkt nach dem Funktionsaufruf, der den Fehlerstatus setzte, aufgerufen wird.
+Es ist irrelevant, ob zwischen dem Aufruf von ''GetLastError()'' nur eine einfache Zuweisung
+oder Eine if-Abfrage steht.
+Dies ergibt keinen Sinn, da sich der Fehlerstatus scheinbar ändert, ohne dass
+eine Funktion aufgerufen wird, die das tun könnte.
 % TODO: Genauer beschreiben
 
 \subsection{Maßnahmen gegen Buffer Bloat}
