@@ -1,0 +1,1 @@
+Export in LibreOffice Draw to SVG, then open the exported SVG in inkscape and save as EPS.
