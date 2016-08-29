@@ -45,7 +45,6 @@
 \usepackage[top=1in, bottom=1.25in, left=1.25in, right=1.25in]{geometry}
 \usepackage{rotating}
 \usepackage{epstopdf}
-\usepackage{caption} % To fix the pointer to labels in PDFs, because of hyperref.
 
 \renewcommand{\footrulewidth}{0.4pt}
 
@@ -56,7 +55,14 @@
 % can be gotten here: https://ctan.org/tex-archive/macros/latex/contrib/slashbox
 \usepackage{slashbox}
 
-\lstset{language=C,frame=single,numbers=left,numbersep=5pt,basicstyle=\footnotesize}
+\lstset{language=C,frame=single,numbers=left,numbersep=5pt,basicstyle=\footnotesize,breakatwhitespace=true,breaklines=true,
+literate={ö}{{\"o}}1
+         {ä}{{\"a}}1
+         {ü}{{\"u}}1
+         {ß}{{\ss}}2
+         {Ä}{{\"A}}1
+         {Ü}{{\"U}}1
+         {Ö}{{\"O}}1}
 
 % see makefile for compiling
 \usepackage{csquotes}
@@ -64,16 +70,6 @@
 \addbibresource{bibliography.bib}
 
 \pgfplotsset{compat=1.5}
-\lstset{
-breaklines=true,
-literate={ö}{{\"o}}1
-         {ä}{{\"a}}1
-         {ü}{{\"u}}1
-         {ß}{{\ss}}2
-         {Ä}{{\"A}}1
-         {Ü}{{\"U}}1
-         {Ö}{{\"O}}1
-}
 
 % define fancy header and footer with 0.4 pt rules
 \pagestyle{fancy}
