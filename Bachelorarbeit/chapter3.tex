@@ -284,8 +284,14 @@ beinhaltet die gleichen Events, wie die Strukturen des Typs OVERLAPPED.
 Bei der Ausführung von WaitForMultipleObjects() auf das Array wird darauf gewartet, dass
 eine vorher gestartete Leseoperation auf einem Handle fertig gestellt wird.
 Das signalisiert ein Event im Array und dessen Position im Array verrät welche
-Position im bundle\_array einen nun gefüllten Puffer hat. Der Puffer kann nun gelesen
-werden und an die Queue zu libipsec gehängt werden.
+Position im bundle\_array einen nun gefüllten Puffer hat. Die Position signalisiert
+hierbei nur die niedrigste Position im Array, deren Event signalisiert wurde. Ein
+im Array höher gelegenes Event könnte auch signalisiert sein.
+Der Puffer kann nun gelesen
+werden und an die Queue zu libipsec gehängt werden. Nach dem Lesen wird die OVERLAPPED-Struktur
+und das Event zurückgesetzt, sowie der Puffer mit Nullen initialisiert und die Länge zurückgesetzt.
+Danach wird ein neuer Lesevorgang auf dem oder den Handles gestartet, deren Leseoperationen
+fertig sind.
 
 Der Code in auf Seite \pageref{lst:handle-plain-windows} zeigt die Implementierung von handle\_plain()
 auf Windows. Die Funktionen zum Starten von asynchronen Leseoperationen auf Handles
