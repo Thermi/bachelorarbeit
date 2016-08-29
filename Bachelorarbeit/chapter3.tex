@@ -45,7 +45,7 @@ mit dem TAP-Treiber funktioniert.
 Die Portierung von libipsec auf Windows, sodass sie dort lauffähig ist, ist das Ziel
 der Bachelorarbeit. Die zu portierenden Teile des Programmcodes betreffen nur
 die Codesegmente, die Plattformspezifische \acp{API} oder \acp{ABI} verwenden,
-also primär alles um Dateiein- und ausgabe, sowie das verwalten von TUN-Geräten.
+also primär alles um Dateiein- und Ausgabe, sowie das verwalten von TUN-Geräten.
 Unter Unix und Linux werden hier \acp{FD} verwendet. Unter Windows werden stattdessen
 Handles genutzt, welche einen anderen Dateityp darstellen. Des weiteren unterscheidet
 sich die Methode zum Multiplexen von Lese-Aufrufen einer Liste von Dateien stark.
@@ -193,7 +193,7 @@ Die hierbei relevanten Dateien sind unter /src/libipsec/ zu finden.
 Standardmäßig installiert strongSwan die IP-Adressen die per Config-Mode
 oder \ac{CP} empfangen wird auf dem ausgehenden Interface (Linux, Kernelspace processing),
 was für die Kommunikation mit dem Peer genutzt wird,
-oder auf dem loopback-Adapter (Windows).
+oder auf dem Loopback-Adapter (Windows).
 Um die IP-Adresse für TUN-Geräte korrekt zu setzen, nutzt libipsec den Parameter
 "charon.install\_virtual\_ip\_on" von strongswan.conf, der während der Initialisierung
 des Plugins gesetzt wird.
@@ -224,7 +224,7 @@ ist das event-Attribut auf ein einzgartiges Event gesetzt, welches genutzt wird 
 das Handle zu finden, dessen Lesevorgang abgeschlossen oder abgebrochen wurde.
 Nach dem Kopieren des Handles in das Array und dem Setzen des Events wird ein asynchroner
 Lesevorgang gestartet. Wenn er sofort beendet wurde, wird das entsprechende Event gesetzt.
-Dadurch beendet der Aufruf von WaitForMultipleObjects() nach dem aufruf direkt, falls
+Dadurch beendet der Aufruf von WaitForMultipleObjects() nach dem Aufruf direkt, falls
 ein Lesevorgang schon zuvor erfolgreich war und der Programmcode wird etwas kürzer.
 % Mehr Erläuterung benötigt
 
@@ -398,7 +398,7 @@ Für die Portierung wurden die \acp{FD} für Handles ausgetauscht und für das B
 Da Eventbasiertes IO-Multiplexing genutzt wird, werden verschiedene Events zum Lesen
 und Schreiben verwendet.
 Die Namen der Events werden als Attribut des Objekts in ''tun\_device\_t->read\_event\_name''
-''tun\_device\_t->write\_event\_name'' gespeichert. Sie können mittles ''tun\_device\_t->get\_read\_event\_name()'
+''tun\_device\_t->write\_event\_name'' gespeichert. Sie können mittels ''tun\_device\_t->get\_read\_event\_name()'
 und ''tun\_device\_t->get\_read\_event\_name()'' gelesen werden.
 
 \paragraph{Ändern der MTU eines TAP-Geräts}
@@ -413,7 +413,7 @@ Bei der Konfiguration eines TAP-Geräts für die Benutzung mit strongSwan müsse
 Schritte ausgeführt werden:
 \begin{itemize}
 \item Das Gerät in den TUN-Modus setzen. Dabei werden als Parameter
-die loka le IP (169.254.128.127), die IP des virtuellen Routers (169.254.128.128)
+die lokale IP (169.254.128.127), die IP des virtuellen Routers (169.254.128.128)
 und die Netzmaske des entfernten Netzwerks (255.255.255.255) gesetzt. 
 (TAP\_WIN\_IOCTL\_CONFIG\_TUN)
 \item Deaktivierung der Überprüfung des ''Sender protocol address''-Feldes.\\
@@ -1050,22 +1050,6 @@ Es wird vom Code in auf Seite \pageref{lst:handle-plain-windows} ausgegeben.
 Des weiteren gibt die Funktion ''GetLastError()'' den Fehlerwert 0 zurück, wenn sie nicht
 direkt nach dem Funktionsaufruf, der den Fehlerstatus setzte, aufgerufen wird.
 Es ist irrelevant, ob zwischen dem Aufruf von ''GetLastError()'' nur eine einfache Zuweisung
-oder Eine if-Abfrage steht.
+oder eine If-Abfrage steht.
 Dies ergibt keinen Sinn, da sich der Fehlerstatus scheinbar ändert, ohne dass
 eine Funktion aufgerufen wird, die das tun könnte.
-
-
-\subsection{Maßnahmen gegen Buffer Bloat}
-libipsec speichert die empfangenen Pakete vor- und nach der Verarbeitung in einer 
-Wartschleife (Queue).
-Nach der Verarbeitung werden die Pakete nochmals gepuffert, bevor sie an das TUN-Gerät 
-oder den Sockel
-weitergegeben werden. Wenn die Pakete langsamer verarbeitet oder verschickt werden 
-als sie eintreffen,
-dann wächst der Puffer, bis der Anwendung (oder dem Computer) der Speicher ausgeht. 
-Dann stürzt die Anwendung ab.
-Um das zu verhindern hat Martin Willi eine Controlled-Delay-Queue implementiert und 
-im Git-Zweig libipsec-queue\footnote{\url{https://git.strongswan.org/?p=strongswan.git;a=shortlog;h=refs/heads/libipsec-queue}} 
-eine komplette Implementierung der Queue in libipsec abgelegt.
-Die Queue verwirft Pakete wenn die Verzögerung zwischen der Ankunft und der Verarbeitung
-des letzten Pakets zu groß ist.
