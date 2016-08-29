@@ -39,7 +39,6 @@ mit dem TAP-Treiber funktioniert.
 \caption{Datenflussdiagramm}
 \label{fig:Datenflussdiagramm}
 \end{figure}
-% TODO: Mehr?
 
 \subsection{Portierung von libipsec auf Windows}
 Die Portierung von libipsec auf Windows, sodass sie dort lauffähig ist, ist das Ziel
@@ -268,7 +267,6 @@ Dies geht aus den vergleichbaren Implementierungsmöglichkeiten, die sich aus de
 WaitFor*Objects()-Funktionen ergeben. Dies wird im Diagramm \autoref{fig:WaitForMultipleObjects}
 und \autoref{fig:WaitForMultipleObjects2} hervor. Diese Diagramme haben weitaus
 mehr Zustände als \autoref{fig:poll_fd}.
-% TODO: Arrays beschreiben
 
 In handle\_plain werden zwei verschiedene Arrays benutzt.
 \begin{description}
@@ -283,7 +281,11 @@ IO benötigt und das Objekt vom Typ chunk\_t beinhaltet den Pufferspeicher und d
 
 Das ''event\_array'' Array zum Multiplexen mittels WaitForMultiplEvents() genutzt und
 beinhaltet die gleichen Events, wie die Strukturen des Typs OVERLAPPED.
-% TODO: Vervollständigen
+Bei der Ausführung von WaitForMultipleObjects() auf das Array wird darauf gewartet, dass
+eine vorher gestartete Leseoperation auf einem Handle fertig gestellt wird.
+Das signalisiert ein Event im Array und dessen Position im Array verrät welche
+Position im bundle\_array einen nun gefüllten Puffer hat. Der Puffer kann nun gelesen
+werden und an die Queue zu libipsec gehängt werden.
 
 Der Code in auf Seite \pageref{lst:handle-plain-windows} zeigt die Implementierung von handle\_plain()
 auf Windows. Die Funktionen zum Starten von asynchronen Leseoperationen auf Handles
