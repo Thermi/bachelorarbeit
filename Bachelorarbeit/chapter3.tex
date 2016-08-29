@@ -266,6 +266,7 @@ mehr Zustände als \autoref{poll_fd}.
 % TODO: Arrays beschreiben
 
 In handle\_plain werden drei verschiedene Arrays benutzt.
+
 % TODO: Vervollständigen
 
 Der Code in \autoref{lst:handle_plain_windows} zeigt die Implementierung von handle\_plain()
@@ -686,6 +687,11 @@ Die Namen der Events werden als Attribut des Objekts in ''tun\_device\_t->read\_
 ''tun\_device\_t->write\_event\_name'' gespeichert. Sie können mittles ''tun\_device\_t->get\_read\_event\_name()'
 und ''tun\_device\_t->get\_read\_event\_name()'' gelesen werden.
 
+\paragraph{Ändern der MTU eines TAP-Geräts}
+Das Ändern der \ac{MTU} ist im Moment nicht unterstützt. Der Treiber ermöglicht es,
+die \ac{MTU} über die Windows-Registry zu ändern. Dort wird der Schlüssel ''MTU''
+dafür genutzt. Er steht standardmäßig auf ''1500'', welches die Standard-\ac{MTU}
+von Ethernet ist.
 \paragraph{Konfiguration eines TAP-Geräts}
 Die Konfiguration eines TAP-Geräts geschieht mit den IOCTL-Werten aus ~/autoref{fig:tap-ioctls}.
 
@@ -698,7 +704,8 @@ und die Netzmaske des entfernten Netzwerks (255.255.255.255) gesetzt.
 (TAP\_WIN\_IOCTL\_CONFIG\_TUN)
 \item Deaktivierung der Überprüfung des ''Sender protocol address''-Feldes.
 (TAP\_WIN\_IOCTL\_CONFIG\_SET\_SRC\_CHECK)
-\item Adapter in den ''up''-Zustand setzen (einschalten).
+\item Adapter in den ''up''-Zustand setzen (einschalten). 
+Nach dem Setzen des Zustands muss kurz gewartet werden um sicher zu gehen, dass das Gerät auch aktiv ist.
 (TAP\_WIN\_IOCTL\_SET\_MEDIA\_STATUS)
 \end{itemize}
 
@@ -1144,7 +1151,7 @@ genauen Eingabeparameter sollte die Datei konsultiert werden.
 IOCtl & Makro & Eingabe & Ausgabe & Zweck & Kommentar \\ \hline
 1 & TAP\_WIN\_IOCTL\_GET\_MAC & NULL & char[6] & Gibt die MAC-Adresse des Geräts zurück & \\ \hline
 2 & TAP\_WIN\_IOCTL\_GET\_VERSION & NULL & ULONG[3] & Gibt die Version des Treibers zurück & \\ \hline
-3 & TAP\_WIN\_IOCTL\_GET\_MTU & NULL & ULONG & Gibt die MTU des Geräts zurück & \\ \hline
+3 & TAP\_WIN\_IOCTL\_GET\_MTU & NULL & ULONG & Gibt die \ac{MTU} des Geräts zurück & \\ \hline
 4 & TAP\_WIN\_IOCTL\_GET\_INFO & NULL & N/A & Gibt Informationen über den Adapter zurück
 & Ist laut Code für NDIS6 nicht implementiert \\ \hline 
 5 & TAP\_WIN\_IOCTL\_CONFIG\_POINT\_TO\_POINT & IPADDR[2] (2*4 CHAR) & NULL & Setzt das Gerät in den Point-To-Point-Modus
