@@ -194,7 +194,7 @@ oder \ac{CP} empfangen wird auf dem ausgehenden Interface (Linux, Kernelspace pr
 was für die Kommunikation mit dem Peer genutzt wird,
 oder auf dem Loopback-Adapter (Windows).
 Um die IP-Adresse für TUN-Geräte korrekt zu setzen, nutzt libipsec den Parameter
-"charon.install\_virtual\_ip\_on" von strongswan.conf, der während der Initialisierung
+''charon.install\_virtual\_ip\_on'' von strongswan.conf, der während der Initialisierung
 des Plugins gesetzt wird.
 % route installation
 % queues
@@ -370,7 +370,7 @@ sehr zeitaufwendig ist. Des weiteren ist der Quellcode von ''devcon.exe'' nicht 
 weshalb es Lizensierungsprobleme damit geben könnte.
 
 \paragraph{TAP-Geräte suchen}
-Um das TAP-Gerät zu nutzen versucht der Code zuerst nach Netzwerkgeräten mit der ID "tap0901" zu suchen,
+Um das TAP-Gerät zu nutzen versucht der Code zuerst nach Netzwerkgeräten mit der ID ''tap0901'' zu suchen,
 welche die ID für TAP-Geräte ist. Dies wird über die Registry getan. Hierbei wird
 im Pfad \begin{lstlisting}[numbers=none]
 HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318\}
@@ -659,11 +659,11 @@ kernel-iph ist ein Plugin für ''charon'', das das Kernel-Interface
 für die Verwaltung von IP-Adressen und Routen implementiert.
 
 Ursprünglich war das Verwalten von IP-Adressen im Master-Zweig nicht implementiert.
-Eine vollständige Implementierung existiert im Zweig "win-vip", die in den Zweig 'windows-libipsec'
+Eine vollständige Implementierung existiert im Zweig ''win-vip'', die in den Zweig 'windows-libipsec'
 gemerged wurde, um eine vollständige Implementierung dort zu erhalten.
 
-Nachgerüstet werden musste Code zum Beachten des "charon.install\_virtual\_ip\_on" Parameters
-der in der Datei "strongswan.conf" definiert werden kann und den libipsec nutzt um
+Nachgerüstet werden musste Code zum Beachten des ''charon.install\_virtual\_ip\_on'' Parameters
+der in der Datei ''strongswan.conf'' definiert werden kann und den libipsec nutzt um
 die Installation der empfangenen IP-Adresse(n) auf den richtigen Adapter zu erzwingen.
 Der Code kopiert den Adapternamen während der Initialisierung des Plugins, daher
 ändert ein Ändern des Parameters während der Laufzeit nicht die Schnittstelle,
@@ -835,7 +835,7 @@ Die Ausgabe des Befehls listet die Kompilierung, sowie das Signieren der Dateien
 % Hier noch Ausgabe der Kompilierung aufführen, sowie welche Teile kritisch sind.
 Wie zu sehen ist, muss das Root-CA-Zertifikat als Datei vorhanden sein.
 Das Code Signing certificate wird nur mit seinem Common Name angegeben.
-Damit das WDK es findet, muss es in "Eigene Zertifikate" zu finden sein.
+Damit das WDK es findet, muss es in ''Eigene Zertifikate'' zu finden sein.
 \begin{figure}
 \includegraphics[scale=0.33]{/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/Bachelorarbeit/Bilder/Eigene_Zertifikate.png}
 \caption{Eigene-Zertifikate-Menü}
@@ -881,7 +881,7 @@ IOCtl & Makro & Eingabe & Ausgabe & Zweck & Kommentar \\ \hline
 & Ist laut Code für NDIS6 nicht implementiert \\ \hline 
 5 & TAP\_WIN\_IOCTL\_CONFIG\_POINT\_TO\_POINT & IPADDR[2] (2*4 CHAR) & NULL & Setzt das Gerät in den Point-To-Point-Modus
 & \\ \hline
-6 & TAP\_WIN\_IOCTL\_SET\_MEDIA\_STATUS & ULONG & NULL & Setzt das Gerät in den "Up" or "Down"-Zustand & \\ \hline
+6 & TAP\_WIN\_IOCTL\_SET\_MEDIA\_STATUS & ULONG & NULL & Setzt das Gerät in den ''Up'' oder ''Down''-Zustand & \\ \hline
 7 & TAP\_WIN\_IOCTL\_CONFIG\_DHCP\_MASQ & IPADDR[4] (4*4 CHAR) & NULL & Aktiviert den internen DHCP-Server, DHCP-IP-Adresse, DHCP-Netzmaske, DHCP-Server-IP, Leasetime & \\ \hline
 8 & TAP\_WIN\_IOCTL\_GET\_LOG\_LINE & allokierter String (char *) & NULL & Gibt eine Debug-Log-Zeile zurück & \\ \hline
 9 & TAP\_WIN\_IOCTL\_CONFIG\_DHCP\_SET\_OPT & char[256] & NULL & Setzt die DHCP-Optionen & \\ \hline
@@ -907,7 +907,7 @@ mehr gefüllt hätte und eine \ac{ARP}-Adressabfrage bei jeder Kommunikation mit
 \ac{IP}-Adresse zu Folge hätte.
 
 Der Patch wurde entwickelt, indem nach der Behandlung von \ac{ARP}-Paketen im
-Quellcode des Treibers gesucht wurde. Dafür wurde nach "ARP" und "arp" mittels
+Quellcode des Treibers gesucht wurde. Dafür wurde nach ''ARP'' und ''arp'' mittels
 ''grep'' im Quelltext gesucht. Dabei wurde die Funktion ''ProcessARP'' in ''src/txpath.c''
 gefunden, in der \ac{ARP}-Requests verarbeitet werden. In dieser Funktion
 werden verschiedene Felder des Pakets überprüft, unter anderem das ''Sender protocol address''-Feld.
