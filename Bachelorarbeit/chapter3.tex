@@ -277,308 +277,6 @@ mit JOB\_REQUEUE\_FAIR neu, sodass der Job als letzter vom Job-Manager in ''char
 wenn hoffentlich der Fehler nicht erneut auftritt.
 
 \begin{figure}
-\label{lst:handle_plain_windows}
-\begin{lstlisting}[caption=Code für handle\_plain auf Windows]
-/**
- * Job handling outbound plaintext packets
- */
-static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
-{
-#ifdef WIN32
-        DBG2(DBG_ESP, "entered handle_plain.");
-        void **key = NULL;
-        bool oldstate;
-        uint32_t length, event_status = 0, i = 0, j = 0, offset;
-        handle_overlapped_buffer_t *bundle_array = NULL, dummy, tun_device_handle_overlapped_buffer, *structures = NULL;
-        OVERLAPPED *overlapped = NULL;
-        HANDLE *event_array = NULL, tun_device_event;
-        tun_device_t *tun_device = this->tun.tun;
-        enumerator_t *tuns_enumerator;
-
-        memset(&tun_device_handle_overlapped_buffer, 0, sizeof(handle_overlapped_buffer_t));
-        /* Reset synchronisation event */
-        ResetEvent(this->event);
-
-        length = this->tuns->get_count(this->tuns);
-
-        this->lock->read_lock(this->lock);
-        /* Read event for this->tun */
-
-        /* allocate arrays for all the structs we need */
-        /* events, overlapped structures and bundles. */
-        /* event_array holds all the HANDLE structures for the events that are
-         * used for notifying the thread of finished reads and writes.
-         */
-
-        overlapped = alloca((length+2)*sizeof(OVERLAPPED));
-        event_array = alloca((length+2)*sizeof(HANDLE));
-        bundle_array = alloca((length+2)*sizeof(handle_overlapped_buffer_t));
-
-        memset(overlapped, 0, (length+2)*sizeof(OVERLAPPED));
-        memset(bundle_array, 0, (length+2)*sizeof(handle_overlapped_buffer_t));
-
-        DBG2(DBG_ESP, "Allocated arrays, opened events");
-
-        /* These are the arrays we're going to work with */
-
-        /* first position is the event we use for synchronisation  */
-        /* Insert notification event */
-        event_array[i] = this->event;
-        DBG2(DBG_ESP, "put notification event into index %d", i);
-        /* Insert dummy structure */
-        bundle_array[i] = dummy;
-        i++;
-
-        /* second position is this->tun */
-        /* insert event object for this->tun device */
-        tun_device_event = CreateEvent(NULL, FALSE, FALSE, this->tun.tun->get_read_event_name(this->tun.tun));
-        if (!tun_device_event)
-        {
-            char *error_message = format_error(GetLastError());
-            DBG2(DBG_ESP, "Error: %s", error_message);
-            free(error_message);
-            return JOB_REQUEUE_FAIR;
-        }
-        event_array[i] = tun_device_event;
-        DBG2(DBG_ESP, "Put TUN %s event in index %d", this->tun.tun->get_name(this->tun.tun), i);
-        ResetEvent(event_array[i]);
-        /* bundle for the read on this->tun */
-        /* Reserve memory for the buffer*/
-        tun_device_handle_overlapped_buffer.buffer = chunk_alloc(tun_device->get_mtu(tun_device));
-        DBG2(DBG_ESP, "Allocated buffer.");
-        tun_device_handle_overlapped_buffer.fileHandle = tun_device->get_handle(tun_device);
-        DBG2(DBG_ESP, "Allocated file handle.");
-        tun_device_handle_overlapped_buffer.overlapped = overlapped;
-        DBG2(DBG_ESP, "Allocated overlapped..");
-        /* Fill in code */
-        /*
-        tun_device_handle_overlapped_buffer.overlapped->hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, this->tun.tun->get_read_event_name(this->tun.tun));
-        */
-        tun_device_handle_overlapped_buffer.overlapped->hEvent= tun_device_event;
-        if (tun_device_handle_overlapped_buffer.overlapped->hEvent == NULL)
-        {
-            char *error_message = format_error(GetLastError());
-            DBG2(DBG_ESP, "Error: %s", error_message);
-            free(error_message);
-            return JOB_REQUEUE_FAIR;
-        }
-        DBG2(DBG_ESP, "Created event");
-        bundle_array[i] = tun_device_handle_overlapped_buffer;
-
-        i++;
-
-        /* Start ReadFile for this->tun.handle */
-        if (!start_read(&tun_device_handle_overlapped_buffer, tun_device_handle_overlapped_buffer.overlapped->hEvent))
-        {
-                // TODO: Cleanup heap
-                this->lock->unlock(this->lock);
-                return JOB_REQUEUE_FAIR;
-        }
-        /* pad bundle_array with two empty structures */
-        /* iterate over all our tun devices, create event handles, reset them, queue read operations on all handles */
-
-        DBG2(DBG_ESP, "Enumerating tun devices ...");
-
-        tuns_enumerator = this->tuns->create_enumerator(this->tuns);
-        while(tuns_enumerator->enumerate(tuns_enumerator, key, &tun_device))
-        {
-            DBG2(DBG_ESP, "TUN device %s", *key);
-            /* Allocate structure and buffer */
-
-            structures[j].buffer = chunk_alloc(tun_device->get_mtu(tun_device));
-            memset(structures[j].buffer.ptr, 0, structures[j].buffer.len);
-            structures[j].fileHandle = tun_device->get_handle(tun_device);
-            /* Allocate and initialise OVERLAPPED structure */
-            structures[j].overlapped = alloca(sizeof(OVERLAPPED));
-            (*structures[j].overlapped) = overlapped[j];
-            memset(&structures[j].overlapped, 0, sizeof(OVERLAPPED));
-            /* Create unique name for that event. */
-            /* Create unique event for read accesses on that device
-             * No security attributes, no manual reset, initial state is unsignaled,
-             * name is the special name we created
-             */
-            structures[j].overlapped->hEvent = CreateEvent(NULL, FALSE, FALSE, tun_device->get_read_event_name(tun_device));
-            // event_array[i] = OpenEvent(EVENT_ALL_ACCESS, FALSE, tun_device->get_read_event_name(tun_device));
-            event_array[i] = structures[j].overlapped->hEvent;
-            bundle_array[i] = structures[j];
-
-            if (event_array[i] == NULL)
-            {
-                char *error_message = format_error(GetLastError());
-                DBG2(DBG_ESP, "Error: %s", error_message);
-                free(error_message);
-                return JOB_REQUEUE_FAIR;
-            }
-            i++;
-
-            /* Initialise read with the allocate overwrite structure */
-            DBG2(DBG_ESP, "Reading on %s", tun_device->get_name(tun_device));
-            if (!start_read(&structures[j], structures[j].overlapped->hEvent))
-            {
-                    // TODO: Cleanup heap
-                    this->lock->unlock(this->lock);
-                    return JOB_REQUEUE_FAIR;
-            }
-            j++;
-        }
-        tuns_enumerator->destroy(tuns_enumerator);
-
-        this->lock->unlock(this->lock);
-        while (TRUE)
-        {
-            /* Wait for a handle to be signaled */
-            /* In the mingw64 sources, MAXIMUM_WAIT_OBJECTS is defined as 64. That means we can wait for a maximum of 64 event handles.
-             * This translates to 63 tun devices. I think this is sufficiently high to not have to implement a mechanism for waiting for more
-             * events /support more TUN devices */
-            oldstate = thread_cancelability(FALSE);
-            DBG2(DBG_ESP, "Waiting for events...");
-            event_status = WaitForMultipleObjects(i, event_array, FALSE, INFINITE);
-            thread_cancelability(oldstate);
-            DBG2(DBG_ESP, "Event triggered with event_status %d", event_status);
-            offset = event_status - WAIT_OBJECT_0;
-            DBG2(DBG_ESP, "offset == %d", offset);
-            
-            /* A handle was signaled. Find the tun handle whose read was successful */
-
-            /* We can only use the event_status of indication for the first completed IO operation.
-             * After the event was signaled, we need to test the OVERLAPPED structure in the other array
-             * to find out what event was signaled.
-             */
-            /*
-             * Probably broken?
-             */
-            /* Check if an event in the array was signaled. (That is the case if
-             * the event_status is between WAIT_OBJECT_0 and WAIT_OBJECT_0 + nCount -1)
-             */
-            if ((WAIT_OBJECT_0 < event_status) && event_status < ((WAIT_OBJECT_0 + length - 1)))
-            {
-                /* the event at event_array[event_status - WAIT_OBJECT_0] has been signaled */
-                /* It is possible that more than one event was signalled. In that case, (event_status - WAIT_OBJECT_0)
-                 * is the index with the lowest event that was signalled. More signalled events can be found higher
-                 *
-                 * According to the documentation, WAIT_OBJECT_0 is defined as 0
-                 */
-                if (offset == 0)
-                {
-                    /* Notification about changes regarding the tun devices.
-                     * Or the object is destroyed.
-                     * We need to rebuild the array. So exit and rebuild. */
-                    DBG2(DBG_ESP, "cleanup.");
-                    /* Cleanup
-                     *  Starts with 1 to skip over the dummy
-                     */
-                    for(uint32_t k=1;k<i;k++)
-                    {
-                        /* stop all asynchronous IO */
-                        CancelIo(bundle_array[k].fileHandle);
-                        CloseHandle(bundle_array[k].overlapped->hEvent);
-                        memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
-                        free(bundle_array[k].buffer.ptr);
-                        ResetEvent(event_array[k]);
-                        CloseHandle(event_array[k]);
-                    }
-                    /* exit */
-                    DBG2(DBG_ESP, "Cleanup done.");
-                    return JOB_REQUEUE_DIRECT;
-                }
-                for(uint32_t k=1;k<i; k++)
-                {
-                    DBG2(DBG_ESP, "position %d in array", k);
-                    /* Is the object signaled? */
-                    DBG2(DBG_ESP, "checking if event is signaled.");
-                    DWORD WaitResult = WaitForSingleObject(bundle_array[k].overlapped->hEvent, 0);
-                    DBG2(DBG_ESP, "WaitForSingleObject returned %d", WaitResult);
-                    if (WaitResult == WAIT_OBJECT_0)
-                    {
-                        /* The arrays have the same length and the same positioning of the elements.
-                         * Therefore, if event_array[k] is signaled, the read on bundle_array[i].fileHandle has succeeded
-                         * and bundle_array[k].buffer has our data now. */
-                        DBG2(DBG_ESP, "Event is signaled. Processing packet.");
-                        /* Do we need to copy the chunk before we enqueue it? */
-                        char *foo = alloca((bundle_array[k].buffer.len *4)/3 + 1);
-                        memset(foo, 0, (bundle_array[k].buffer.len *4)/3 + 1);
-                        DBG2(DBG_ESP, "Length of buffer: %u", bundle_array[k].buffer.len);
-                        chunk_to_base64(bundle_array[k].buffer, foo);
-                        DBG2(DBG_ESP, "Content of Buffer: %s", foo);
-
-                        ip_packet_t *packet;
-                        /* clone the buffer */
-                        chunk_t buffer_clone = chunk_clone (bundle_array[k].buffer);
-                        packet = ip_packet_create(buffer_clone);
-                        DBG2(DBG_ESP, "Packet contents: %B", packet->get_encoding(packet));
-                        if (packet)
-                        {
-                                ipsec->processor->queue_outbound(ipsec->processor, packet);
-                        }
-                        else
-                        {
-                                DBG2(DBG_ESP, "invalid IP packet read from TUN device");
-                        }
-                        /* Reset the overlapped structure, event and buffer */
-                        /* Print out the package for debugging */
-                        memset(&bundle_array[k].overlapped, 0, sizeof(OVERLAPPED));
-                        /* Don't leak packets */
-                        memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
-
-                        bundle_array[k].overlapped->hEvent = event_array[k];
-
-                        if (!start_read(&bundle_array[k], bundle_array[k].overlapped->hEvent))
-                        {
-                           /* Cleanup
-                            *  Starts with 1 to skip over the dummy
-                            */
-                            for(uint32_t k=1;k<i;k++)
-                            {
-                                /* stop all asynchronous IO */
-                                CancelIo(bundle_array[k].fileHandle);
-                                CloseHandle(bundle_array[k].overlapped->hEvent);
-                                memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
-                                free(bundle_array[k].buffer.ptr);
-                                ResetEvent(event_array[k]);
-                                CloseHandle(event_array[k]);
-                            }
-                            this->lock->unlock(this->lock);
-                            return JOB_REQUEUE_FAIR;
-                        }
-                    }
-                    else
-                    {
-                        DBG2(DBG_ESP, "Event is not signaled.");
-                    }
-                }
-
-            }
-            /* Function failed */
-            else
-            {
-                DBG2(DBG_ESP, "waiting for events on the tun device reads failed.");
-
-                /* Cleanup
-                 *  Starts with 1 to skip over the dummy
-                 */
-                for(uint32_t k=1;k<i;k++)
-                {
-                    /* stop all asynchronous IO */
-                    CancelIo(bundle_array[k].fileHandle);
-                    CloseHandle(bundle_array[k].overlapped->hEvent);
-                    memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
-                    free(bundle_array[k].buffer.ptr);
-                    ResetEvent(event_array[k]);
-                    CloseHandle(event_array[k]);
-                }
-                return JOB_REQUEUE_FAIR;
-
-            }
-        }
-        return JOB_REQUEUE_DIRECT;
-        #else
-        [...]
-        #endif
-}
-\end{lstlisting}
-\end{figure}
-
-\begin{figure}
 \label{fig:WaitForMultipleObjects}
 \centering
 \def\svgwidth{\columnwidth}
@@ -702,10 +400,10 @@ Schritte ausgeführt werden:
 die loka le IP (169.254.128.127), die IP des virtuellen Routers (169.254.128.128)
 und die Netzmaske des entfernten Netzwerks (255.255.255.255) gesetzt. 
 (TAP\_WIN\_IOCTL\_CONFIG\_TUN)
-\item Deaktivierung der Überprüfung des ''Sender protocol address''-Feldes.
+\item Deaktivierung der Überprüfung des ''Sender protocol address''-Feldes.\\
 (TAP\_WIN\_IOCTL\_CONFIG\_SET\_SRC\_CHECK)
 \item Adapter in den ''up''-Zustand setzen (einschalten). 
-Nach dem Setzen des Zustands muss kurz gewartet werden um sicher zu gehen, dass das Gerät auch aktiv ist.
+Nach dem Setzen des Zustands muss kurz gewartet werden um sicher zu gehen, dass das Gerät auch aktiv ist.\\
 (TAP\_WIN\_IOCTL\_SET\_MEDIA\_STATUS)
 \end{itemize}
 
@@ -1282,7 +980,8 @@ Als Zielhost
 Der Code wurde getestet, indem versucht wurde eine VPN-Verbindung zu einem \ac{IKE}-Peer
 unter meiner Kontrolle aufzubauen. Der ausgehandelte \ac{TS} wurde so gewählt, dass
 die Beschränkung von Route based VPNs keine Rolle spielen.
-Die genutzte Konfiguration wird in ~\autoref{subsec:Testkonfiguration} bereitgestellt.
+Die genutzte Konfiguration ist im Appendix unter \autoref{lst:swanctl.conf}
+und \autoref{lst:strongswan.conf} zu finden.
 
 \subsection{Test der Verbindung}
 Das Testen der Verbindung wurde durch durch einfaches Pingen über die Verbindung bewerkstelligt.
@@ -1301,6 +1000,16 @@ Des weiteren wird eine Möglichkeit benötigt, um über \ac{VICI} nach Daten fü
 Passwortaufforderungen, die bei der Authentifizierung mittels XAUTH oder EAP auftreten können,
 zu fragen. Dies wird für die vollständige Unterstützen von \ac{MFA} benötigt.
 
+Auf Windows benutzt das Tool ''swanctl'', welches dort zum Kontrollieren des Daemons
+genutzt wird, eine TCP-Verbindung über 127.0.0.1:4502 um mit dem Daemon zu kommunizieren.
+Dies ist im Vergleich zur Implementierung auf anderen Plattformen unsicher, da dort
+UNIX-Sockets genutzt werden, die standardmäßig aufgrund der \acp{ACL} abgesichert werden
+und nur ''root'' auf den Socket zugreifen kann. Der Wiki-Artikel macht auf die Unsicherheit
+des \ac{VICI}-Protokolls, welches zwischen ''swanctl'' und ''charon'' gesprochen wird, besonders aufmerksam.
+\begin{quote}
+The VICI protocol runs over a reliable transport protocol. As the protocol itself currently does not provide any security or authentication properties, it is recommended to run it over a UNIX socket with appropriate permissions.
+\end{quote}\cite[][]{_vici_2016}
+
 \subsection{Probleme}
 Die implementierte Lösung funktioniert im Moment noch nicht. Das Problem ist, dass
 die Windows-eigenen Funktionen nicht wie dokumentiert funktionieren.
@@ -1317,12 +1026,17 @@ Das ist jedoch nicht der Fall. Der Aufruf beendet mit ''WAIT\_TIMEOUT'' (0x102, 
 was bedeuted, dass das Event nicht signalisiert ist. Wenn der Rückgabewert
 ignoriert wird, dann befindet sich im Puffer kein valides IPv4-Packet.
 
+Das Problem ist besonders evident bei der Betrachtung des Debug-Logs,
+welches sich in \autoref{lst:debug-log} finden lässt. Es wird vom Code in \autoref{lst:handle_plain_windows}
+ausgegeben.
+
 Des weiteren gibt die Funktion ''GetLastError()'' den Fehlerwert 0 zurück, wenn sie nicht
 direkt nach dem Funktionsaufruf, der den Fehlerstatus setzte, aufgerufen wird.
 Es ist irrelevant, ob zwischen dem Aufruf von ''GetLastError()'' nur eine einfache Zuweisung
 oder Eine if-Abfrage steht.
 Dies ergibt keinen Sinn, da sich der Fehlerstatus scheinbar ändert, ohne dass
 eine Funktion aufgerufen wird, die das tun könnte.
+
 
 \subsection{Maßnahmen gegen Buffer Bloat}
 libipsec speichert die empfangenen Pakete vor- und nach der Verarbeitung in einer 
