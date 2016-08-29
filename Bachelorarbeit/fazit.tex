@@ -29,4 +29,12 @@ Die Probleme, die die Implementierung schlussendlich scheitern ließen lassen es
 die Frage zu stellen, ob Anwendungen, die mit mingw64 kompiliert wurden überhaupt
 fehlerfrei auf Handles von Usermodedevice-Treiber zugreifen können und ob
 nicht weitere Fehler in mingw64 existieren, die das Implementieren der Kompatibilität
-mit TAP-Geräten verhindern.
+mit TAP-Geräten verhindern. Die Alternativanwendung ''OpenVPN'' benutzt den
+Treiber problemlos, wobei sie jedoch mit Visual Studio kompiliert wird,
+was den kritischen Unterschied im Verhalten ausmachen könnte.
+Von mingw64 ist bekannt, dass es ab und zu Probleme mit falschen Headern und ähnlichem
+gibt. Es steht offen, ob es tatsächlich ein Problem mit dem eigenen geschriebenen Code
+aus der Bachelorarbeit ist, oder ob es eine Problematik ist, die tiefer verwurzelt ist.
+
+Die weitere Verfolgung der Probleme in tiefere Schichten des Systems wurden aus
+Zeitmangel nicht weiter verfolgt.
