@@ -1032,6 +1032,83 @@ static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
 [...]
 \end{lstlisting}
 
+\begin{lstlisting}[caption=Ausgabe von ipconfig und route -4 print,label=lst:ipconfigroute4]
+C:\Users\Noel\bin>ipconfig
+
+Windows-IP-Konfiguration
+
+
+Ethernet-Adapter THIS IS A TAP DEVICE:
+
+   Verbindungsspezifisches DNS-Suffix:
+   Verbindungslokale IPv6-Adresse  . : fe80::596b:bf92:963f:63a3%8
+   IPv4-Adresse  . . . . . . . . . . : 172.16.20.2
+   Subnetzmaske  . . . . . . . . . . : 255.255.255.255
+   Standardgateway . . . . . . . . . :
+
+Ethernet-Adapter Ethernet:
+
+   Verbindungsspezifisches DNS-Suffix: thermicorp.lan
+   IPv6-Adresse. . . . . . . . . . . : 2a02:8071:9282:e600:3031:9c6b:6485:3cc9
+   Temporäre IPv6-Adresse. . . . . . : 2a02:8071:9282:e600:5181:db51:f4d7:2afa
+   Temporäre IPv6-Adresse. . . . . . : 2a02:8071:9282:e600:7154:ac74:30c4:cbee
+   Verbindungslokale IPv6-Adresse  . : fe80::3031:9c6b:6485:3cc9%3
+   IPv4-Adresse  . . . . . . . . . . : 192.168.178.218
+   Subnetzmaske  . . . . . . . . . . : 255.255.255.0
+   Standardgateway . . . . . . . . . : fe80::a96:d7ff:fe85:e002%3
+                                       192.168.178.1
+
+Tunneladapter isatap.{EDA0C976-3256-4B30-8A92-708D2F643E28}:
+
+   Medienstatus. . . . . . . . . . . : Medium getrennt
+   Verbindungsspezifisches DNS-Suffix:
+
+Tunneladapter Teredo Tunneling Pseudo-Interface:
+
+   Medienstatus. . . . . . . . . . . : Medium getrennt
+   Verbindungsspezifisches DNS-Suffix:
+
+Tunneladapter isatap.thermicorp.lan:
+
+   Medienstatus. . . . . . . . . . . : Medium getrennt
+   Verbindungsspezifisches DNS-Suffix: thermicorp.lan
+
+
+C:\Users\Noel\bin>route -4 print
+===========================================================================
+Schnittstellenliste
+  8...00 ff ed a0 c9 76 ......TAP-Windows Adapter V9
+  3...08 00 27 ef 0b 0e ......Intel(R) PRO/1000 MT-Desktopadapter
+  1...........................Software Loopback Interface 1
+  4...00 00 00 00 00 00 00 e0 Microsoft-ISATAP-Adapter
+  5...00 00 00 00 00 00 00 e0 Teredo Tunneling Pseudo-Interface
+  6...00 00 00 00 00 00 00 e0 Microsoft-ISATAP-Adapter #2
+===========================================================================
+
+IPv4-Routentabelle
+===========================================================================
+Aktive Routen:
+     Netzwerkziel    Netzwerkmaske          Gateway    Schnittstelle Metrik
+          0.0.0.0          0.0.0.0    192.168.178.1  192.168.178.218     10
+        127.0.0.0        255.0.0.0   Auf Verbindung         127.0.0.1    306
+        127.0.0.1  255.255.255.255   Auf Verbindung         127.0.0.1    306
+  127.255.255.255  255.255.255.255   Auf Verbindung         127.0.0.1    306
+      172.16.20.2  255.255.255.255   Auf Verbindung       172.16.20.2    276
+      172.16.25.2  255.255.255.255  169.254.128.128      172.16.20.2     30
+    192.168.178.0    255.255.255.0   Auf Verbindung   192.168.178.218    266
+  192.168.178.218  255.255.255.255   Auf Verbindung   192.168.178.218    266
+  192.168.178.255  255.255.255.255   Auf Verbindung   192.168.178.218    266
+        224.0.0.0        240.0.0.0   Auf Verbindung         127.0.0.1    306
+        224.0.0.0        240.0.0.0   Auf Verbindung       172.16.20.2    276
+        224.0.0.0        240.0.0.0   Auf Verbindung   192.168.178.218    266
+  255.255.255.255  255.255.255.255   Auf Verbindung         127.0.0.1    306
+  255.255.255.255  255.255.255.255   Auf Verbindung       172.16.20.2    276
+  255.255.255.255  255.255.255.255   Auf Verbindung   192.168.178.218    266
+===========================================================================
+Ständige Routen:
+  Keine
+
+\end{lstlisting}
 \subsection{Lizensierung der Arbeit}
 Diese \ac{BA} steht unter der GNU General Public License version 3 (GPLv3)
 und darf unter Berücksichtigung der Lizensvereinbarung der GPLv3 verfielfältigt
