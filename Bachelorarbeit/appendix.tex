@@ -74,9 +74,9 @@ bintec Secure IPsec Client & IKEv1, IKEv2 \\ \hline
 \begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|X|}\firsthline
 Software & Lizenz \\ \hline
-strongSwan & MIT/GPLv2\footcite[][]{_contributions_2014} \\ \hline
+strongSwan & MIT/GPLv2 \\ \hline
 Windows Agile VPN Client & Proprietär \\ \hline
-Shrewsoft VPN Client & Shareware\footcite[][]{_shrew_2007} \\ \hline
+Shrewsoft VPN Client & Shareware \\ \hline
 NCP Secure Entry Client & Proprietär \\ \hline
 bintec Secure IPsec Client & Proprietär \\ \hline
 \end{tabularx}
@@ -149,7 +149,7 @@ SHA-1                                                   & x & x & x & o & x \\  
 SHA-256                                                 & x & x & o & x & x \\  \hline
 SHA-384                                                 & x & x & o & x & x \\  \hline
 SHA-512                                                 & x & o & o & x & x \\  \hline
-SHA-256-96\footnote{SHA-256 mit Truncation auf 96 Bit}  & x & x & o & o & o \\  \hline
+SHA-256-96                                              & x & x & o & o & o \\  \hline
 AES-XCBC                                                & x & o & o & o & o \\  \hline
 AES-128-GMAC                                            & x & o & o & o & o \\  \hline
 AES-192-GMAC                                            & x & o & o & o & o \\  \hline
@@ -195,7 +195,7 @@ NEWHOPE-128    & x & o & o & o & o \\  \hline
 \begin{table}[h!]
 \begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
 \backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec                  \\ \hline
-Hybrid\footnote{Client mit XAUTH, Server mittels X.509}  & x & x & x & x & x  \\ \hline
+Hybrid                                                   & x & x & x & x & x  \\ \hline
 PSK                                                      & x & o & x & x & o  \\ \hline
 PSK + XAUTH                                              & x & o & x & x & o  \\ \hline
 X.509                                                    & x & x & x & x & x  \\ \hline
@@ -260,14 +260,14 @@ IPsec über TCP        & o & o                     & o & x & x \\ \hline
 IPv6                  & x & x                     & x & x & x \\ \hline
 Attribut-Zertifikate  & x & ?                     & o & o & ? \\ \hline
 PFS                   & x & o                     & x & x & x \\ \hline
-IKE-Fragmentierung    & x & ?\footnotemark[1] & x & o & o \\ \hline
+IKE-Fragmentierung    & x & Nur IKEv1             & x & o & o \\ \hline
 Komprimierung         & x & o                     & o & x & o \\ \hline
 \end{tabularx}
 \label{tab:IPsec-Implementierungen-Features}
 \caption{Unterstützte Features der IPsec-Implementierungen}
 \end{table}
 \end{center}
-\footnotetext[1]{Nur IKEv1}
+
 \subsection{Testkonfiguration}
 \label{subsec:Testkonfiguration}
 
