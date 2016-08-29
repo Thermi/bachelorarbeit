@@ -1,0 +1,1047 @@
+% This file is part of Bachelorarbeit
+
+% Bachelorarbeit is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License version 3 as published by
+% the Free Software Foundation.
+
+% Bachelorarbeit is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+
+% You should have received a copy of the GNU General Public License
+% along with Foobar. If not, see <http://www.gnu.org/licenses/>.
+
+\section{Appendix}
+\label{sec:appendix}
+
+\subsection{Featurematrix}
+\label{subsec:featurematrix}
+Die Daten aus diesen Tabellen wurden unter Nutzung der öffentlich zugänglichen
+Dokumente auf den entsprechenden Herstellerwebseiten erstellt.
+
+Wenn bei einem symmetrischen Verschlüsselungsalgorithmus kein Modus angegeben
+war, wurde \ac{CBC} angenommen.
+
+Wenn bei einem Authentifizierungsmodus nicht alle unterstützen Permutationen
+angegeben waren, wurden alle standardisierten Permutationen als unterstützt 
+angenommen.
+
+Wenn ein Feature nicht explizit als unterstützt angegeben wurde, so wurde angenommen
+dass es nicht unterstützt wird.
+
+Offenbar ist der ''bintec Secure IPsec Client'' nur ein Rebranding des ''NCP Secure Entry Client'',
+wenn man vom \ac{GUI} ausgehen kann. 
+Ein weiteres Indiz ist, dass im Installer des ''bintec Secure IPsec Client''
+der String ''NCP engineering GmbH'' auftaucht. Daher wäre es zu verstehen,
+wenn aus den Dokumentationen der beiden Produkte Featureparität hervorkäme.
+Dem ist aber nicht so, wie aus den Tabellen hervorgeht.
+
+Diese Tabellen beziehen sich nur auf die Fähigkeiten, die ab Windows 7 unterstützt sind.
+Sie machen keine Aussage über die Unterstützung der Software auf anderen Platformen
+und hat keinen Anspruch auf Vollständigkeit.
+
+\paragraph{Symbolik}
+\begin{description}
+\item[x] Unterstützt
+\item[o] Nicht unterstützt
+\item[?] unbekannt
+\end{description}
+\paragraph{Referenzen zur Bibliographie}
+\begin{itemize}
+\item strongSwan\footcite[][]{_ikev1ciphersuites_2016}\footcite[][]{_ikev2ciphersuites_2016}
+\item Windows Agile VPN Client\footcite[][]{_windows7_2016}
+\item Shrewsoft VPN Client\footcite[][]{_shrew_2013}
+\item NCP Secure Entry Client\footcite[][]{jurgen_honig_datenblatt_2016}
+\item bintec Secure IPsec Client\footcite[][]{_bintec_2016-1}
+\end{itemize}
+
+\begin{center}
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|X|}\firsthline
+Software & IKE-Versionen \\ \hline
+strongSwan & IKEv1, IKEv2\\ \hline
+Windows Agile VPN Client & IKEv1+L2TP, IKEv2 \\ \hline
+Shrewsoft VPN Client & IKEv1 \\ \hline
+NCP Secure Entry Client & IKEv1, IKEv2 \\ \hline
+bintec Secure IPsec Client & IKEv1, IKEv2 \\ \hline
+\end{tabularx}
+\label{tab:IPsec-Implementierungen-IKE-Versionen}
+\caption{Unterstützte IKE-Versionen der IPsec-Implementierungen}
+\end{table}
+
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|X|}\firsthline
+Software & Lizenz \\ \hline
+strongSwan & MIT/GPLv2\footcite[][]{_contributions_2014} \\ \hline
+Windows Agile VPN Client & Proprietär \\ \hline
+Shrewsoft VPN Client & Shareware\footcite[][]{_shrew_2007} \\ \hline
+NCP Secure Entry Client & Proprietär \\ \hline
+bintec Secure IPsec Client & Proprietär \\ \hline
+\end{tabularx}
+\label{tab:IPsec-Implementierungen-Lizenzen}
+\caption{Lizenzen der IPsec-Implementierungen}
+\end{table}
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+AES-128-CBC          &  x  & x & x & x & x \\  \hline
+AES-192-CBC          &  x  & x & x & x & x \\  \hline
+AES-256-CBC          &  x  & x & x & x & x \\  \hline
+AES-128-GCM-8        &  x  & o & o & o & o \\  \hline
+AES-128-GCM-12       &  x  & o & o & o & o \\  \hline
+AES-128-GCM-16       &  x  & o & o & o & o \\  \hline
+AES-192-GCM-8        &  x  & o & o & o & o \\  \hline
+AES-192-GCM-12       &  x  & o & o & o & o \\  \hline
+AES-192-GCM-16       &  x  & o & o & o & o \\  \hline
+AES-256-GCM-8        &  x  & o & o & o & o \\  \hline
+AES-256-GCM-12       &  x  & o & o & o & o \\  \hline
+AES-256-GCM-16       &  x  & o & o & o & o \\  \hline
+AES-128-CTR          &  x  & o & o & o & o \\  \hline
+AES-192-CTR          &  x  & o & o & o & o \\  \hline
+AES-256-CTR          &  x  & o & o & o & o \\  \hline
+AES-128-CCM-8        &  x  & o & o & o & o \\  \hline
+AES-128-CCM-12       &  x  & o & o & o & o \\  \hline
+AES-128-CCM-16       &  x  & o & o & o & o \\  \hline
+AES-192-CCM-8        &  x  & o & o & o & o \\  \hline
+AES-192-CCM-12       &  x  & o & o & o & o \\  \hline
+AES-192-CCM-16       &  x  & o & o & o & o \\  \hline
+AES-256-CCM-8        &  x  & o & o & o & o \\  \hline
+AES-256-CCM-12       &  x  & o & o & o & o \\  \hline
+AES-256-CCM-16       &  x  & o & o & o & o \\  \hline
+DES-CBC              &  o  & o & x & o & o \\  \hline
+3DES-CBC             &  x  & x & x & x & x \\  \hline
+BLOWFISH-128-CBC     &  x  & o & x & x & x \\  \hline
+BLOWFISH-192-CBC     &  x  & o & x & x & x \\  \hline
+BLOWFISH-256-CBC     &  x  & o & x & x & x \\  \hline
+CAMELLIA-128-CBC     &  x  & o & o & o & o \\  \hline
+CAMELLIA-192-CBC     &  x  & o & o & o & o \\  \hline
+CAMELLIA-256-CBC     &  x  & o & o & o & o \\  \hline
+CAMELLIA-128-CCM-8   &  x  & o & o & o & o \\  \hline
+CAMELLIA-128-CCM-12  &  x  & o & o & o & o \\  \hline
+CAMELLIA-128-CCM-16  &  x  & o & o & o & o \\  \hline
+CAMELLIA-192-CCM-8   &  x  & o & o & o & o \\  \hline
+CAMELLIA-192-CCM-12  &  x  & o & o & o & o \\  \hline
+CAMELLIA-192-CCM-16  &  x  & o & o & o & o \\  \hline
+CAMELLIA-256-CCM-8   &  x  & o & o & o & o \\  \hline
+CAMELLIA-256-CCM-12  &  x  & o & o & o & o \\  \hline
+CAMELLIA-256-CCM-16  &  x  & o & o & o & o \\  \hline
+SERPENT-128-CBC      &  x  & o & o & o & o \\  \hline
+SERPENT-192-CBC      &  x  & o & o & o & o \\  \hline
+SERPENT-256-CBC      &  x  & o & o & o & o \\  \hline
+TWOFISH-128-CBC      &  x  & o & o & o & o \\  \hline
+TWOFISH-192-CBC      &  x  & o & o & o & o \\  \hline
+TWOFISH-256-CBC      &  x  & o & o & o & o \\  \hline
+CAST-128-CBC         &  x  & o & x & o & o \\  \hline
+chacha20poly1305     &  x  & o & o & o & o \\  \hline
+\end{tabularx}
+\label{tab:IPsec-Implementierungen-Vertraulichkeit-Algorithmen}
+\caption{Unterstützte Algorithmen für Vertraulichkeit der IPsec-Implementierungen}
+\end{table}
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+MD5                                                     & x & o & x & x & x \\  \hline
+SHA-1                                                   & x & x & x & o & x \\  \hline
+SHA-256                                                 & x & x & o & x & x \\  \hline
+SHA-384                                                 & x & x & o & x & x \\  \hline
+SHA-512                                                 & x & o & o & x & x \\  \hline
+SHA-256-96\footnote{SHA-256 mit Truncation auf 96 Bit}  & x & x & o & o & o \\  \hline
+AES-XCBC                                                & x & o & o & o & o \\  \hline
+AES-128-GMAC                                            & x & o & o & o & o \\  \hline
+AES-192-GMAC                                            & x & o & o & o & o \\  \hline
+AES-256-GMAC                                            & x & o & o & o & o \\  \hline
+\end{tabularx}
+\label{tab:IPsec-Implementierungen-Authentizitaet-Algorithmen}
+\caption{Unterstützte Algorithmen für Authentizität der IPsec-Implementierungen}
+\end{table}
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+MODP-768       & x & o & x & x & x \\  \hline
+MODP-1024      & x & x & x & x & x \\  \hline
+MODP-1536      & x & o & x & x & x \\  \hline
+MODP-2048      & x & o & x & x & x \\  \hline
+MODP-3072      & x & o & x & x & x \\  \hline
+MODP-4096      & x & o & x & x & x \\  \hline
+MODP-6144      & x & o & x & x & x \\  \hline
+MODP-8192      & x & o & x & x & x \\  \hline
+MODP-1024s160  & x & o & o & o & o \\  \hline
+MODP-2048s224  & x & o & o & o & o \\  \hline
+MODP-2048s256  & x & o & o & o & o \\  \hline
+ECP-192        & x & o & o & x & o \\  \hline
+ECP-224        & x & o & o & x & o \\  \hline
+ECP-256        & x & o & o & x & o \\  \hline
+ECP-384        & x & o & o & x & o \\  \hline
+ECP-521        & x & o & o & x & o \\  \hline
+ECP-224BP      & x & o & o & o & o \\  \hline
+ECP-256BP      & x & o & o & o & o \\  \hline
+ECP-384BP      & x & o & o & o & o \\  \hline
+ECP-512BP      & x & o & o & o & o \\  \hline
+NTRU-112       & x & o & o & o & o \\  \hline
+NTRU-128       & x & o & o & o & o \\  \hline
+NTRU-192       & x & o & o & o & o \\  \hline
+NTRU-256       & x & o & o & o & o \\  \hline
+NEWHOPE-128    & x & o & o & o & o \\  \hline
+\end{tabularx}
+\label{tab:IPsec-Implementierungen-DH-Algorithmen}
+\caption{Unterstützte Schlüsselaustauschprotokolle der IPsec-Implementierungen}
+\end{table}
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec                  \\ \hline
+Hybrid\footnote{Client mit XAUTH, Server mittels X.509}  & x & x & x & x & x  \\ \hline
+PSK                                                      & x & o & x & x & o  \\ \hline
+PSK + XAUTH                                              & x & o & x & x & o  \\ \hline
+X.509                                                    & x & x & x & x & x  \\ \hline
+EAP-MD5                                                  & x & o & o & x & o  \\ \hline
+EAP-PAP                                                  & x & o & o & x & o  \\ \hline
+EAP-CHAP                                                 & x & o & o & x & o  \\ \hline
+EAP-MSCHAPv2                                             & x & x & o & x & o  \\ \hline
+EAP-GTC                                                  & x & o & o & o & o  \\ \hline
+EAP-TLS                                                  & x & x & o & x & o  \\ \hline
+EAP-TTLS                                                 & x & o & o & o & o  \\ \hline
+EAP-AKA                                                  & x & o & o & o & o  \\ \hline
+EAP-TNC                                                  & x & o & o & o & o  \\ \hline
+TNC-IMC                                                  & x & o & o & o & o  \\ \hline
+TNC-IMV                                                  & x & o & o & o & o  \\ \hline
+\end{tabularx}
+\label{tab:IPsec-Implementierungen-Authentifizierungs-Modi}
+\caption{Unterstützte Authentifizierungsmethoden der IPsec-Implementierungen}
+\end{table}
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+CRL  & x & x & o & x & x \\ \hline
+OCSP & x & ? & o & x & x \\ \hline
+\end{tabularx}
+\label{tab:IPsec-Implementierungen-CRL-Support}
+\caption{Unterstützte Mechanismen zum Zurückziehen von Zertifikaten der IPsec-Implementierungen}
+\end{table}
+
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+Tunnel-Modus     & x & x & x & x & x \\  \hline
+Transport-Modus  & x & x & o & o & o \\  \hline
+BEET-Modus       & x & o & o & o & o \\  \hline
+\end{tabularx}
+\label{tab:IPsec-Implementierungen-Tunnel-Modi}
+\caption{Unterstützte Tunnel-Modi der IPsec-Implementierungen}
+\end{table}
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
+\backslashbox{Modus}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+Main Mode       & x & x & x & x & ? \\ \hline
+Aggressive Mode & x & x & x & x & ? \\ \hline 
+Quick Mode      & x & o & x & x & ? \\ \hline
+Config Mode     & x & x & x & x & x \\ \hline
+\end{tabularx}
+\label{tab:IPsec-Implementierungen-IKE-Modi}
+\caption{Unterstützte IKE-Modi der IPsec-Implementierungen}
+\end{table}
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|c|c|c|c|c|}\firsthline
+\backslashbox{Feature}{Software} & strongSwan & Windows & Shrewsoft & NCP & bintec \\ \hline
+NAT-T                 & x & x                     & x & x & x \\ \hline
+DPD                   & x & x                     & x & x & x \\ \hline
+MOBIKE                & x & x                     & o & o & o \\ \hline
+GUI                   & o & x                     & x & x & x \\ \hline
+IPsec über TCP        & o & o                     & o & x & x \\ \hline
+IPv6                  & x & x                     & x & x & x \\ \hline
+Attribut-Zertifikate  & x & ?                     & o & o & ? \\ \hline
+PFS                   & x & o                     & x & x & x \\ \hline
+IKE-Fragmentierung    & x & ?\footnotemark[1] & x & o & o \\ \hline
+Komprimierung         & x & o                     & o & x & o \\ \hline
+\end{tabularx}
+\label{tab:IPsec-Implementierungen-Features}
+\caption{Unterstützte Features der IPsec-Implementierungen}
+\end{table}
+\end{center}
+\footnotetext[1]{Nur IKEv1}
+\subsection{Testkonfiguration}
+\label{subsec:Testkonfiguration}
+
+\begin{lstlisting}[caption=Testkonfiguration - swanctl.conf,label=lst:swanctl.conf]
+connections {
+        foo {
+            version = 2
+            dpd_delay = 10
+            dpd_timeout = 60
+            fragmentation = yes
+            send_cert = always
+            remote_addrs = 37.120.161.220
+            proposals = aes256gcm16-prfsha256-modp4096
+            vips = 0.0.0.0
+			mobike = no
+			encap = yes
+            local {
+                auth = eap-tls
+                certs = certificate.pem
+            }
+            remote {
+                auth = pubkey
+                id = thermi.strangled.net
+                cacerts = serverca.pem
+            }
+            children {
+                    bar {
+                        dpd_action = restart
+                        start_action = none
+                        esp_proposals = aes256-sha256-ecp521
+                        remote_ts = 172.16.25.2/32
+                    }
+            }
+        }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Testkonfiguration - strongswan.conf,label=lst:strongswan.conf]
+charon-svc {
+	filelog {
+		this_log.txt{
+			default=2
+			job = 1
+			mgr = 0
+			enc = 0 
+			asn = 0
+			flush_line = yes
+			ike_name = yes
+			append = no
+		}
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Code von win32.h,label=lst:libstrongswan-win32.h]
+/*
+ * Copyright (C) 2016 Noel Kuntze
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+#ifndef WIN32_H
+#define WIN32_H
+
+#define WIN32_TUN_READ_EVENT_TEMPLATE "WIN32-libipsec-read-device-%d"
+#define WIN32_TUN_WRITE_EVENT_TEMPLATE "WIN32-libipsec-write-device-%d"
+#define WIN32_TUN_EVENT_LENGTH 80
+#define TAP_WIN_COMPONENT_ID "tap0901"
+
+#define ADAPTER_KEY "SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}"
+#define NETWORK_CONNECTIONS_KEY "SYSTEM\\CurrentControlSet\\Control\\Network\\{4D36E972-E325-11CE-BFC1-08002BE10318}"
+
+/*
+ * ======================
+ * Filesystem prefixes
+ * ======================
+ */
+
+#define USERMODEDEVICEDIR "\\\\.\\Global\\"
+#define SYSDEVICEDIR      "\\Device\\"
+#define USERDEVICEDIR     "\\DosDevices\\Global\\"
+#define TAP_WIN_SUFFIX    ".tap"
+
+/*
+ * TAP IOCTL constants and macros.
+ *
+ */
+#define TAP_WIN_CONTROL_CODE(request,method) \
+  CTL_CODE (FILE_DEVICE_UNKNOWN, request, method, FILE_ANY_ACCESS)
+
+/* Present in 8.1 */
+
+#define TAP_WIN_IOCTL_GET_MAC               TAP_WIN_CONTROL_CODE (1, METHOD_BUFFERED)
+#define TAP_WIN_IOCTL_GET_VERSION           TAP_WIN_CONTROL_CODE (2, METHOD_BUFFERED)
+#define TAP_WIN_IOCTL_GET_MTU               TAP_WIN_CONTROL_CODE (3, METHOD_BUFFERED)
+#define TAP_WIN_IOCTL_GET_INFO              TAP_WIN_CONTROL_CODE (4, METHOD_BUFFERED)
+#define TAP_WIN_IOCTL_CONFIG_POINT_TO_POINT TAP_WIN_CONTROL_CODE (5, METHOD_BUFFERED)
+#define TAP_WIN_IOCTL_SET_MEDIA_STATUS      TAP_WIN_CONTROL_CODE (6, METHOD_BUFFERED)
+#define TAP_WIN_IOCTL_CONFIG_DHCP_MASQ      TAP_WIN_CONTROL_CODE (7, METHOD_BUFFERED)
+#define TAP_WIN_IOCTL_GET_LOG_LINE          TAP_WIN_CONTROL_CODE (8, METHOD_BUFFERED)
+#define TAP_WIN_IOCTL_CONFIG_DHCP_SET_OPT   TAP_WIN_CONTROL_CODE (9, METHOD_BUFFERED)
+
+/* Added in 8.2 */
+
+/* obsoletes TAP_WIN_IOCTL_CONFIG_POINT_TO_POINT */
+#define TAP_WIN_IOCTL_CONFIG_TUN            TAP_WIN_CONTROL_CODE (10, METHOD_BUFFERED)
+#define TAP_WIN_IOCTL_CONFIG_SET_SRC_CHECK  TAP_WIN_CONTROL_CODE (11, METHOD_BUFFERED)
+
+
+#endif /* WIN32_H */
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Patch für TAP-Windows6,label=lst:tap-windows-patch]
+diff --git a/src/adapter.c b/src/adapter.c
+index 2883b79..fd575f9 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -222,6 +222,9 @@ tapReadConfiguration(
+     Adapter->MediaStateAlwaysConnected = FALSE;
+     Adapter->LogicalMediaState = FALSE;
+     Adapter->AllowNonAdmin = FALSE;
++    // source check can not be set in the registry yet. This has to be set each
++    // time the adapter is opened.
++    Adapter->m_source_check = TRUE;
+     //
+     // Open the registry for this adapter to read advanced
+     // configuration parameters stored by the INF file.
+diff --git a/src/adapter.h b/src/adapter.h
+index 2f09d12..70a394d 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -4,6 +4,7 @@
+  *
+  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
+  * 
++ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
+  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
+  *  and is released under the GPL version 2 (see below).
+  *
+@@ -251,6 +252,10 @@ typedef struct _TAP_ADAPTER_CONTEXT
+   BOOLEAN m_CalledAdapterFreeResources;
+   BOOLEAN m_RegisteredAdapterShutdownHandler;
+ 
++   // This variable is initialised as TRUE. If it is set to FALSE, the adapter does
++   // not check the source IP field of the ARP requests it receives on the adapter.
++  BOOLEAN m_source_check;
++
+ } TAP_ADAPTER_CONTEXT, *PTAP_ADAPTER_CONTEXT;
+ 
+ FORCEINLINE
+diff --git a/src/device.c b/src/device.c
+index 2b7ba9b..85897b6 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -4,6 +4,7 @@
+  *
+  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
+  *
++ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
+  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
+  *  and is released under the GPL version 2 (see below).
+  *
+@@ -692,7 +693,20 @@ Return Value:
+             }
+         }
+         break;
+-
++    case TAP_WIN_IOCTL_CONFIG_SET_SRC_CHECK:
++        {
++            if (inBufLength >= sizeof(ULONG))
++            {
++                adapter->m_source_check = (BOOLEAN) ((PULONG) (Irp->AssociatedIrp.SystemBuffer))[0];
++                Irp->IoStatus.Information = 1;
++            }
++            else
++            {
++                NOTE_ERROR();
++                Irp->IoStatus.Status = ntStatus = STATUS_INVALID_PARAMETER;
++            }
++        }
++        break;
+     default:
+ 
+         //
+diff --git a/src/tap-windows.h b/src/tap-windows.h
+index d546a5b..0809c2e 100644
+--- a/src/tap-windows.h
++++ b/src/tap-windows.h
+@@ -4,6 +4,7 @@
+  *
+  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
+  *
++ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
+  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
+  *  and is released under the GPL version 2 (see below).
+  *
+@@ -49,7 +50,7 @@
+ 
+ /* obsoletes TAP_WIN_IOCTL_CONFIG_POINT_TO_POINT */
+ #define TAP_WIN_IOCTL_CONFIG_TUN            TAP_WIN_CONTROL_CODE (10, METHOD_BUFFERED)
+-
++#define TAP_WIN_IOCTL_CONFIG_SET_SRC_CHECK  TAP_WIN_CONTROL_CODE (11, METHOD_BUFFERED)
+ /*
+  * =================
+  * Registry keys
+diff --git a/src/txpath.c b/src/txpath.c
+index f627934..8af5f21 100644
+--- a/src/txpath.c
++++ b/src/txpath.c
+@@ -4,6 +4,7 @@
+  *
+  *  This code was inspired by the CIPE-Win32 driver by Damion K. Wilson.
+  * 
++ *  Copyright (C) 2016 Noel Kuntze <noel@familie-kuntze.de>
+  *  This source code is Copyright (C) 2002-2014 OpenVPN Technologies, Inc.,
+  *  and is released under the GPL version 2 (see below).
+  *
+@@ -216,6 +217,15 @@ ProcessARP(
+     //-----------------------------------------------
+     // Is this the kind of packet we are looking for?
+     //-----------------------------------------------
++    BOOLEAN source_check = FALSE;
++    if (Adapter->m_source_check)
++    {
++        source_check = (src->m_ARP_IP_Source == adapter_ip);
++    }
++    else
++    {
++        source_check = TRUE;
++    }
+     if (src->m_Proto == htons (NDIS_ETH_TYPE_ARP)
+         && MAC_EQUAL (src->m_MAC_Source, Adapter->PermanentAddress)
+         && MAC_EQUAL (src->m_ARP_MAC_Source, Adapter->PermanentAddress)
+@@ -225,7 +235,7 @@ ProcessARP(
+         && src->m_MAC_AddressSize == sizeof (MACADDR)
+         && src->m_PROTO_AddressType == htons (NDIS_ETH_TYPE_IPV4)
+         && src->m_PROTO_AddressSize == sizeof (IPADDR)
+-        && src->m_ARP_IP_Source == adapter_ip
++        && source_check
+         && (src->m_ARP_IP_Destination & ip_netmask) == ip_network
+         && src->m_ARP_IP_Destination != adapter_ip)
+     {
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Code für das Suchen eines TAP-Geräts,label=lst:get_tap_req]
+/*
+ * Searches through the registry for suitable TAP driver interfaces
+ * On Windows, the TAP interface metadata is stored and described in the registry.
+ * It returns a linked list that contains all found guids. The guids describe the interfaces.
+ */
+
+linked_list_t *get_tap_reg()
+{
+    HKEY adapter_key;
+    LONG status;
+    DWORD len;
+    linked_list_t *list = linked_list_create();
+    int i = 0;
+
+    /*
+     * Open parent key. It contains all other keys that
+     * describe any possible interfaces.
+     */
+    status = RegOpenKeyEx(
+            HKEY_LOCAL_MACHINE,
+            ADAPTER_KEY,
+            0,
+            KEY_READ,
+            &adapter_key);
+
+    if (status != ERROR_SUCCESS)
+    {
+        DBG2(DBG_LIB, "Error opening registry key: %s", ADAPTER_KEY);
+    }
+
+    while (true)
+    {
+        char enum_name[256];
+        char unit_string[256];
+        HKEY unit_key;
+        char component_id_string[] = "ComponentId";
+        char component_id[256];
+        char net_cfg_instance_id_string[] = "NetCfgInstanceId";
+        char net_cfg_instance_id[256];
+        DWORD data_type;
+
+        len = sizeof (enum_name);
+        status = RegEnumKeyEx(
+                adapter_key,
+                i,
+                enum_name,
+                &len,
+                NULL,
+                NULL,
+                NULL,
+                NULL);
+        if (status == ERROR_NO_MORE_ITEMS)
+        {
+            break;
+        }
+        else if (status != ERROR_SUCCESS)
+        {
+            DBG2(DBG_LIB, "Error enumerating registry subkeys of key: %s",
+                    ADAPTER_KEY);
+        }
+
+        snprintf(unit_string, sizeof (unit_string), "%s\\%s",
+                ADAPTER_KEY, enum_name);
+
+        status = RegOpenKeyEx(
+                HKEY_LOCAL_MACHINE,
+                unit_string,
+                0,
+                KEY_READ,
+                &unit_key);
+
+        if (status != ERROR_SUCCESS)
+        {
+            DBG2(DBG_LIB, "Error opening registry key: %s", unit_string);
+        }
+        else
+        {
+            len = sizeof (component_id);
+            status = RegQueryValueEx(
+                    unit_key,
+                    component_id_string,
+                    NULL,
+                    &data_type,
+                    component_id,
+                    &len);
+
+            if (status != ERROR_SUCCESS || data_type != REG_SZ)
+            {
+                DBG2(DBG_LIB, "Error opening registry key: %s\\%s",
+                        unit_string, component_id_string);
+            }
+            else
+            {
+                len = sizeof (net_cfg_instance_id);
+                status = RegQueryValueEx(
+                        unit_key,
+                        net_cfg_instance_id_string,
+                        NULL,
+                        &data_type,
+                        net_cfg_instance_id,
+                        &len);
+
+                if (status == ERROR_SUCCESS && data_type == REG_SZ)
+                {
+                    if (!strcmp(component_id, TAP_WIN_COMPONENT_ID))
+                    {
+                        /* That thing is a valid interface key */
+                        /* link into return list */
+                        char *guid = malloc(sizeof(net_cfg_instance_id));
+                        memcpy(guid, net_cfg_instance_id, sizeof(net_cfg_instance_id));
+                        list->insert_last(list, guid);
+                    }
+                }
+            }
+            RegCloseKey(unit_key);
+        }
+        ++i;
+    }
+
+    RegCloseKey(adapter_key);
+    return list;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Code für handle\_plain auf Windows,label=lst:handle-plain-windows]
+/**
+ * Job handling outbound plaintext packets
+ */
+static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
+{
+#ifdef WIN32
+        DBG2(DBG_ESP, "entered handle_plain.");
+        void **key = NULL;
+        bool oldstate;
+        uint32_t length, event_status = 0, i = 0, j = 0, offset;
+        handle_overlapped_buffer_t *bundle_array = NULL, dummy, tun_device_handle_overlapped_buffer, *structures = NULL;
+        OVERLAPPED *overlapped = NULL;
+        HANDLE *event_array = NULL, tun_device_event;
+        tun_device_t *tun_device = this->tun.tun;
+        enumerator_t *tuns_enumerator;
+
+        memset(&tun_device_handle_overlapped_buffer, 0, sizeof(handle_overlapped_buffer_t));
+        /* Reset synchronisation event */
+        ResetEvent(this->event);
+
+        length = this->tuns->get_count(this->tuns);
+
+        this->lock->read_lock(this->lock);
+        /* Read event for this->tun */
+
+        /* allocate arrays for all the structs we need */
+        /* events, overlapped structures and bundles. */
+        /* event_array holds all the HANDLE structures for the events that are
+         * used for notifying the thread of finished reads and writes.
+         */
+
+        overlapped = alloca((length+2)*sizeof(OVERLAPPED));
+        event_array = alloca((length+2)*sizeof(HANDLE));
+        bundle_array = alloca((length+2)*sizeof(handle_overlapped_buffer_t));
+
+        memset(overlapped, 0, (length+2)*sizeof(OVERLAPPED));
+        memset(bundle_array, 0, (length+2)*sizeof(handle_overlapped_buffer_t));
+
+        DBG2(DBG_ESP, "Allocated arrays, opened events");
+
+        /* These are the arrays we're going to work with */
+
+        /* first position is the event we use for synchronisation  */
+        /* Insert notification event */
+        event_array[i] = this->event;
+        DBG2(DBG_ESP, "put notification event into index %d", i);
+        /* Insert dummy structure */
+        bundle_array[i] = dummy;
+        i++;
+
+        /* second position is this->tun */
+        /* insert event object for this->tun device */
+        tun_device_event = CreateEvent(NULL, FALSE, FALSE, this->tun.tun->get_read_event_name(this->tun.tun));
+        if (!tun_device_event)
+        {
+            char *error_message = format_error(GetLastError());
+            DBG2(DBG_ESP, "Error: %s", error_message);
+            free(error_message);
+            return JOB_REQUEUE_FAIR;
+        }
+        event_array[i] = tun_device_event;
+        DBG2(DBG_ESP, "Put TUN %s event in index %d", this->tun.tun->get_name(this->tun.tun), i);
+        ResetEvent(event_array[i]);
+        /* bundle for the read on this->tun */
+        /* Reserve memory for the buffer*/
+        tun_device_handle_overlapped_buffer.buffer = chunk_alloc(tun_device->get_mtu(tun_device));
+
+        DBG2(DBG_ESP, "Allocated buffer.");
+        tun_device_handle_overlapped_buffer.fileHandle = tun_device->get_handle(tun_device);
+        DBG2(DBG_ESP, "Allocated file handle.");
+        tun_device_handle_overlapped_buffer.overlapped = overlapped;
+        DBG2(DBG_ESP, "Allocated overlapped..");
+        /* Fill in code */
+        /*
+        tun_device_handle_overlapped_buffer.overlapped->hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, this->tun.tun->get_read_event_name(this->tun.tun));
+        */
+        tun_device_handle_overlapped_buffer.overlapped->hEvent= tun_device_event;
+        if (tun_device_handle_overlapped_buffer.overlapped->hEvent == NULL)
+        {
+            char *error_message = format_error(GetLastError());
+            DBG2(DBG_ESP, "Error: %s", error_message);
+            free(error_message);
+            return JOB_REQUEUE_FAIR;
+        }
+        DBG2(DBG_ESP, "Created event");
+        bundle_array[i] = tun_device_handle_overlapped_buffer;
+
+        i++;
+
+        /* Start ReadFile for this->tun.handle */
+        if (!start_read(&tun_device_handle_overlapped_buffer, tun_device_handle_overlapped_buffer.overlapped->hEvent))
+        {
+                // TODO: Cleanup heap
+                this->lock->unlock(this->lock);
+                return JOB_REQUEUE_FAIR;
+        }
+        /* pad bundle_array with two empty structures */
+        /* iterate over all our tun devices, create event handles, reset them, queue read operations on all handles */
+
+        DBG2(DBG_ESP, "Enumerating tun devices ...");
+
+        tuns_enumerator = this->tuns->create_enumerator(this->tuns);
+        while(tuns_enumerator->enumerate(tuns_enumerator, key, &tun_device))
+        {
+            DBG2(DBG_ESP, "TUN device %s", *key);
+            /* Allocate structure and buffer */
+
+            structures[j].buffer = chunk_alloc(tun_device->get_mtu(tun_device));
+            memset(structures[j].buffer.ptr, 0, structures[j].buffer.len);
+            structures[j].fileHandle = tun_device->get_handle(tun_device);
+            /* Allocate and initialise OVERLAPPED structure */
+            structures[j].overlapped = alloca(sizeof(OVERLAPPED));
+            (*structures[j].overlapped) = overlapped[j];
+            memset(&structures[j].overlapped, 0, sizeof(OVERLAPPED));
+            /* Create unique name for that event. */
+            /* Create unique event for read accesses on that device
+             * No security attributes, no manual reset, initial state is unsignaled,
+             * name is the special name we created
+             */
+            structures[j].overlapped->hEvent = CreateEvent(NULL, FALSE, FALSE, tun_device->get_read_event_name(tun_device));
+            // event_array[i] = OpenEvent(EVENT_ALL_ACCESS, FALSE, tun_device->get_read_event_name(tun_device));
+            event_array[i] = structures[j].overlapped->hEvent;
+            bundle_array[i] = structures[j];
+
+            if (event_array[i] == NULL)
+            {
+                char *error_message = format_error(GetLastError());
+                DBG2(DBG_ESP, "Error: %s", error_message);
+                free(error_message);
+                return JOB_REQUEUE_FAIR;
+            }
+            i++;
+
+            /* Initialise read with the allocate overwrite structure */
+            DBG2(DBG_ESP, "Reading on %s", tun_device->get_name(tun_device));
+            if (!start_read(&structures[j], structures[j].overlapped->hEvent))
+            {
+                    // TODO: Cleanup heap
+                    this->lock->unlock(this->lock);
+                    return JOB_REQUEUE_FAIR;
+            }
+            j++;
+        }
+        tuns_enumerator->destroy(tuns_enumerator);
+
+        this->lock->unlock(this->lock);
+        while (TRUE)
+        {
+            /* Wait for a handle to be signaled */
+            /* In the mingw64 sources, MAXIMUM_WAIT_OBJECTS is defined as 64. That means we can wait for a maximum of 64 event handles.
+             * This translates to 63 tun devices. I think this is sufficiently high to not have to implement a mechanism for waiting for more
+             * events /support more TUN devices */
+            oldstate = thread_cancelability(FALSE);
+            DBG2(DBG_ESP, "Waiting for events...");
+            event_status = WaitForMultipleObjects(i, event_array, FALSE, INFINITE);
+            thread_cancelability(oldstate);
+            DBG2(DBG_ESP, "Event triggered with event_status %d", event_status);
+            offset = event_status - WAIT_OBJECT_0;
+            DBG2(DBG_ESP, "offset == %d", offset);
+            
+            /* A handle was signaled. Find the tun handle whose read was successful */
+
+            /* We can only use the event_status of indication for the first completed IO operation.
+             * After the event was signaled, we need to test the OVERLAPPED structure in the other array
+             * to find out what event was signaled.
+             */
+            /*
+             * Probably broken?
+             */
+            /* Check if an event in the array was signaled. (That is the case if
+             * the event_status is between WAIT_OBJECT_0 and WAIT_OBJECT_0 + nCount -1)
+             */
+            if ((WAIT_OBJECT_0 < event_status) && event_status < ((WAIT_OBJECT_0 + length - 1)))
+            {
+                /* the event at event_array[event_status - WAIT_OBJECT_0] has been signaled */
+                /* It is possible that more than one event was signalled. In that case, (event_status - WAIT_OBJECT_0)
+                 * is the index with the lowest event that was signalled. More signalled events can be found higher
+                 *
+                 * According to the documentation, WAIT_OBJECT_0 is defined as 0
+                 */
+                if (offset == 0)
+                {
+                    /* Notification about changes regarding the tun devices.
+                     * Or the object is destroyed.
+                     * We need to rebuild the array. So exit and rebuild. */
+                    DBG2(DBG_ESP, "cleanup.");
+                    /* Cleanup
+                     *  Starts with 1 to skip over the dummy
+                     */
+                    for(uint32_t k=1;k<i;k++)
+                    {
+                        /* stop all asynchronous IO */
+                        CancelIo(bundle_array[k].fileHandle);
+                        CloseHandle(bundle_array[k].overlapped->hEvent);
+                        memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
+                        free(bundle_array[k].buffer.ptr);
+                        ResetEvent(event_array[k]);
+                        CloseHandle(event_array[k]);
+                    }
+                    /* exit */
+                    DBG2(DBG_ESP, "Cleanup done.");
+                    return JOB_REQUEUE_DIRECT;
+                }
+                for(uint32_t k=1;k<i; k++)
+                {
+                    DBG2(DBG_ESP, "position %d in array", k);
+                    /* Is the object signaled? */
+                    DBG2(DBG_ESP, "checking if event is signaled.");
+                    DWORD WaitResult = WaitForSingleObject(bundle_array[k].overlapped->hEvent, 0);
+                    DBG2(DBG_ESP, "WaitForSingleObject returned %d", WaitResult);
+                    if (WaitResult == WAIT_OBJECT_0)
+                    {
+                        /* The arrays have the same length and the same positioning of the elements.
+                         * Therefore, if event_array[k] is signaled, the read on bundle_array[i].fileHandle has succeeded
+                         * and bundle_array[k].buffer has our data now. */
+                        DBG2(DBG_ESP, "Event is signaled. Processing packet.");
+                        /* Do we need to copy the chunk before we enqueue it? */
+                        char *foo = alloca((bundle_array[k].buffer.len *4)/3 + 1);
+                        memset(foo, 0, (bundle_array[k].buffer.len *4)/3 + 1);
+                        DBG2(DBG_ESP, "Length of buffer: %u", bundle_array[k].buffer.len);
+                        chunk_to_base64(bundle_array[k].buffer, foo);
+                        DBG2(DBG_ESP, "Content of Buffer: %s", foo);
+
+                        ip_packet_t *packet;
+                        /* clone the buffer */
+                        chunk_t buffer_clone = chunk_clone (bundle_array[k].buffer);
+                        packet = ip_packet_create(buffer_clone);
+                        DBG2(DBG_ESP, "Packet contents: %B", packet->get_encoding(packet));
+                        if (packet)
+                        {
+                                ipsec->processor->queue_outbound(ipsec->processor, packet);
+                        }
+                        else
+                        {
+                                DBG2(DBG_ESP, "invalid IP packet read from TUN device");
+                        }
+                        /* Reset the overlapped structure, event and buffer */
+                        /* Print out the package for debugging */
+                        memset(&bundle_array[k].overlapped, 0, sizeof(OVERLAPPED));
+                        /* Don't leak packets */
+                        memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
+
+                        bundle_array[k].overlapped->hEvent = event_array[k];
+
+                        if (!start_read(&bundle_array[k], bundle_array[k].overlapped->hEvent))
+                        {
+                           /* Cleanup
+                            *  Starts with 1 to skip over the dummy
+                            */
+                            for(uint32_t k=1;k<i;k++)
+                            {
+                                /* stop all asynchronous IO */
+                                CancelIo(bundle_array[k].fileHandle);
+                                CloseHandle(bundle_array[k].overlapped->hEvent);
+                                memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
+                                free(bundle_array[k].buffer.ptr);
+                                ResetEvent(event_array[k]);
+                                CloseHandle(event_array[k]);
+                            }
+                            this->lock->unlock(this->lock);
+                            return JOB_REQUEUE_FAIR;
+                        }
+                    }
+                    else
+                    {
+                        DBG2(DBG_ESP, "Event is not signaled.");
+                    }
+                }
+
+            }
+            /* Function failed */
+            else
+            {
+                DBG2(DBG_ESP, "waiting for events on the tun device reads failed.");
+
+                /* Cleanup
+                 *  Starts with 1 to skip over the dummy
+                 */
+                for(uint32_t k=1;k<i;k++)
+                {
+                    /* stop all asynchronous IO */
+                    CancelIo(bundle_array[k].fileHandle);
+                    CloseHandle(bundle_array[k].overlapped->hEvent);
+                    memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
+                    free(bundle_array[k].buffer.ptr);
+                    ResetEvent(event_array[k]);
+                    CloseHandle(event_array[k]);
+                }
+                return JOB_REQUEUE_FAIR;
+
+            }
+        }
+        return JOB_REQUEUE_DIRECT;
+        #else
+        [...]
+        #endif
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Debug-Log; Zeigt Problematik mit WaitForSingleObject(),label=lst:debug-log]
+00[DMN] Starting IKE service charon-svc (strongSwan 5.4.1dr1, Windows Client 6.2.9200 (SP 0.0)
+00[LIB] plugin 'sha3': loaded successfully
+00[LIB] plugin 'md4': loaded successfully
+00[LIB] plugin 'nonce': loaded successfully
+00[LIB] plugin 'x509': loaded successfully
+00[LIB] plugin 'pubkey': loaded successfully
+00[LIB] plugin 'pkcs1': loaded successfully
+00[LIB] plugin 'dnscert': loaded successfully
+00[LIB] plugin 'ipseckey': loaded successfully
+00[LIB] plugin 'pem': loaded successfully
+00[LIB] plugin 'openssl': loaded successfully
+00[LIB] plugin 'files': loaded successfully
+00[LIB] Error opening registry key: SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002BE10318}\Properties
+00[LIB] TAP-Windows driver version 9.22 available.
+00[LIB] created TUN device: {EDA0C976-3256-4B30-8A92-708D2F643E28}
+00[LIB] plugin 'kernel-libipsec': loaded successfully
+00[LIB] plugin 'kernel-wfp': loaded successfully
+00[LIB] plugin 'kernel-iph': loaded successfully
+00[LIB] plugin 'socket-win': loaded successfully
+00[LIB] plugin 'vici': loaded successfully
+00[LIB] plugin 'eap-identity': loaded successfully
+00[LIB] plugin 'eap-gtc': loaded successfully
+00[LIB] plugin 'eap-dynamic': loaded successfully
+00[LIB] plugin 'eap-tls': loaded successfully
+00[LIB] plugin 'eap-peap': loaded successfully
+00[LIB] feature CUSTOM:kernel-ipsec in plugin 'kernel-wfp' failed to load
+00[LIB] feature PUBKEY:DSA in plugin 'pem' has unmet dependency: PUBKEY:DSA
+00[LIB] feature CUSTOM:dnscert in plugin 'dnscert' has unmet dependency: RESOLVER
+00[LIB] feature CUSTOM:ipseckey in plugin 'ipseckey' has unmet dependency: RESOLVER
+00[LIB] feature PRIVKEY:DSA in plugin 'pem' has unmet dependency: PRIVKEY:DSA
+00[LIB] feature PRIVKEY:BLISS in plugin 'pem' has unmet dependency: PRIVKEY:BLISS
+00[LIB] feature CERT_DECODE:PGP in plugin 'pem' has unmet dependency: CERT_DECODE:PGP
+00[LIB] feature CERT_DECODE:OCSP_REQUEST in plugin 'pem' has unmet dependency: CERT_DECODE:OCSP_REQUEST
+00[LIB] unloading plugin 'dnscert' without loaded features
+00[LIB] unloading plugin 'ipseckey' without loaded features
+00[LIB] unloading plugin 'kernel-wfp' without loaded features
+00[LIB] loaded plugins: charon-svc sha3 md4 nonce x509 pubkey pkcs1 pem openssl files kernel-libipsec kernel-iph socket-win vici eap-identity eap-gtc eap-dynamic eap-tls eap-peap
+00[LIB] unable to load 8 plugin features (7 due to unmet dependencies)
+00[JOB] spawning 16 worker threads
+00[LIB] created thread 4016
+00[LIB] created thread 3032
+00[LIB] created thread 3216
+00[LIB] created thread 3876
+00[LIB] created thread 3132
+00[LIB] created thread 1580
+00[LIB] created thread 1244
+00[LIB] created thread 4212
+00[LIB] created thread 3152
+00[LIB] created thread 4208
+00[LIB] created thread 2560
+00[LIB] created thread 2764
+00[LIB] created thread 1604
+00[LIB] created thread 4220
+00[LIB] created thread 1304
+00[LIB] created thread 972
+08[ESP] entered handle_plain.
+08[ESP] Allocated arrays, opened events
+08[ESP] put notification event into index 0
+08[ESP] Put TUN {EDA0C976-3256-4B30-8A92-708D2F643E28} event in index 1
+08[ESP] Allocated buffer.
+08[ESP] Allocated file handle.
+08[ESP] Allocated overlapped..
+08[ESP] Created event
+08[ESP] ReadFile() returned 0
+08[ESP] Error 997
+08[ESP] Read on tun device is pending.
+08[ESP] Enumerating tun devices ...
+08[ESP] Waiting for events...
+08[ESP] Event triggered with event_status 1
+08[ESP] offset == 1
+08[ESP] position 1 in array
+08[ESP] checking if event is signaled.
+08[ESP] WaitForSingleObject returned 258
+08[ESP] Event is not signaled.
+08[ESP] Waiting for events...
+[...]
+\end{lstlisting}
+
+\subsection{Lizensierung der Arbeit}
+Diese \ac{BA} steht unter der GNU General Public License version 3 (GPLv3)
+und darf unter Berücksichtigung der Lizensvereinbarung der GPLv3 verfielfältigt
+und verteilt werden. Der Lizenztext ist auf der offiziellen Webseite\footnote{\url{https://www.gnu.org/licenses/gpl.html}}
+zu finden.
+
+Das Logo der \ac{HSO} steht unter seiner eigenen Lizenz. Es steht nicht unter der GPLv3.
+Der gesamte Code steht unter der URL \url{https://github.com/Thermi/Bachelorarbeit} zur Verfügung.
+
+\begin{centering} 
+
+Diese Arbeit wurde mittels \LaTeX erstellt
+\end{centering}
