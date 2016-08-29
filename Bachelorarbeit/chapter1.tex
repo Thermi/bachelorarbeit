@@ -121,12 +121,12 @@ Das Zuordnen von \ac{IPsec}-Paketen zu \ac{IPsec}-\acp{SA} wird bewerkstelligt,
 indem nach dem \ac{SPI} des Pakets in der \ac{SAD} gesucht wird.
 
 \paragraph{Unterschiede in der Schreibweise von IKE\_SA und CHILD\_SA in der Bachelorarbeit und den RFCs}
-Diese spezielle Begrifflichkeit stammt aus dem strongSwan-Quellcode, in dem
+Diese spezielle Begrifflichkeit stammt aus dem ''strongSwan''-Quellcode, in dem
 die Datenstrukturen für eine IKE SA und eine CHILD SA Unterstriche enthalten.
 Um die Begriffe einheitlich zu verwenden wird der Unterstrich immer mitgeschrieben.
-Dies verdeutlicht auch, dass hier speziell von strongSwan gesprochen wird.
+Dies verdeutlicht auch, dass hier speziell von ''strongSwan'' gesprochen wird.
 In den \acp{RFC} über \ac{IPsec} wird ebenfalls von IKE\_SAs und CHILD\_SAs gesprochen,
-dort jedoch ohne Unterstrich.
+dort jedoch ohne Unterstrich. Was ''strongSwan'' ist wird in \autoref{ch:strongswan} erläutert.
 
 \paragraph{PFS}
 \ac{PFS} disjunkt die Schlüssel für die CHILD\_SAs von den Schlüsseln
@@ -239,17 +239,23 @@ auch für Route based IPsec genutzt werden kann.
 Beide Stacks sind konform zu RFC 2367\footcite[][]{daniel_l._mcdonald_rfc_1998}.
 
 Die Kommunikation mit dem Kernel bezüglich Netzwerkfunktionen geschieht über
-den Netlink-Sockel. Die notwendigen Funktionen in charon sind im Plugin ''kernel-netlink'' implementiert.
+den Netlink-Sockel. 
+Das ''strongSwan''-Projekt implementiert mit dem Dienst ''charon'' einen \ac{ISAKMP}/IKEv1 und IKEv2-Keying-Daemon
+auf Linux.
+Die notwendigen Funktionen für die Kommunikation mit dem Kernel sind in ''charon'' im Plugin ''kernel-netlink'' implementiert.
 Über Netlink werden auch die \ac{SAD} und \ac{SPD} verwaltet.
 
 \subsubsection{IPsec unter Windows}
 Microsoft hat im Laufe der Entwicklungsgeschichte von Windows drei verschiedene
 \ac{IPsec}-Implementierungen implementiert, die teilweise parallel existierten.
 
-
 In der Firewall von Windows existiert eine Implementierung, die Policy-based ist
 und daher flexibler ist und es erlaubt Firewall-Regeln zu schreiben, die abhängig davon sind,
 ob ein Paket mit \ac{IPsec} geschützt war.
+
+''strongSwan'' implementiert mit ''charon-svc'' einen \ac{ISAKMP}/IKEv1 und IKEv2-Keying-Daemon
+auf Windows. Die Kommunikation mit dem Kernel ist dort in den Plugins ''kernel-wfp''
+und ''kernel-iph'' implementiert.
 
 \paragraph{Windows Agile VPN Client}
 Seit Windows 7 existiert in Windows eine Implementierung von \ac{IPsec} im Netzwerkmnanager,
@@ -270,7 +276,7 @@ Diese Implementierung unterstütz den Config-Modus nicht und ist daher nicht fü
 \paragraph{WFP}
 \ac{WFP} ist die grundlegende Technologie im Netzwerkstack von Windows, mit
 der \ac{IPsec} im Kernel, sowie die Firewall dort implementiert wurde.
-charon kann mit \ac{WFP} mithilfe des ''kernel-wfp''-Plugins kommunizieren
+''charon'' kann mit \ac{WFP} mithilfe des ''kernel-wfp''-Plugins kommunizieren
 und \acp{SA} und \acp{SP} in die jeweiligen Datenbanken einfügen.
 
 \ac{WFP} hat mehrere Probleme, unter anderem mit virtuellen IP-Adressen,
@@ -284,7 +290,7 @@ auf Basis von \ac{WFP} zu erstellen.\footcite[][]{tobias_brunner_kernel-wfp_2014
 
 \paragraph{IPH}
 Windows bietet die \ac{IPH}-Funktionen an, die das Verwalten von
-\ac{IP}-Adressen, Routen und Geräten erleichtert. strongSwan
+\ac{IP}-Adressen, Routen und Geräten erleichtert. ''strongSwan''
 nutzt diese Funktionen im ''kernel-iph''-Plugin, um ein Kernel-Interface
 für Windows mit diesen Funktionen zu implementieren.
 
