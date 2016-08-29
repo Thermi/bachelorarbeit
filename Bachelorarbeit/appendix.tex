@@ -666,6 +666,390 @@ linked_list_t *get_tap_reg()
 }
 \end{lstlisting}
 \end{center}
+
+\begin{figure}
+\label{lst:handle_plain_windows}
+\begin{lstlisting}[caption=Code für handle\_plain auf Windows]
+/**
+ * Job handling outbound plaintext packets
+ */
+static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
+{
+#ifdef WIN32
+        DBG2(DBG_ESP, "entered handle_plain.");
+        void **key = NULL;
+        bool oldstate;
+        uint32_t length, event_status = 0, i = 0, j = 0, offset;
+        handle_overlapped_buffer_t *bundle_array = NULL, dummy, tun_device_handle_overlapped_buffer, *structures = NULL;
+        OVERLAPPED *overlapped = NULL;
+        HANDLE *event_array = NULL, tun_device_event;
+        tun_device_t *tun_device = this->tun.tun;
+        enumerator_t *tuns_enumerator;
+
+        memset(&tun_device_handle_overlapped_buffer, 0, sizeof(handle_overlapped_buffer_t));
+        /* Reset synchronisation event */
+        ResetEvent(this->event);
+
+        length = this->tuns->get_count(this->tuns);
+
+        this->lock->read_lock(this->lock);
+        /* Read event for this->tun */
+
+        /* allocate arrays for all the structs we need */
+        /* events, overlapped structures and bundles. */
+        /* event_array holds all the HANDLE structures for the events that are
+         * used for notifying the thread of finished reads and writes.
+         */
+
+        overlapped = alloca((length+2)*sizeof(OVERLAPPED));
+        event_array = alloca((length+2)*sizeof(HANDLE));
+        bundle_array = alloca((length+2)*sizeof(handle_overlapped_buffer_t));
+
+        memset(overlapped, 0, (length+2)*sizeof(OVERLAPPED));
+        memset(bundle_array, 0, (length+2)*sizeof(handle_overlapped_buffer_t));
+
+        DBG2(DBG_ESP, "Allocated arrays, opened events");
+
+        /* These are the arrays we're going to work with */
+
+        /* first position is the event we use for synchronisation  */
+        /* Insert notification event */
+        event_array[i] = this->event;
+        DBG2(DBG_ESP, "put notification event into index %d", i);
+        /* Insert dummy structure */
+        bundle_array[i] = dummy;
+        i++;
+
+        /* second position is this->tun */
+        /* insert event object for this->tun device */
+        tun_device_event = CreateEvent(NULL, FALSE, FALSE, this->tun.tun->get_read_event_name(this->tun.tun));
+        if (!tun_device_event)
+        {
+            char *error_message = format_error(GetLastError());
+            DBG2(DBG_ESP, "Error: %s", error_message);
+            free(error_message);
+            return JOB_REQUEUE_FAIR;
+        }
+        event_array[i] = tun_device_event;
+        DBG2(DBG_ESP, "Put TUN %s event in index %d", this->tun.tun->get_name(this->tun.tun), i);
+        ResetEvent(event_array[i]);
+        /* bundle for the read on this->tun */
+        /* Reserve memory for the buffer*/
+        tun_device_handle_overlapped_buffer.buffer = chunk_alloc(tun_device->get_mtu(tun_device));
+        DBG2(DBG_ESP, "Allocated buffer.");
+        tun_device_handle_overlapped_buffer.fileHandle = tun_device->get_handle(tun_device);
+        DBG2(DBG_ESP, "Allocated file handle.");
+        tun_device_handle_overlapped_buffer.overlapped = overlapped;
+        DBG2(DBG_ESP, "Allocated overlapped..");
+        /* Fill in code */
+        /*
+        tun_device_handle_overlapped_buffer.overlapped->hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, this->tun.tun->get_read_event_name(this->tun.tun));
+        */
+        tun_device_handle_overlapped_buffer.overlapped->hEvent= tun_device_event;
+        if (tun_device_handle_overlapped_buffer.overlapped->hEvent == NULL)
+        {
+            char *error_message = format_error(GetLastError());
+            DBG2(DBG_ESP, "Error: %s", error_message);
+            free(error_message);
+            return JOB_REQUEUE_FAIR;
+        }
+        DBG2(DBG_ESP, "Created event");
+        bundle_array[i] = tun_device_handle_overlapped_buffer;
+
+        i++;
+
+        /* Start ReadFile for this->tun.handle */
+        if (!start_read(&tun_device_handle_overlapped_buffer, tun_device_handle_overlapped_buffer.overlapped->hEvent))
+        {
+                // TODO: Cleanup heap
+                this->lock->unlock(this->lock);
+                return JOB_REQUEUE_FAIR;
+        }
+        /* pad bundle_array with two empty structures */
+        /* iterate over all our tun devices, create event handles, reset them, queue read operations on all handles */
+
+        DBG2(DBG_ESP, "Enumerating tun devices ...");
+
+        tuns_enumerator = this->tuns->create_enumerator(this->tuns);
+        while(tuns_enumerator->enumerate(tuns_enumerator, key, &tun_device))
+        {
+            DBG2(DBG_ESP, "TUN device %s", *key);
+            /* Allocate structure and buffer */
+
+            structures[j].buffer = chunk_alloc(tun_device->get_mtu(tun_device));
+            memset(structures[j].buffer.ptr, 0, structures[j].buffer.len);
+            structures[j].fileHandle = tun_device->get_handle(tun_device);
+            /* Allocate and initialise OVERLAPPED structure */
+            structures[j].overlapped = alloca(sizeof(OVERLAPPED));
+            (*structures[j].overlapped) = overlapped[j];
+            memset(&structures[j].overlapped, 0, sizeof(OVERLAPPED));
+            /* Create unique name for that event. */
+            /* Create unique event for read accesses on that device
+             * No security attributes, no manual reset, initial state is unsignaled,
+             * name is the special name we created
+             */
+            structures[j].overlapped->hEvent = CreateEvent(NULL, FALSE, FALSE, tun_device->get_read_event_name(tun_device));
+            // event_array[i] = OpenEvent(EVENT_ALL_ACCESS, FALSE, tun_device->get_read_event_name(tun_device));
+            event_array[i] = structures[j].overlapped->hEvent;
+            bundle_array[i] = structures[j];
+
+            if (event_array[i] == NULL)
+            {
+                char *error_message = format_error(GetLastError());
+                DBG2(DBG_ESP, "Error: %s", error_message);
+                free(error_message);
+                return JOB_REQUEUE_FAIR;
+            }
+            i++;
+
+            /* Initialise read with the allocate overwrite structure */
+            DBG2(DBG_ESP, "Reading on %s", tun_device->get_name(tun_device));
+            if (!start_read(&structures[j], structures[j].overlapped->hEvent))
+            {
+                    // TODO: Cleanup heap
+                    this->lock->unlock(this->lock);
+                    return JOB_REQUEUE_FAIR;
+            }
+            j++;
+        }
+        tuns_enumerator->destroy(tuns_enumerator);
+
+        this->lock->unlock(this->lock);
+        while (TRUE)
+        {
+            /* Wait for a handle to be signaled */
+            /* In the mingw64 sources, MAXIMUM_WAIT_OBJECTS is defined as 64. That means we can wait for a maximum of 64 event handles.
+             * This translates to 63 tun devices. I think this is sufficiently high to not have to implement a mechanism for waiting for more
+             * events /support more TUN devices */
+            oldstate = thread_cancelability(FALSE);
+            DBG2(DBG_ESP, "Waiting for events...");
+            event_status = WaitForMultipleObjects(i, event_array, FALSE, INFINITE);
+            thread_cancelability(oldstate);
+            DBG2(DBG_ESP, "Event triggered with event_status %d", event_status);
+            offset = event_status - WAIT_OBJECT_0;
+            DBG2(DBG_ESP, "offset == %d", offset);
+            
+            /* A handle was signaled. Find the tun handle whose read was successful */
+
+            /* We can only use the event_status of indication for the first completed IO operation.
+             * After the event was signaled, we need to test the OVERLAPPED structure in the other array
+             * to find out what event was signaled.
+             */
+            /*
+             * Probably broken?
+             */
+            /* Check if an event in the array was signaled. (That is the case if
+             * the event_status is between WAIT_OBJECT_0 and WAIT_OBJECT_0 + nCount -1)
+             */
+            if ((WAIT_OBJECT_0 < event_status) && event_status < ((WAIT_OBJECT_0 + length - 1)))
+            {
+                /* the event at event_array[event_status - WAIT_OBJECT_0] has been signaled */
+                /* It is possible that more than one event was signalled. In that case, (event_status - WAIT_OBJECT_0)
+                 * is the index with the lowest event that was signalled. More signalled events can be found higher
+                 *
+                 * According to the documentation, WAIT_OBJECT_0 is defined as 0
+                 */
+                if (offset == 0)
+                {
+                    /* Notification about changes regarding the tun devices.
+                     * Or the object is destroyed.
+                     * We need to rebuild the array. So exit and rebuild. */
+                    DBG2(DBG_ESP, "cleanup.");
+                    /* Cleanup
+                     *  Starts with 1 to skip over the dummy
+                     */
+                    for(uint32_t k=1;k<i;k++)
+                    {
+                        /* stop all asynchronous IO */
+                        CancelIo(bundle_array[k].fileHandle);
+                        CloseHandle(bundle_array[k].overlapped->hEvent);
+                        memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
+                        free(bundle_array[k].buffer.ptr);
+                        ResetEvent(event_array[k]);
+                        CloseHandle(event_array[k]);
+                    }
+                    /* exit */
+                    DBG2(DBG_ESP, "Cleanup done.");
+                    return JOB_REQUEUE_DIRECT;
+                }
+                for(uint32_t k=1;k<i; k++)
+                {
+                    DBG2(DBG_ESP, "position %d in array", k);
+                    /* Is the object signaled? */
+                    DBG2(DBG_ESP, "checking if event is signaled.");
+                    DWORD WaitResult = WaitForSingleObject(bundle_array[k].overlapped->hEvent, 0);
+                    DBG2(DBG_ESP, "WaitForSingleObject returned %d", WaitResult);
+                    if (WaitResult == WAIT_OBJECT_0)
+                    {
+                        /* The arrays have the same length and the same positioning of the elements.
+                         * Therefore, if event_array[k] is signaled, the read on bundle_array[i].fileHandle has succeeded
+                         * and bundle_array[k].buffer has our data now. */
+                        DBG2(DBG_ESP, "Event is signaled. Processing packet.");
+                        /* Do we need to copy the chunk before we enqueue it? */
+                        char *foo = alloca((bundle_array[k].buffer.len *4)/3 + 1);
+                        memset(foo, 0, (bundle_array[k].buffer.len *4)/3 + 1);
+                        DBG2(DBG_ESP, "Length of buffer: %u", bundle_array[k].buffer.len);
+                        chunk_to_base64(bundle_array[k].buffer, foo);
+                        DBG2(DBG_ESP, "Content of Buffer: %s", foo);
+
+                        ip_packet_t *packet;
+                        /* clone the buffer */
+                        chunk_t buffer_clone = chunk_clone (bundle_array[k].buffer);
+                        packet = ip_packet_create(buffer_clone);
+                        DBG2(DBG_ESP, "Packet contents: %B", packet->get_encoding(packet));
+                        if (packet)
+                        {
+                                ipsec->processor->queue_outbound(ipsec->processor, packet);
+                        }
+                        else
+                        {
+                                DBG2(DBG_ESP, "invalid IP packet read from TUN device");
+                        }
+                        /* Reset the overlapped structure, event and buffer */
+                        /* Print out the package for debugging */
+                        memset(&bundle_array[k].overlapped, 0, sizeof(OVERLAPPED));
+                        /* Don't leak packets */
+                        memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
+
+                        bundle_array[k].overlapped->hEvent = event_array[k];
+
+                        if (!start_read(&bundle_array[k], bundle_array[k].overlapped->hEvent))
+                        {
+                           /* Cleanup
+                            *  Starts with 1 to skip over the dummy
+                            */
+                            for(uint32_t k=1;k<i;k++)
+                            {
+                                /* stop all asynchronous IO */
+                                CancelIo(bundle_array[k].fileHandle);
+                                CloseHandle(bundle_array[k].overlapped->hEvent);
+                                memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
+                                free(bundle_array[k].buffer.ptr);
+                                ResetEvent(event_array[k]);
+                                CloseHandle(event_array[k]);
+                            }
+                            this->lock->unlock(this->lock);
+                            return JOB_REQUEUE_FAIR;
+                        }
+                    }
+                    else
+                    {
+                        DBG2(DBG_ESP, "Event is not signaled.");
+                    }
+                }
+
+            }
+            /* Function failed */
+            else
+            {
+                DBG2(DBG_ESP, "waiting for events on the tun device reads failed.");
+
+                /* Cleanup
+                 *  Starts with 1 to skip over the dummy
+                 */
+                for(uint32_t k=1;k<i;k++)
+                {
+                    /* stop all asynchronous IO */
+                    CancelIo(bundle_array[k].fileHandle);
+                    CloseHandle(bundle_array[k].overlapped->hEvent);
+                    memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
+                    free(bundle_array[k].buffer.ptr);
+                    ResetEvent(event_array[k]);
+                    CloseHandle(event_array[k]);
+                }
+                return JOB_REQUEUE_FAIR;
+
+            }
+        }
+        return JOB_REQUEUE_DIRECT;
+        #else
+        [...]
+        #endif
+}
+\end{lstlisting}
+\end{figure}
+
+\begin{figure}
+\label{lst:debug-log}
+\begin{lstlisting}[caption=Debug-Log; Zeigt Problematik mit WaitForSingleObject()]
+00[DMN] Starting IKE service charon-svc (strongSwan 5.4.1dr1, Windows Client 6.2.9200 (SP 0.0)
+00[LIB] plugin 'sha3': loaded successfully
+00[LIB] plugin 'md4': loaded successfully
+00[LIB] plugin 'nonce': loaded successfully
+00[LIB] plugin 'x509': loaded successfully
+00[LIB] plugin 'pubkey': loaded successfully
+00[LIB] plugin 'pkcs1': loaded successfully
+00[LIB] plugin 'dnscert': loaded successfully
+00[LIB] plugin 'ipseckey': loaded successfully
+00[LIB] plugin 'pem': loaded successfully
+00[LIB] plugin 'openssl': loaded successfully
+00[LIB] plugin 'files': loaded successfully
+00[LIB] Error opening registry key: SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002BE10318}\Properties
+00[LIB] TAP-Windows driver version 9.22 available.
+00[LIB] created TUN device: {EDA0C976-3256-4B30-8A92-708D2F643E28}
+00[LIB] plugin 'kernel-libipsec': loaded successfully
+00[LIB] plugin 'kernel-wfp': loaded successfully
+00[LIB] plugin 'kernel-iph': loaded successfully
+00[LIB] plugin 'socket-win': loaded successfully
+00[LIB] plugin 'vici': loaded successfully
+00[LIB] plugin 'eap-identity': loaded successfully
+00[LIB] plugin 'eap-gtc': loaded successfully
+00[LIB] plugin 'eap-dynamic': loaded successfully
+00[LIB] plugin 'eap-tls': loaded successfully
+00[LIB] plugin 'eap-peap': loaded successfully
+00[LIB] feature CUSTOM:kernel-ipsec in plugin 'kernel-wfp' failed to load
+00[LIB] feature PUBKEY:DSA in plugin 'pem' has unmet dependency: PUBKEY:DSA
+00[LIB] feature CUSTOM:dnscert in plugin 'dnscert' has unmet dependency: RESOLVER
+00[LIB] feature CUSTOM:ipseckey in plugin 'ipseckey' has unmet dependency: RESOLVER
+00[LIB] feature PRIVKEY:DSA in plugin 'pem' has unmet dependency: PRIVKEY:DSA
+00[LIB] feature PRIVKEY:BLISS in plugin 'pem' has unmet dependency: PRIVKEY:BLISS
+00[LIB] feature CERT_DECODE:PGP in plugin 'pem' has unmet dependency: CERT_DECODE:PGP
+00[LIB] feature CERT_DECODE:OCSP_REQUEST in plugin 'pem' has unmet dependency: CERT_DECODE:OCSP_REQUEST
+00[LIB] unloading plugin 'dnscert' without loaded features
+00[LIB] unloading plugin 'ipseckey' without loaded features
+00[LIB] unloading plugin 'kernel-wfp' without loaded features
+00[LIB] loaded plugins: charon-svc sha3 md4 nonce x509 pubkey pkcs1 pem openssl files kernel-libipsec kernel-iph socket-win vici eap-identity eap-gtc eap-dynamic eap-tls eap-peap
+00[LIB] unable to load 8 plugin features (7 due to unmet dependencies)
+00[JOB] spawning 16 worker threads
+00[LIB] created thread 4016
+00[LIB] created thread 3032
+00[LIB] created thread 3216
+00[LIB] created thread 3876
+00[LIB] created thread 3132
+00[LIB] created thread 1580
+00[LIB] created thread 1244
+00[LIB] created thread 4212
+00[LIB] created thread 3152
+00[LIB] created thread 4208
+00[LIB] created thread 2560
+00[LIB] created thread 2764
+00[LIB] created thread 1604
+00[LIB] created thread 4220
+00[LIB] created thread 1304
+00[LIB] created thread 972
+08[ESP] entered handle_plain.
+08[ESP] Allocated arrays, opened events
+08[ESP] put notification event into index 0
+08[ESP] Put TUN {EDA0C976-3256-4B30-8A92-708D2F643E28} event in index 1
+08[ESP] Allocated buffer.
+08[ESP] Allocated file handle.
+08[ESP] Allocated overlapped..
+08[ESP] Created event
+08[ESP] ReadFile() returned 0
+08[ESP] Error 997
+08[ESP] Read on tun device is pending.
+08[ESP] Enumerating tun devices ...
+08[ESP] Waiting for events...
+08[ESP] Event triggered with event_status 1
+08[ESP] offset == 1
+08[ESP] position 1 in array
+08[ESP] checking if event is signaled.
+08[ESP] WaitForSingleObject returned 258
+08[ESP] Event is not signaled.
+08[ESP] Waiting for events...
+[...]
+\end{lstlisting}
+\end{figure}
 \subsection{Lizensierung der Arbeit}
 Diese \ac{BA} steht unter der GNU General Public License version 3 (GPLv3)
 und darf unter Berücksichtigung der Lizensvereinbarung der GPLv3 verfielfältigt
