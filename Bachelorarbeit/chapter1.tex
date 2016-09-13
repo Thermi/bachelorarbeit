@@ -129,11 +129,10 @@ In den \acp{RFC} über \ac{IPsec} wird ebenfalls von IKE\_SAs und CHILD\_SAs ges
 dort jedoch ohne Unterstrich. Was ''strongSwan'' ist wird in \autoref{ch:strongswan} erläutert.
 
 \paragraph{PFS}
-\ac{PFS} disjunkt die Schlüssel für die CHILD\_SAs von den Schlüsseln
-für die \ac{IKE}-\acp{SA}, indem beim Aushandeln einer CHILD\_SA ein weiterer
-\ac{DH}-Schlüsselaustausch stattfindet\footcite[13]{charlie_kaufman_rfc_2014}.
 Ohne \ac{PFS} werden die Schlüssel für die CHILD\_SAs vom Schlüssel der IKE\_SA
-abgeleitet. Wenn ein kryptografischer Schlüssel für den Verschlüsselungsalgorithmus
+abgeleitet. Wenn \ac{PFS} eingesetzt wird, so wird stattdessen ein \ac{DH}-Schlüsselaustausch
+eingesetzt, um die Schlüssel zu generieren.\footcite[13]{charlie_kaufman_rfc_2014}.
+Wenn ein kryptografischer Schlüssel für den Verschlüsselungsalgorithmus
 einer \ac{IPsec} \ac{SA} kompromittiert wird, so kann ein Angreifer nur den Verkehr entschlüsseln,
 der mit dieser \ac{SA} verschlüsselt wurde.
 
