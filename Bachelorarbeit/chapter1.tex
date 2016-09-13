@@ -228,10 +228,11 @@ der Verkehr nur mittels eines \ac{HMAC} abgesichert wird.\footcite[][]{stephen_k
 \end{figure}
 
 \subsubsection{MTU und MSS}
-
-Das Tunneln von Paketen verändert die \ac{MTU} des Trägers, da die Größe des darunterliegenden
-Datenträgers (IP, (UDP), ESP/AH) beachtet werden muss, sowie die Blockgröße
-des eingesetzten Verschlüsselungsalgorithmus und der eingesetzte \ac{MAC}.
+Beim Tunneln von Paketen muss beachtet werden, dass die \ac{MTU} im Tunnel geringer
+ist als die \ac{MTU} des physikalischen Trägers. Bei der Berechnung der \ac{MTU} des Tunnels müssen
+die Header der beteiligten Protokolle (\ac{IP}, (\ac{UDP},) \ac{ESP}/\ac{AH}),
+sowie die Blockgrößen der eingesetzten Verschlüsselungsalgorithmus und der eingesetzte \ac{MAC}
+berücksichtigt werden.
 Gewöhnliche Computer nehmen in der Regel eine \ac{MTU} von 1500 Byte an und 
 berechnen aus dieser \ac{MTU} die TCP-\ac{MSS} und geben diese beim Verbindungsaufbau mit \ac{TCP}
 an. Da die daraus resultierenden Pakete jedoch dann zu groß sind, müssen diese fragmentiert werden.
