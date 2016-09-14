@@ -320,13 +320,56 @@ der \ac{IPsec} im Kernel, sowie die Firewall dort implementiert wurde.
 und \acp{SA} und \acp{SP} in die jeweiligen Datenbanken einfügen.
 
 \ac{WFP} hat mehrere Probleme, unter anderem mit virtuellen IP-Adressen,
-UDP encapsulation, sowie mit mehreren Traffic Selectors im Transport-Modus.
+UDP-Encapsulation, mit mehreren Traffic Selectors im Transport-Modus
+und mit Protokoll oder Port-Beschränkungen in den \acp{SP} von Net-To-Net-\acp{SP}\footcite[][]{martin_willi_git.strongswan.org_2014}
+
+Martin Willi hat die Problematik mit virtuellen IPs in einem Git-Commit beschrieben:
+\hyphenblockcquote{UKenglish}{martin_willi_git.strongswan.org_2014}{
+WIP: Windows virtual IP notes
+
+When not using skipAsSource with the installed virtual IP, the IP gets promoted
+as source address for the already available routes over that interface. When
+setting the flag, all of our manually installed IPsec routes still use
+the interfaces main address as source address, as the route uses that interface.
+
+To fix this issue, we probably need a dedicated interface for virtual IPs that
+allows us to install our separated routes over that interface.
+
+Using the MS Loopback adapter kinda works; when disabling skipAsSource, an
+address installed to that adapter gets used and outgoing traffic flows as
+expected. Inbound traffic, though, fails with STATUS\_IPSEC\_CLEAR\_TEXT\_DROP,
+probably related to:
+
+https://wiki.strongswan.org/projects/strongswan/wiki/Kernel-wfp\#Accessing-Gateway-internal-address-in-a-net-to-net-tunnel
+}
+Aufgrund der Problematik bezüglich virtueller IPs ist es nicht sinnvoll einen \ac{RW}-Client
+auf Basis von \ac{WFP} zu erstellen.\footcite[][]{tobias_brunner_kernel-wfp_2014}\footcite[][]{martin_willi_git.strongswan.org_2014}
+
+Die Problematik mit UDP-Encapsulation wird so beschrieben, dass unaufgeforderte
+UDP-Encapsulation-Pakete mit dem Ereignis ''STATUS\_INTERNAL\_ERROR'' verworfen werden.
+Laut dem Text beeinflusst das nur Pakete, die über eine \ac{SA} mit UDP-Encapsulation
+empfangen werden und die der Kernel nicht zu einer bereits bekannten Verbindung
+zuordnen kann. Eine \ac{TCP}-Verbindung, die der Windows-Host über eine solche \ac{SA}
+aufgebaut hat, ist zum Beispiel von diesem Problem unbeeinflusst.\footcite[][]{martin_willi_git.strongswan.org_2014}
+
+Der Wiki-Artikel über kernel-wfp beschreibt, dass die Datenstrukturen, die in Windows
+für die Definition einer Transport-Policy genutzt werden, nur die Spezifizierung eines
+einzelnen Selektors zulassen.\footcite[][]{martin_willi_git.strongswan.org_2014} Das verhindert die Nutzung mehrer Selektoren für eine
+CHILD\_SA im Transport-Modus. Dies könnte zum Beispiel für \ac{L2TP}/\ac{IPsec} genutzt werden,
+um das \ac{L2TP}-Pseudowire und \ac{ICMP}-Pakete zwischen den teilnehmenden Hosts
+abzusichern.
+
+Der Kernel überprüft die Header der Transportschicht nicht, wenn Pakete weitergeleitet
+werden. Daher werden Protokoll- und Portselektoren für Forwarding-\acp{SP} nicht
+unterstützt. strongSwan ignoriert solche Selektoren daher, wenn kernel-wfp genutzt wird
+und Forwarding-Policies installiert werden. Für Input- und Output-Policies werden sie jedoch
+erzwungen.\footcite[][]{martin_willi_git.strongswan.org_2014}
+
+
 Des weiteren stellt \ac{WFP} keine Statistiken über die einzelnen \acp{SA} bereit,
 was verhindert, dass volumenbasiertes Rekeying und das Auslesen von Nutzungsstatistiken
 der \acp{SA} implementiert werden kann.
 
-Aufgrund der Problematik bezüglich virtueller IPs ist es nicht sinnvoll einen \ac{RW}-Client
-auf Basis von \ac{WFP} zu erstellen.\footcite[][]{tobias_brunner_kernel-wfp_2014}\footcite[][]{martin_willi_git.strongswan.org_2014}
 
 \paragraph{IPH}
 Windows bietet die \ac{IPH}-Funktionen an, die das Verwalten von
