@@ -133,6 +133,9 @@ literate={ö}{{\"o}}1
 
 % start nice Roman numbering in capital letters. (Use "roman" for lower case Roman numbering)
 \pagenumbering{Roman}
+\input{eidesstattliche_erklaerung.tex}
+\newpage
+\input{einleitung.tex}
 \input{inhaltsverzeichnis.tex}
 \input{abbildungsverzeichnis.tex}
 \input{codeverzeichnis.tex}
@@ -144,7 +147,6 @@ literate={ö}{{\"o}}1
 \newpage
 % use arabic numbering in the actual text of the thesis
 \pagenumbering{arabic}
-\input{einleitung.tex}
 \input{chapter1.tex}
 \input{chapter2.tex}
 \input{chapter3.tex}
@@ -152,5 +154,4 @@ literate={ö}{{\"o}}1
 \input{fazit.tex}
 \input{bibliographie.tex}
 \input{appendix.tex}
-\input{eidesstattliche_erklaerung.tex}
 \end{document}
