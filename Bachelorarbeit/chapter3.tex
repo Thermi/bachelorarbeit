@@ -469,11 +469,9 @@ wie die IP des virtuellen Routers, den Status des Geräts sowie der Modus des Ge
 Für die Portierung wurden die \acp{FD} für Handles ausgetauscht und für das Benachrichtigen
 über Änderungen in der Liste der TUN-Geräte wurde ein Event verwendet.
 
-Da Eventbasiertes IO-Multiplexing genutzt wird, werden verschiedene Events zum Lesen
-und Schreiben verwendet.
-Die Namen der Events werden als Attribut des Objekts in ''tun\_device\_t->read\_event\_name''
-''tun\_device\_t->write\_event\_name'' gespeichert. Sie können mittels ''tun\_device\_t->get\_read\_event\_name()'
-und ''tun\_device\_t->get\_read\_event\_name()'' gelesen werden.
+Für das Lesen und Schreiben vom und auf dem Handle wird ein Event benötigt,
+welches in die OVERLAPPED-Struktur eingefügt wird. Das Event wird dynamisch mittels CreateEvent()
+erstellt und nach der Nutzung mittels CloseHandle() geschlossen.
 
 \paragraph{Ändern der MTU eines TAP-Geräts}
 Das Ändern der \ac{MTU} ist im Moment nicht unterstützt. Der Treiber ermöglicht es,
@@ -1107,8 +1105,76 @@ The VICI protocol runs over a reliable transport protocol. As the protocol itsel
 \end{quote}\cite[][]{_vici_2016}
 
 \subsection{Probleme}
-Die implementierte Lösung funktioniert im Moment noch nicht. Das Problem ist, dass
-die Windows-eigenen Funktionen nicht wie dokumentiert funktionieren.
+Während der \ac{BA} wurden mehrere Probleme identifiziert, die mit unbekanntem
+Verhalten von Funktionen und Standards zusammenhängen.
+\paragraph{C-Standard}
+Eines dieser Probleme ist, dass der C-Standard die Deklaration einer Variable
+direkt nach einem ''case'' eines switch-cases nur erlaubt, wenn die Deklaration
+in einem Codeblock stattfindet.
+Der folgende Code produziert eine Fehlermeldung:
+\begin{lstlisting}[caption=Problematik mit C-Standard,label=c-standard]
+void main() {
+    int foo = 0;
+    
+    switch(foo)
+    {
+        case 0:
+            char *bar;
+            break;
+        default:
+            break;
+    }
+
+}
+\end{lstlisting}
+Die Problematik kann umgangen werden, wenn der Code im case mit geschweiften Klammern
+umfasst wird, wie hier:
+\begin{lstlisting}[caption=Abhilfe für Problematik mit C-Standard,label=c-standard-fix]
+void main() {
+    int foo = 0;
+    
+    switch(foo)
+    {
+        case 0:
+        {
+            char *bar;
+            break;
+        }
+        default:
+            break;
+    }
+}
+\end{lstlisting}
+\begin{filecontents*}{c-standard-error.tex}
+test.c: In Funktion »main«:
+test.c:7:13: Fehler: eine Marke kann nur Teil einer Anweisung sein, und eine Deklaration ist keine Anweisung
+             char *bar;
+             ^~~~
+\end{filecontents*}
+
+\lstinputlisting[caption=Fehlermeldung von gcc,label=c-standard-error,inputencoding=utf8/latin1]{c-standard-error.tex}
+
+Interessanterweise ist eine Deklaration in einem ''case'' erlaubt, jedoch nur
+nicht direkt nach der Deklaration des ''case''.
+Daher funktioniert dieser Code auch.
+
+\begin{lstlisting}[caption=Abhilfe mittels NOOP,label=c-standard-noop]
+void main() {
+    int foo = 0;
+    
+    switch(foo)
+    {
+        case 0:
+            ;
+            char *bar;
+            break;
+        default:
+            break;
+    }
+}
+
+\end{lstlisting}
+\paragraph{WaitForSingleObject()}
 Wie erläutert wird WaitForMultipleObjects() genutzt, um die IO-Operationen
 zu multiplexen. Diese Funktion beendet im Programmcode mit dem Wert ''1'',
 was bedeuted dass das zweite Objekt (In C werden Arrays von 0 auf indexiert.)
@@ -1126,6 +1192,7 @@ Das Problem ist besonders evident bei der Betrachtung des Debug-Logs,
 welches sich auf Seite \pageref{lst:debug-log} finden lässt.
 Es wird vom Code in auf Seite \pageref{lst:handle-plain-windows} ausgegeben.
 
+\paragraph{GetLastError()}
 Des weiteren gibt die Funktion ''GetLastError()'' den Fehlerwert 0 zurück, wenn sie nicht
 direkt nach dem Funktionsaufruf, der den Fehlerstatus setzte, aufgerufen wird.
 Es ist irrelevant, ob zwischen dem Aufruf von ''GetLastError()'' nur eine einfache Zuweisung
