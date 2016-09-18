@@ -66,7 +66,7 @@ Die bestehende Implementierung umfasst die eigentliche Bibliothek, eine Implemen
 eines Kernel-Interface zwischen libipsec und ''charon'', sowie Code in libstrongswan
 um TUN-Geräte zu öffnen. Martin Willi hat 2014 bereits die gesamte Portierungsarbeit
 für version 5.2.0 von strongSwan gemacht. Der Port unterstützt Windows 7 / server 2008 R2
-und neuer.
+und neuere Versionen von Microsoft Windows.
 
 \subsection{Unterstützte Kryptographie}
 Die unterstützte Kryptographie ist notwendigerweise von den deklarierten Identifikatoren
@@ -84,7 +84,7 @@ von Verkehr genutzt werden.
 \subsubsection{libipsec}
 libipsec implementiert die Verarbeitung von Paketen, das Erzwingen der \acp{SP},
 das Verwalten der \acp{SP}, \acp{SA}, Routen und der TUN-Geräte.
-Die hierbei relevanten Dateien sind unter /src/libipsec/ zu finden.
+Die hierbei relevanten Dateien sind unter ''/src/libipsec/'' zu finden.
 
 Standardmäßig installiert strongSwan die IP-Adressen die per Config-Mode
 oder \ac{CP} empfangen wird auf dem ausgehenden Interface (Linux, Kernelspace processing),
