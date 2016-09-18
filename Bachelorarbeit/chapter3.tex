@@ -44,14 +44,14 @@ mit dem TAP-Treiber funktioniert.
 Die Portierung von libipsec auf Windows, sodass sie dort lauffähig ist, ist das Ziel
 der Bachelorarbeit. Die zu portierenden Teile des Programmcodes betreffen nur
 die Codesegmente, die Plattformspezifische \acp{API} oder \acp{ABI} verwenden,
-also primär alles um Dateiein- und Ausgabe, sowie das verwalten von TUN-Geräten.
+also primär alles um Dateiein- und Ausgabe, sowie das Verwalten von TUN-Geräten.
 Unter Unix und Linux werden hier \acp{FD} verwendet. Unter Windows werden stattdessen
 Handles genutzt, welche einen anderen Dateityp darstellen. Des weiteren unterscheidet
 sich die Methode zum Multiplexen von Lese-Aufrufen auf einer Liste von Handles oder \acp{FD} stark.
 Unter Unix und Linux wird hierfür poll() genutzt, unter Windows geschieht das jedoch
 Event-basiert mit WaitForMultipleObjects().
 Explizite Beispiele hierfür sind im Abschnitt über die Portierung von libipsec sichtbar.
-Bei der Portierung wurde für das verwalten von Speicherabschnitten 
+Bei der Portierung wurde für das Verwalten von Speicherabschnitten 
 primär alloca() genutzt, statt malloc() und seine Unterarten. Der Unterschied hierbei ist die
 Speicherdauer. Mit alloca() allokierter Speicher ist nur bis zum Verlassen der Funktion gültig
 und wird automatisch freigegeben. Mit malloc() allokierter Speicher muss manuell freigegeben werden.
