@@ -54,9 +54,10 @@ Multithreading implementiert.
 ''charon'' benötigt für die Verwaltung von \ac{IP}-Adressen, Routen, TUN-Schnittstellen,
 Firewallregeln und
 der \ac{SPD} und der \ac{SAD} Zugriff auf den Kernel. Die dafür nötigen Funktionen
-werden in Plugins für ''libcharon'' implementiert, die die dafür benötigten Funktionen
-in einem Standardisierten Interface implementieren. Die momentan existierenden Plugins,
-die Kernel-Schnittstellen implementieren sind ''kernel-pfroute'', ''kernel-netlink'', ''kernel-wfp''
+werden in Plugins für ''libcharon'' implementiert. Die Plugins implementieren ein
+standardisiertes Interface für die Methoden, die sie implementieren.
+Die momentan existierenden Plugins,
+die Kernel-Schnittstellen implementieren, sind ''kernel-pfroute'', ''kernel-netlink'', ''kernel-wfp''
 und ''kernel-iph''.\footcite[][]{_pluginlist_2016}
 
 % Mehr Informationen?
