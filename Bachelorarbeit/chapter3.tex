@@ -403,6 +403,13 @@ des Funktionsblocks noch valide. Es wird automatisch beim Zerstören des Objekts
 #endif
 \end{lstlisting}
 
+Das Plugin ''kernel-iph'' installiert Routen mit einer Metrik von 10.
+Andere Software von Windows, die Routen installiert, benutzen eine höhere Metrik.
+
+Routen mit einer Prefixlänge von 0 werden auf zwei Routen mit der Prefixlänge 1 aufgeteilt.
+Dies wird gemacht um die Standardroute, welche ebenfalls eine Metrik von 10 besitzt,
+nicht zu überschreiben.
+
 Die Implementierung von handle\_plain() auf Windows unterstütz, wie die Implementierung
 auf Linux und UNIX das Multiplexen von IO von mehreren TUN-Adaptern. Der Grund dafür ist,
 dass verschiedene TUN-Implementierungen gegebenenfalls verschiedene Adapter für mehrere Tunnel
