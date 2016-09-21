@@ -109,7 +109,14 @@ und eines \ac{IP}v6-Headers kopiert und die fehlenden Protokollkonstanten per Ha
 Diese wurden in ''src/libipsec/win32.h'' abgelegt und in ''src/libpsec/ip\_packet.h'' und ''src/libipsec/ip\_packet.c''
 inkludiert. Dies ist in diesem Fall nicht kritisch, da libipsec unter der GPLv2-Lizenz und
 die Header unter der GPLv2 und der BSD-Lizenz stehen. Als Name für das Ifdef-Guard
-wurde ''WINDOWS\_32\_PROTOCOL\_HEADERS'' gewählt.
+wurde ''WINDOWS\_32\_PROTOCOL\_HEADERS'' gewählt. Ein Ifdef-Guard wird benötigt um das Reimportieren
+von Header-Dateien in C zu unterbinden. Wenn eine Header-Datei erneut importiert wird,
+dann führt das dazu, dass die Kompilierung abbricht, da eine Variable redefiniert wird.
+Die Redefinierung einer Variable produziert in C eine Warnung oder einen Fehler.
+C-Code wird in der Regel mit dem Argument ''-Wall'' kompiliert, welches
+alle Warnungen zu Fehlern umwandelt. Das wird getan, um Warnungen nicht zu übersehen.
+Der Compiler generiert Warnungen, wenn er Programmierfehler erkennt,
+die berichtenswert sind, aber kein größeres Hinderniss für die Kompilierung sind.
 
 \begin{lstlisting}[caption=Header für libipsec]
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
@@ -443,7 +450,7 @@ Des weiteren ist der Quellcode von ''devcon.exe'' zwar verfügbar\footnote{\url{
 aber nur unter einer proprietären Lizenz von Microsoft, der MS-PL\footnote{\url{https://github.com/Microsoft/Windows-driver-samples/blob/master/LICENSE}},
 verfügbar. Eine Reimplementierung müsste Code aus dem Quellcode von ''devcon.exe'' nutzen,
 welcher dann auch unter der MS-PL stünde. Die Verbreitung des Codes wäre dann nicht möglich,
-da die MS-PL mit der GPL inkompatibel ist\footnote{\url{https://www.gnu.org/licenses/license-list.en.html\#GPLIncompatibleLicenses}}.
+da die MS-PL mit der GPL inkompatibel ist\footcite[][]{_gnu.org_2016}.
 Da der Code unter der MIT-Lizenz beim strongSwan-Projekt eingereicht werden muss
 und dann dual-lizensiert wird.
 Wenn nur der Zugriff auf die benötigte API benutzt werden würde, so wäre es möglich,
