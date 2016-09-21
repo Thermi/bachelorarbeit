@@ -438,9 +438,13 @@ OpenVPN, spezifisch in  der Datei ''src/openvpn/tun.c.''.
 
 \paragraph{TAP-Geräte erstellen}
 Das Erstellen von TAP-Geräten ist im Moment nicht unterstützt. Der Grund dafür ist,
-dass die Funktionalität von ''devcon.exe'' dafür nachgebaut werden müsste, was
-sehr zeitaufwendig ist. Des weiteren ist der Quellcode von ''devcon.exe'' nicht offen,
-weshalb es Lizensierungsprobleme damit geben könnte.
+dass die Funktionalität von ''devcon.exe'' dafür nachgebaut werden müsste.
+Des weiteren ist der Quellcode von ''devcon.exe'' zwar verfügbar\footnote{\url{https://github.com/Microsoft/Windows-driver-samples/tree/master/setup/devcon},
+aber nur unter einer proprietären Lizenz von Microsoft, der MS-PL\footnote{\url{https://github.com/Microsoft/Windows-driver-samples/blob/master/LICENSE}},
+verfügbar. Eine Reimplementierung müsste Code aus dem Quellcode von ''devcon.exe'' nutzen,
+welcher dann auch unter der MS-PL stünde. Die Verbreitung des Codes wäre dann nicht möglich.
+Wenn nur der Zugriff auf die benötigte API benutzt werden würde, so wäre es möglich,
+die Unterstützung zu implementieren. Aus Zeitgründen wurde das nicht getan.
 
 \paragraph{TAP-Geräte suchen}
 Um das TAP-Gerät zu nutzen versucht der Code zuerst nach Netzwerkgeräten mit der ID ''tap0901'' zu suchen,
