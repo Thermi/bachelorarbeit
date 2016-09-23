@@ -34,6 +34,15 @@ Die Software ist multithreaded und in objektorientiertem C geschrieben.
 Die Grundlage wurde von Martin Willi und Jan Hutter in ihrer Diplomarbeit im Jahr 2005 gelegt\footcite[][]{jan_hutter_strongswan_2005}.
 ''strongSwan'' wird unter anderem von der secunet AG in den SINA-Boxen für Hochsichere Anwendungen, Alcatel-Lucent, Astaro und
 der US-Regierung genutzt.\footcite[][Folie 8]{andreas_steffen_strongswan_2011}
+Der strongSwan-Quellcode wird unter der GPLv2 veröffentlicht. Kunden des strongSwan-Projekts können
+den Quellcode unter einer anderen Lizenz beziehen.
+
+Um Code zu den Kernbibliotheken oder den verschiedenen Programmen des Projekts beizutragen,
+muss dieser unter der MIT-X11-Lizenz beigetragen werden.
+Dies ist erforderlich, damit der Quellcode in das Projekt integriert werden kann,
+das Projekt gegebenenfalls zur GPLv3 wechseln kann und um es den Entwicklern überhaupt
+zu ermöglichen, den Quellcode unter einer anderen Lizenz weiterzugeben\footcite[][Contributing]{_contributions_2014}.
+
 \subsubsection{charon}
 ''charon'' ist der Daemon, der in der Diplomarbeit\footcite[][]{jan_hutter_strongswan_2005} entwickelt wurde.
 Er arbeitet parallel und wurde in objektorientiertem C geschrieben, so wie die Software Xine.
@@ -86,6 +95,7 @@ des Betriebssystems auf.
 \paragraph{OpenVPN TAP-Treiber}
 Der OpenVPN-Tap-Treiber ist unter den Namen ''TAP-Windows'' bekannt und wurde von
 OpenVPN Technologies, Inc. für den Einsatz mit OpenVPN entwickelt.
+Er steht unter der GPLv2.
 Der Treiber stellt unter Windows ein Ethernet-Gerät dar, inklusive Kollisionsdomäne.
 Dies ist für dein Einsatz mit \ac{IPsec} etwas unbeholfen, da \ac{IPsec} \ac{IP}-Pakete
 überträgt und keine Ethernet-Rahmen.
@@ -104,7 +114,17 @@ und bei der Erstellung des Adapters initialisiert wird. Die MAC-Adresse kann
 auch über die Registry verändert werden.
 
 Um mit dem virtuellen Adapter kommunizieren zu können, wird ein Handle mit dem Gerät
-geöffnet, über das dann asynchron gelesen und geschrieben werden kann.
+geöffnet, über das dann asynchron gelesen und geschrieben werden kann. Des weiteren kann
+das Gerät über das Handle mittels IoCtl konfiguriert werden.
+
+Im September 2016 wurde eine Anfrage an OpenVPN Technologies, Inc. gestellt, ob die Headerdatei für die IoCtl-Werte und die verschiedenen Pfade,
+um das Handle für das Gerät öffnen können, unter die MIT-X11-Lizenz gestellt werden könnte.
+Der Grund dafür ist, dass geistiges Eigentum, das unter der GPL-Lizenz ist, nicht in ein Projekt unter
+der MIT-X11-Lizenz integriert werden kann, da die MIT-X11-Lizenz freier ist als die GPL-Lizenz.
+Die Anfrage wurde am 18. September 2016 auf dem Hackathon von OpenVPN diskutiert
+und von James Yonan, dem Mitbegründer von OpenVPN Technologies, Inc. und Verantwortlichen
+für den Quellcode des TAP-Windows6-Treibers ist, hat ihr entsprochen.
+Bei Abgabe der \æc{BA} war eine entsprechend lizensierte Version der Header-Datei noch nicht verfügbar.
 
 \paragraph{Betriebsmodi}
 Der TAP-Treiber beherrscht drei verschiedene Betriebsmodi für verschiedene Zwecke.
