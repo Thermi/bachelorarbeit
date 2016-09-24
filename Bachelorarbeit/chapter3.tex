@@ -1075,6 +1075,82 @@ ARP requests auf dem TUN-Adapter beantwortet werden und ob das Paket auf dem
 anderen Endpunkt auftaucht. Des weiteren werden die Traffic-Counter der \acp{SA} überprüft,
 um zu überprüfen, ob die Pakete jemals verarbeitet wurden.
 
+\subsection{Leistung}
+
+Die Leistung der Implementierung wurde mittels einer Verbindung vom Gast zum Host der Testplattform ermittelt.
+Hierbei wurden die folgenden Konfigurationen genutzt:
+\begin{lstlisting}[label=lst:speedtest-initiator-config,caption=Initiator-Konfiguration für den Geschwindigkeitstest]
+connections {
+        speedtest {
+                version = 2
+                fragmentation = yes
+                remote_addrs = 192.168.178.43
+                mobike = yes
+                proposals = aes256gcm16-prfsha256-modp4096
+                vips = 0.0.0.0
+                local {
+                        auth = psk
+                        id = speedtest
+                }
+                remote {
+                        auth = psk
+                }
+                children {
+                        speedtest-child {
+                                esp_proposals = null-sha1
+                                remote_ts = 172.17.0.1
+                        }
+                }
+
+        }
+}
+
+secrets {
+        ike-speedtest {
+                secret = speedtest
+                id = 192.168.178.43
+        }
+}
+\end{lstlisting}
+\begin{lstlisting}[label=lst:speedtest-responder-config,caption=Responder-Konfiguration für den Geschwindigkeitstest]
+connections {
+        speedtest {
+                version = 2
+                fragmentation = yes
+                mobike = yes
+                proposals = aes256gcm16-prfsha256-modp4096
+                pools = alpha
+                local {
+                        auth = psk
+                }
+                remote {
+                        auth = psk
+                        id = speedtest
+                }
+                children {
+                        speedtest-child {
+                                esp_proposals = null-sha1
+                                local_ts = 172.17.0.1
+                        }
+                }
+                
+        }
+}
+
+pools {
+        alpha {
+                addrs = 172.16.16.1-172.16.16.10
+        }
+}
+secrets {
+        ike-speedtest {
+                secret = speedtest
+                id = speedtest
+        }
+}
+
+\end{lstlisting}
+
 \subsection{Notwendige Features für Nutzung als RW auf Windows}
 Um strongSwan als \ac{RW} auf Windows benutzbar zu machen werden neben dem Implementieren
 der Unterstützung von TAP-Geräten unter anderem die Unterstützung der Installation von DNS-Resolvereinträgen
