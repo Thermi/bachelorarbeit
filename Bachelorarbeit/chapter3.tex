@@ -165,7 +165,6 @@ sondern unter der MIT-Lizenz. Das wurde getan, um die Änderungen ins Projekt ei
 
 #endif /* WIN32_H */
 \end{lstlisting}
-\pagebreak
 Die Headerdatei ''win32.h'' definiert verschiedene Makros für die Kommunikation mit und Konfiguration
 des TAP-Windows6-Treibers.
 
@@ -176,11 +175,25 @@ valide TAP-Geräte unter den Netzwerkverbindungen zu finden. Dabei wird der Stri
 Die existierenden Netzwerkadapter können unter {HKEY\_LOCAL\_MACHINE\linebreak
 \textbackslash{}SYSTEM\textbackslash{}CurrentControlSet\textbackslash{}Control
 \textbackslash{}Class\textbackslash{}\{4D36E972-E325-11CE-BFC1-08002BE10318\} gefunden werden.
-\begin{figure}
+
+\begin{figure}[!h]
 \caption{Registry-Eintrag über ein TAP-Gerät}
 \label{fig:registry-tap-device}
 \includegraphics[width=\textwidth]{Windows-Registry-TAP-Device.png}
 \end{figure}
+
+In~\autoref{fig:registry-tap-device} sind die verschiedenen Einträge eines Geräts unter
+dem oben genannten Pfad zu sehen beispielhaft an einem TAP-Gerät zu sehen. Das TAP-Gerät
+wurde mit dem TAP-Windows6-Treiber erstellt.
+
+\begin{figure}[!h]
+\caption{Netzwerkverwaltung eines TAP-Geräts}
+\label{fig:networkmanager-extended}
+\includegraphics{Windows-NetworkManager-Extended.png}
+\end{figure}
+
+In~\autoref{fig:networkmanager-extended} sind die vom Benutzer konfigurierbaren Optionen zu sehen.
+Sie werden als Werte in der Registry gespeichert und können auch dort verändert werden.
 
 Die Makros USERMODEDEVICEDIR und TAP\_WIN\_SUFFIX werden zusammen mit der GUID des Geräts
 genutzt, um ein Handle im Geräteverzeichnis zu erstellen. Der sich daraus ergebende Pfad
@@ -188,7 +201,8 @@ wird genutzt, um ein Handle zu erstellen, welches der TAP-Windows6-Treiber nutzt
 mit dem Programm im Userspace zu kommunizieren und umgekehrt.
 
 Die Definitionen, die mit TAP\_WIN\_IOCTL beginnen definieren die Werte, die mit
-IoCtl benutzt werden können, um das TAP-Gerät zu konfigurieren.
+IoCtl benutzt werden können, um das TAP-Gerät zu konfigurieren. Details über die verschiedenen
+Werte sind in~\autoref{fig:tap-ioctls} zu finden.
 
 
 \subsubsection{kernel-libipsec}
