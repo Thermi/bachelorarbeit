@@ -127,7 +127,6 @@ sondern unter der MIT-Lizenz. Das wurde getan, um die Änderungen ins Projekt ei
 #define TAP_WIN_COMPONENT_ID "tap0901"
 
 #define ADAPTER_KEY "SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}"
-#define NETWORK_CONNECTIONS_KEY "SYSTEM\\CurrentControlSet\\Control\\Network\\{4D36E972-E325-11CE-BFC1-08002BE10318}"
 
 /*
  * ======================
@@ -136,8 +135,6 @@ sondern unter der MIT-Lizenz. Das wurde getan, um die Änderungen ins Projekt ei
  */
 
 #define USERMODEDEVICEDIR "\\\\.\\Global\\"
-#define SYSDEVICEDIR      "\\Device\\"
-#define USERDEVICEDIR     "\\DosDevices\\Global\\"
 #define TAP_WIN_SUFFIX    ".tap"
 
 /*
@@ -168,8 +165,31 @@ sondern unter der MIT-Lizenz. Das wurde getan, um die Änderungen ins Projekt ei
 
 #endif /* WIN32_H */
 \end{lstlisting}
-Die Headerdatei ''win32.h'' definiert verschiedene Markso für die Kommunikation und Konfiguration
+\pagebreak
+Die Headerdatei ''win32.h'' definiert verschiedene Makros für die Kommunikation mit und Konfiguration
 des TAP-Windows6-Treibers.
+
+Das Makro ''TAP\_WIN\_COMPONENT\_ID'' mit Wert 'tap0901'' wird genutzt, um in der Registry
+valide TAP-Geräte unter den Netzwerkverbindungen zu finden. Dabei wird der String-Wert ''ComponentId''
+überprüft. Wenn sein Inhalt ''tap0901'' ist, dann ist das Gerät ein valides TAP-Gerät.
+
+Die existierenden Netzwerkadapter können unter {HKEY\_LOCAL\_MACHINE\linebreak
+\textbackslash{}SYSTEM\textbackslash{}CurrentControlSet\textbackslash{}Control
+\textbackslash{}Class\textbackslash{}\{4D36E972-E325-11CE-BFC1-08002BE10318\} gefunden werden.
+\begin{figure}
+\caption{Registry-Eintrag über ein TAP-Gerät}
+\label{fig:registry-tap-device}
+\includegraphics[width=\textwidth]{Windows-Registry-TAP-Device.png}
+\end{figure}
+
+Die Makros USERMODEDEVICEDIR und TAP_WIN_SUFFIX werden zusammen mit der GUID des Geräts
+genutzt, um ein Handle im Geräteverzeichnis zu erstellen. Der sich daraus ergebende Pfad
+wird genutzt, um ein Handle zu erstellen, welches der TAP-Windows6-Treiber nutzt, um
+mit dem Programm im Userspace zu kommunizieren und umgekehrt.
+
+Die Definitionen, die mit TAP\_WIN\_IOCTL beginnen definieren die Werte, die mit
+IoCtl benutzt werden können, um das TAP-Gerät zu konfigurieren.
+
 
 \subsubsection{kernel-libipsec}
 Die primäre Aufgabe hier war die Installation der Routen in ''kernel\_libipsec\_ipsec.c''
