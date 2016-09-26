@@ -1078,6 +1078,13 @@ um zu überprüfen, ob die Pakete jemals verarbeitet wurden.
 \subsection{Leistung}
 
 Die Leistung der Implementierung wurde mittels einer Verbindung vom Gast zum Host der Testplattform ermittelt.
+Als Testumgebung wurde eine Virtualbox-\ac{VM} genutzt, die auf einem Computer
+mit einem Intel(R) Core(TM) i7-3820 CPU ausgerüstet ist. Diese \ac{CPU} hat vier Kerne.
+Die verschiedenen Prozesse wurden nicht auf bestimmte Kerne gepinnt. Der \ac{CPU}-Governor
+wurde in den Performance-Modus gestellt. Die Messpunkte
+wurden mittels einer simplen Software in \texttt{Python 2.7.12} ermittelt, die im Abstand
+von einer Sekunde die CPU-Auslastung der Kerne ermittelt.
+
 Hierbei wurden die folgenden Konfigurationen genutzt:
 \begin{lstlisting}[label=lst:speedtest-initiator-config,caption=Initiator-Konfiguration für den Geschwindigkeitstest]
 connections {
@@ -1136,7 +1143,7 @@ connections {
                                 local_ts = 172.17.0.1
                         }
                 }
-
+                
         }
 }
 
@@ -1149,6 +1156,7 @@ secrets {
         ike-speedtest {
                 secret = speedtest
                 id = speedtest-initiator
+                id = speedtest-responder
         }
 }
 \end{lstlisting}
@@ -1157,11 +1165,18 @@ Die CHILD\_SA wird vom Initiator mithilfe von \texttt{swanctl} aufgebaut. Das Ko
 ist in~\autoref{lst:swanctl-speedtest} sichtbar.
 \begin{lstlisting}[label=lst:swanctl-speedtest,caption=Kommando für den Tunnelaufbau des Geschwindigkeitstests]
 swanctl -i --child speedtest-child
-\end{lstlisting} 
+\end{lstlisting}
 
 \begin{lstlisting}[label=lst:speedtest-host-iperf-server,caption=Kommando für den Start des iperf-Servers]
-iperf -s
+iperf3 -f m -s 
 \end{lstlisting}
+
+\begin{lstlisting}[label=lst:speedtest-guest-iperf-client,caption=Kommando für den Start des iperf-Clients]
+iperf3 -t 60 -c 172.17.0.1
+\end{lstlisting}
+Der \texttt{iperf3}-Server wurde mit dem Kommando aus~\autoref{lst:speedtest-host-iperf-server}
+gestartet und der Client mit dem Kommando aus~\autoref{lst:speedtest-guest-iperf-client}.
+
 
 Damit das Routing auf dem Initiator korrekt funktioniert, wurde ihm mittels eines pools
 und \texttt{Config Mode} eine ''virtuelle'' \ac{IP}-Adresse zugewiesen. Dies war und ist
@@ -1175,7 +1190,8 @@ Auf dem Linux-Host wurde \texttt{iperf3} in Version \texttt{3.1.3} von einem Arc
 
 Der \texttt{iperf3}-Server wurde auf dem Host in einer Bash-Shell mittels
 dem Befehl in~\autoref{lst:speedtest-host-iperf-server} gestartet.
-
+\begin{figure}[h!]
+\caption{Statistik über iperf3-Leistung durch den Tunnel}
 \begin{tikzpicture}
 \pgfplotstableread{benchmark_guest.txt}\benchmarkguest
 \pgfplotstableread{iperf_server_normalized.txt}\benchmarkthroughput
@@ -1196,7 +1212,7 @@ legend entries={Gast-CPU 0, Gast-CPU-2, Gast-CPU-3}
 \begin{axis}[
 hide x axis,
 axis y line*=right,
-ylabel={Durchsatz in KiloBit pro Sekunde},
+ylabel={Durchsatz in MegaBit pro Sekunde},
 legend entries={Durchsatz von iperf3},
 legend pos=south west,
 width=\textwidth,
@@ -1205,25 +1221,63 @@ height=\textwidth
 \addplot [draw=green] table[x=time,y=throughput] {\benchmarkthroughput};
 \end{axis}
 \end{tikzpicture}
+\label{fig:iperf-statistics}
+\end{figure}
+
+In~\autoref{fig:iperf-statistics} wurde der Durchsatz einer \texttt{iperf3}-Messung
+durch den konfigurierten Tunnel dargestellt.
+
+Die Leistung des TAP-Adapters scheint auf etwa 60 MegaBit pro Sekunde beschränkt zu sein.
+Dies ist hier jedoch nicht einer möglichen schlechte Implementierung der IO-Operationen in charon
+geschuldet, sondern dem TAP-Windows6-Treiber selbst. Es ist seit langem bekannt, dass die
+Leistung des Treibers sehr schlecht ist\footcite[][]{_openvpn_2015}.
+Es fällt auf, dass die \ac{CPU}-Last nie auf 100\%, sondern nur auf 90\%
+steigt und die erste CPU des Gasts in der Mitte des Tests eine relativ geringe Auslastung von
+70\% bis 40\% erfährt.
+
 \subsection{Notwendige Features für Nutzung als RW auf Windows}
-Um strongSwan als \ac{RW} auf Windows benutzbar zu machen werden neben dem Implementieren
-der Unterstützung von TAP-Geräten unter anderem die Unterstützung der Installation von DNS-Resolvereinträgen
-benötigt, da in der Regel interne DNS-Server an die \acp{RW} über Config Mode oder \acp{CP}
-gesendet werden, die sie nutzen sollen.
 
-Des weiteren wird eine Möglichkeit benötigt, um über \ac{VICI} nach Daten für dynamisch auftretende
-Passwortaufforderungen, die bei der Authentifizierung mittels XAUTH oder EAP auftreten können,
-zu fragen. Dies wird für die vollständige Unterstützen von \ac{MFA} benötigt.
+\paragraph{DNS-Resolver}
+Um DNS-Server installieren zu können, muss die Unterstützung dafür noch implementiert werden.
+DNS-Einträge werden in IKE mittels \texttt{Config Mode} oder \ac{CP} an den Initiator übertragen
+und dort konfiguriert.
+\paragraph{Windows 10}
+Windows verwaltet die DNS-Resolvereinträge für jede Schnittstelle einzeln, statt
+global in einer Datei. Seit Windows 10 wird jeder konfigurierte Resolver nach einem Namen
+gefragt und die schnellste Antwort wird genutzt. Das ist gefährlich, da in VPNs 
+zu Unternehmensnetzen für gewöhnlich private DNS-Zonen für die Adressierung
+von Computern im Unternehmensnetzwerken genutzt werden. Ein Angreifer kann
+den Verkehr zwischen dem Host und dem DNS-Resolver in einem unprivilegierten
+Netzwerk abhören und so in Erfahrung bringen mit welchen internen Hosts kommuniziert wird.
+Des weiteren kann er diese Anfragen beantworten und die Race-Condition zwischen den
+Resolvern versuchen zu gewinnen, um den Verkehr zum Rechner umzuleiten und
+den Host so anzugreifen. Dies kann unter Windows mittels Firewallregeln
+verhindert werden, die mittels \ac{WFP} verwaltet werden.
 
-Auf Windows benutzt das Tool ''swanctl'', welches dort zum Kontrollieren des Daemons
-genutzt wird, eine TCP-Verbindung über 127.0.0.1:4502 um mit dem Daemon zu kommunizieren.
-Dies ist im Vergleich zur Implementierung auf anderen Plattformen unsicher, da dort
-UNIX-Sockets genutzt werden, die standardmäßig aufgrund der \acp{ACL} abgesichert werden
-und nur ''root'' auf den Socket zugreifen kann. Der Wiki-Artikel macht auf die Unsicherheit
-des \ac{VICI}-Protokolls, welches zwischen ''swanctl'' und ''charon'' gesprochen wird, besonders aufmerksam.
+\paragraph{Authentifizierung für VICI}
+In die \ac{VICI}-\ac{API} von charon ist keine Authentifizierung integriert.
+Auf Windows wird die \ac{VICI}-\ac{API} über einen TCP-Socket genutzt, der auf Port 4502
+horcht. charon bindet den Dienst dabei an die \ac{IP}-Adresse \texttt{127.0.0.1}.
+Damit ist der Dienst für alle lokalen Anwendungen erreichbar und jedes Programm
+kann charon konfigurieren und kontrollieren.
+Um dem vorzubeugen müsste eine Authentifizierungsschicht in \ac{VICI} implementiert werden.
+Unter Linux/UNIX macht charon die \ac{VICI}-\ac{API} nur über einen Unix-Socket
+zugänglich, welcher mittels den konfigurierten Zugriffsrechten standardmäßig
+nur für den ''root''-Benutzer zugänglich ist. Die Anwendungen, die als ''root''-Benutzer
+ausgeführt werden, sind in der Regel ausgewählt und vertrauenswürdig.  Wenn eine Anwendung
+als ''root''-Benutzer ausgeführt wird, hat sie in der Regel, wenn keine weiteren Sicherheitsmaßnahmen getroffen
+wurden, bereits Zugriff auf alle Systemfunktionen und kann beliebige Aktionen im System ausführen.
+Der Wiki-Artikel über \ac{VICI} zeigt die Unsicherheit des \ac{VICI}-Protokolls auf.
 \begin{quote}
 The VICI protocol runs over a reliable transport protocol. As the protocol itself currently does not provide any security or authentication properties, it is recommended to run it over a UNIX socket with appropriate permissions.
 \end{quote}\cite[][]{_vici_2016}
+\paragraph{Dynamische Authentifizierungsaufforderungen}
+Charon beherrscht noch keine Weitergabe von Authentifizierungsaufforderungen,
+die über XAUTH oder EAP empfangen werden und nach mehreren Strings fragen.
+Ein solches Szenario ist die Authentifizierung mittels einer PIN und eines Passworts.
+charon kann im Moment nur einen einzelnen String über XAUTH oder EAP übertragen.
+Ein weiteres Problem ist, dass eine PIN, die zum Konfigurationszeitpunkt
+eingegeben wird, nicht zwingend zum Authentifizierungszeitpunkt gültig ist.
 
 \subsection{Probleme}
 Während der \ac{BA} wurden mehrere Probleme identifiziert, die mit unbekanntem
