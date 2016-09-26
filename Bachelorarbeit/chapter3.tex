@@ -1090,10 +1090,11 @@ connections {
                 vips = 0.0.0.0
                 local {
                         auth = psk
-                        id = speedtest
+                        id = speedtest-initiator
                 }
                 remote {
                         auth = psk
+                        id = speedtest-responder
                 }
                 children {
                         speedtest-child {
@@ -1108,7 +1109,8 @@ connections {
 secrets {
         ike-speedtest {
                 secret = speedtest
-                id = 192.168.178.43
+                id = speedtest-responder
+                id = speedtest-initiator
         }
 }
 \end{lstlisting}
@@ -1122,10 +1124,11 @@ connections {
                 pools = alpha
                 local {
                         auth = psk
+                        id = speedtest-responder
                 }
                 remote {
                         auth = psk
-                        id = speedtest
+                        id = speedtest-initiator
                 }
                 children {
                         speedtest-child {
@@ -1133,7 +1136,7 @@ connections {
                                 local_ts = 172.17.0.1
                         }
                 }
-                
+
         }
 }
 
@@ -1145,12 +1148,63 @@ pools {
 secrets {
         ike-speedtest {
                 secret = speedtest
-                id = speedtest
+                id = speedtest-initiator
         }
 }
-
 \end{lstlisting}
 
+Die CHILD\_SA wird vom Initiator mithilfe von \texttt{swanctl} aufgebaut. Das Kommando
+ist in~\autoref{lst:swanctl-speedtest} sichtbar.
+\begin{lstlisting}[label=lst:swanctl-speedtest,caption=Kommando für den Tunnelaufbau des Geschwindigkeitstests]
+swanctl -i --child speedtest-child
+\end{lstlisting} 
+
+\begin{lstlisting}[label=lst:speedtest-host-iperf-server,caption=Kommando für den Start des iperf-Servers]
+iperf -s
+\end{lstlisting}
+
+Damit das Routing auf dem Initiator korrekt funktioniert, wurde ihm mittels eines pools
+und \texttt{Config Mode} eine ''virtuelle'' \ac{IP}-Adresse zugewiesen. Dies war und ist
+nötig, damit die \acp{SP} auf dem Initiator installiert werden können.
+Die IP \texttt{172.17.0.1} ist eine lokale IP auf dem resolver. Sie wurde als
+einer der Teilnehmer beim Geschwindigkeitstest genutzt. 
+Als Software wurde \texttt{iperf3} in Version \texttt{3.1.3} genutzt.
+Die Binärdatei für den Windows-Gast wurde von \url{https://iperf.fr/iperf-download.php} bezogen.
+Auf dem Linux-Host wurde \texttt{iperf3} in Version \texttt{3.1.3} von einem Archlinux-Mirrorserver mittels
+\texttt{pacman} bezogen.
+
+Der \texttt{iperf3}-Server wurde auf dem Host in einer Bash-Shell mittels
+dem Befehl in~\autoref{lst:speedtest-host-iperf-server} gestartet.
+
+\begin{tikzpicture}
+\pgfplotstableread{benchmark_guest.txt}\benchmarkguest
+\pgfplotstableread{iperf_server_normalized.txt}\benchmarkthroughput
+\begin{axis}[
+title=CPU-Last und Durchsatz bezogen auf Zeit,
+xlabel={Zeit in Sekunden seit Start der Messung},
+ylabel={CPU-Last in Prozent},
+legend pos=south east,
+width=\textwidth,
+height=\textwidth,
+legend entries={Gast-CPU 0, Gast-CPU-2, Gast-CPU-3}
+]
+
+\addplot table[x=time,y=cpu0] {\benchmarkguest};
+\addplot table[x=time,y=cpu1] {\benchmarkguest};
+\addplot table[x=time,y=cpu2] {\benchmarkguest};
+\end{axis}
+\begin{axis}[
+hide x axis,
+axis y line*=right,
+ylabel={Durchsatz in KiloBit pro Sekunde},
+legend entries={Durchsatz von iperf3},
+legend pos=south west,
+width=\textwidth,
+height=\textwidth
+]
+\addplot [draw=green] table[x=time,y=throughput] {\benchmarkthroughput};
+\end{axis}
+\end{tikzpicture}
 \subsection{Notwendige Features für Nutzung als RW auf Windows}
 Um strongSwan als \ac{RW} auf Windows benutzbar zu machen werden neben dem Implementieren
 der Unterstützung von TAP-Geräten unter anderem die Unterstützung der Installation von DNS-Resolvereinträgen
