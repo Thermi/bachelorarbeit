@@ -305,6 +305,30 @@ und das Event zurückgesetzt, sowie der Puffer mit Nullen initialisiert und die 
 Danach wird ein neuer Lesevorgang auf dem oder den Handles gestartet, deren Leseoperationen
 fertig sind.
 
+\begin{figure}[h!]
+\begin{bytefield}[boxformatting={\centering\itshape},
+bitwidth=2em,
+endianness=big,
+bitheight=6ex
+]{15}
+\\
+\\
+\\
+\bitlabel{5}{Notification-Event} &
+\bitlabel{5}{this->tun} &
+\bitlabel{5}{Restliche Geräte} \\
+\begin{leftwordgroup}{event\_array}
+\bitbox{5}{this->event}
+\bitbox{5}{Event für this->tun}
+\bitbox{5}{\dots} 
+\end{leftwordgroup} \\
+\begin{leftwordgroup}{bundle\_array}
+\bitbox{5}{dummy-Struct}
+\bitbox{5}{Struct für this->tun}
+\bitbox{5}{\dots}
+\end{leftwordgroup} \\
+\end{bytefield}
+\end{figure}
 Der Code auf Seite \pageref{lst:handle-plain-windows} zeigt die Implementierung von handle\_plain()
 auf Windows. Die Funktionen zum Starten von asynchronen Leseoperationen auf Handles
 wurden in start\_read() abgekapselt. Das Übersetzen von Fehlercodes in menschenlesbare
@@ -797,6 +821,8 @@ Die Klasse für TUN-Geräte musste für Windows angepasst werden.
 Spezifisch mussten neue Funktionen zum Lesen und Schreiben implementiert werden,
 sowie Attribute geändert werden.
 Auf Windows wird ein Objekt vom Typ \texttt{HANDLE} genutzt, statt eines \ac{FD}.
+Das \texttt{HANDLE} wird dabei von der Funktoon \texttt{init\_tun()} gesetzt,
+welche beim Instanzieren der Klasse im Konstruktur aufgerufen wird.
 
 \begin{lstlisting}[caption=Code für das Erstellen von tun\_device\_t,label=lst:tun_device_t_create]
 tun_device_t *tun_device_create(const char *name_tmpl)
