@@ -107,3 +107,15 @@
 }
 
 % end of utility code for nice handling of SVG files
+
+% start of the code for nice labels above bitboxes in bytefield
+
+\newcommand{\bitlabel}[2]{%
+    \bitbox[]{#1}{%
+        \raisebox{0pt}[4ex][0pt]{%
+            \turnbox{45}{\fontsize{7}{7}\selectfont#2}%
+        }%
+    }%
+}
+
+% end of the code for nice labels above bitboxes in bytefield
