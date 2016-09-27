@@ -270,16 +270,94 @@ Dies wird im Diagramm \autoref{fig:WaitForMultipleObjects}
 und \autoref{fig:WaitForMultipleObjects2} hervor. Diese Diagramme haben weitaus
 mehr Zustände als \autoref{fig:poll_fd}. 
 
-Der Code für  die Implementierung von handle\_plain() auf Windows ist auf~\pageref{lst:handle-plain-windows}
-zu sehen. Der Code für die Implementierung auf Windows ist 239 Zeilen lang, was
-deutlich mehr ist als bei anderen Funktionen. Das liegt daran, dass die Initialisierung
-der Strukturen relativ aufwendig ist und mehrfach durchgeführt werden muss.
+Der Code für die Implementierung von \texttt{handle\_plain} auf Windows ist 239 Zeilen lang.
+Daher wurde darauf verzichtet, sie hier in den Text zu kopieren. Stattdessen ist sie
+im Appendix auf Seite~\pageref{lst:handle-plain-windows} zu finden.
+
 Die Funktionen zum Starten von asynchronen Leseoperationen auf Handles
-wurden in start\_read() ausgelagert und das Übersetzen von Fehlercodes in menschenlesbare
-Texte in format\_error(). Bei Fehlern beim Lesen startet sich der Job
+wurden in \texttt{start\_read()} ausgelagert und das Übersetzen von Fehlercodes in menschenlesbare
+Texte in \texttt{format\_error()}. Bei Fehlern beim Lesen startet sich der Job
 mit JOB\_REQUEUE\_FAIR neu, sodass der Job als letzter vom Job-Manager in \texttt{charon} neugestartet wird,
 wenn hoffentlich der Fehler nicht erneut auftritt.
 
+Die Funktion \texttt{start\_read()} ist in~\autoref{lst:start_read} abgebildet.
+Sie startet eine asynchrone Leseoperationen mit dem übergebenen \texttt{handle\_overlapped\_buffer\_t}-Objekt
+und überprüft den Rückgabewert von \texttt{ReadFile()}.
+
+\begin{lstlisting}[caption=Code von start\_read(),label=lst:start_read]
+/*
+ * Enqueue a Read operation on the given handle with the given struct
+ * @return: bool
+ */
+static BOOL start_read(handle_overlapped_buffer_t *structure, HANDLE event)
+{
+        DWORD error;
+        BOOL status;
+        /* Initialise read with the allocate overwrite structure */
+        status = ReadFile(structure->fileHandle, structure->buffer.ptr,
+                structure->buffer.len, NULL, structure->overlapped);
+        error = GetLastError();
+        if (status)
+        {
+            /* Read returned immediately */
+            /* We need to signal the event ourselves */
+            SetEvent(event);
+            return TRUE;
+        }
+        else
+        {
+
+            switch(error)
+            {
+                case ERROR_SUCCESS:
+                case ERROR_IO_PENDING:
+                {
+                    /* all fine */
+                    return TRUE;
+                    break;
+                }
+                default:
+                {
+                    /* Leave the NULL; here. Otherwise mingw64 complains about char *error_message = format_error(error); not being a label.*/
+                    char *error_message = format_error(error);
+                    DBG2(DBG_ESP, "Error %d.", format_error);
+                    free(error_message);
+                    return FALSE;
+                    break;
+                }
+            }
+
+        }
+}
+\end{lstlisting}
+
+Die Funktion \texttt{format\_error()} ist in~\autoref{lst:format_error} abgebildet
+und formatiert nur einen Fehler, der mit \texttt{GetLastError()}
+abgefragt wurde und ruft die entsprechende Fehlermeldung aus der Fehlerliste in Windows ab.
+Dabei wird die Fehlermeldung auf dem Heap allokiert und der Pointer auf sie
+an die aufrufende Anwendung zurückgegeben.
+
+\begin{lstlisting}[caption=Code für format\_error(),label=lst:format_error]
+/*
+ * Formats an error message based on error. Takes info from system.
+ * @return formatted error message
+ */
+static char* format_error(DWORD error)
+{
+            char *lpMsgBuf = NULL;
+            FormatMessage(
+                FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                error,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                (LPTSTR) &lpMsgBuf,
+                0,
+                NULL);
+            return lpMsgBuf;
+}
+
+\end{lstlisting}
 \begin{figure}[h!]
 \caption{Arrays aus handle\_plain}
 \begin{bytefield}[boxformatting={\centering\itshape},
@@ -344,8 +422,8 @@ dargestellt sind.
 
 Alle Strukturen vom Typ \texttt{handle\_overlapped\_buffer\_t} beinhalten jeweils ein Objekt
 vom Typ \texttt{HANDLE}, ein Objekt vom Typ \texttt{*OVERLAPPED} und ein Objekt vom Typ chunk\_t.
-Das Handle gehört zu einem TUN-Gerät, das \texttt{OVERLAPPED}-Objekt wird direkt für asynchrones
-IO benötigt und das Objekt vom Typ chunk\_t beinhaltet den Pufferspeicher und dessen Länge
+Das Handle gehört zu einem TUN-Gerät, das \texttt{OVERLAPPED}-Objekt wird für asynchrone
+IO-Operationen benötigt und das Objekt vom Typ chunk\_t beinhaltet den Pufferspeicher und dessen Länge
 für die asynchronen Lesevorgänge. Die Puffer und die \texttt{OVERLAPPED}-Objekte
 müssen während der Lesevorgänge in zugänglichen Speicherbereichen sein.
 
@@ -427,7 +505,7 @@ Routen mit einer Prefixlänge von 0 werden auf zwei Routen mit der Prefixlänge 
 Dies wird gemacht um die Standardroute, welche ebenfalls eine Metrik von 10 besitzt,
 nicht zu überschreiben.
 
-Die Implementierung von \ŧexttt{handle\_plain()} auf Windows unterstütz, wie die Implementierung
+Die Implementierung von \texttt{handle\_plain()} auf Windows unterstütz, wie die Implementierung
 auf Linux und UNIX das Multiplexen von IO von mehreren TUN-Adaptern. Der Grund dafür ist,
 dass verschiedene TUN-Implementierungen gegebenenfalls verschiedene Adapter für mehrere Tunnel
 benötigen. Mit dem TAP-Windows-Treiber ist dies zwar nicht der Fall, es wurde der Vollständigkeit
