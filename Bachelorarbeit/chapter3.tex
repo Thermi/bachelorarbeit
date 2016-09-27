@@ -1114,9 +1114,12 @@ mit einem Intel(R) Core(TM) i7-3820 CPU ausgerüstet ist. Diese \ac{CPU} hat vie
 Die verschiedenen Prozesse wurden nicht auf bestimmte Kerne gepinnt. Der \ac{CPU}-Governor
 wurde in den Performance-Modus gestellt. Die Messpunkte
 wurden mittels einer simplen Software in \texttt{Python 2.7.12} ermittelt, die im Abstand
-von einer Sekunde die CPU-Auslastung der Kerne ermittelt.
+von einer Sekunde die CPU-Auslastung der Kerne ermittelt. Für die Konfiguration des
+Initiators und des Responders wurden die Konfigurationen aus~\autoref{lst:speedtest-initiator-config}
+und~\autoref{lst:speedtest-responder-config} genutzt.
+Die Ciphersuite \texttt{null-sha1} wurde gewählt, um den Overhead bei der Verarbeitung
+der Pakete in \texttŧ{charon} zu minimieren.
 
-Hierbei wurden die folgenden Konfigurationen genutzt:
 \begin{lstlisting}[label=lst:speedtest-initiator-config,caption=Initiator-Konfiguration für den Geschwindigkeitstest]
 connections {
         speedtest {
