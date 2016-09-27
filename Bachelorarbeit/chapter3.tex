@@ -26,7 +26,7 @@ nicht unterstützt wurde.
 Weitere Punkte wurden nach dem ersten Kompilierungsversuch, sowie der Beobachtung
 des Verhaltens während dem Tunnelaufbau herausgefunden.
 
-Die Unterstützung für virtuelle IP-Adressen wurden aus dem Zweig ''windows-vip''
+Die Unterstützung für virtuelle IP-Adressen wurden aus dem Zweig \texttt{win-vip}
 vom strongSwan Git-Repository bezogen und angepasst. Der Großteil des Quellcodes
 stammt also von Martin Brunner, der diesen Code geschrieben hat. Der Code musste
 noch um die Beachtung eines Konfigurationswertes ergänzt werden.
@@ -63,7 +63,7 @@ mittels MinGW-W64 unterstützt wird.\footcite[][]{_windows_2015}
 
 \subsection{Bestehende Implementierung}
 Die bestehende Implementierung umfasst die eigentliche Bibliothek, eine Implementierung
-eines Kernel-Interface zwischen libipsec und ''charon'', sowie Code in libstrongswan
+eines Kernel-Interface zwischen libipsec und \texttt{charon}, sowie Code in libstrongswan
 um TUN-Geräte zu öffnen. Martin Willi hat 2014 bereits die gesamte Portierungsarbeit
 für version 5.2.0 von strongSwan gemacht. Der Port unterstützt Windows 7 / server 2008 R2
 und neuere Versionen von Microsoft Windows.
@@ -91,7 +91,7 @@ oder \ac{CP} empfangen wird auf dem ausgehenden Interface (Linux, Kernelspace pr
 was für die Kommunikation mit dem Peer genutzt wird,
 oder auf dem Loopback-Adapter (Windows).
 Um die IP-Adresse für TUN-Geräte korrekt zu setzen, nutzt libipsec den Parameter
-''charon.install\_virtual\_ip\_on'' von strongswan.conf, der während der Initialisierung
+\texttt{charon.install\_virtual\_ip\_on} von strongswan.conf, der während der Initialisierung
 des Plugins gesetzt wird.
 % route installation
 % queues
@@ -108,7 +108,7 @@ und eines \ac{IP}v6-Headers kopiert und die fehlenden Protokollkonstanten per Ha
 
 Ursprünglich wurden diese in ''src/libipsec/win32.h'' abgelegt und in ''src/libpsec/ip\_packet.h'' und ''src/libipsec/ip\_packet.c''
 inkludiert. Dabei wurden die Header aus den Headern des Kernels oder den Headenr der GNU LIBC kopiert.
-Als Name für das Ifdef-Guard wurde ''WINDOWS\_32\_PROTOCOL\_HEADERS'' gewählt. Ein Ifdef-Guard wird benötigt um das Reimportieren
+Als Name für das Ifdef-Guard wurde \texttt{WINDOWS\_32\_PROTOCOL\_HEADERS} gewählt. Ein Ifdef-Guard wird benötigt um das Reimportieren
 von Header-Dateien in C zu unterbinden. Wenn eine Header-Datei erneut importiert wird,
 dann führt das dazu, dass die Kompilierung abbricht, da eine Variable redefiniert wird.
 Die Redefinierung einer Variable produziert in C eine Warnung oder einen Fehler.
@@ -168,8 +168,8 @@ sondern unter der MIT-Lizenz. Das wurde getan, um die Änderungen ins Projekt ei
 Die Headerdatei ''win32.h'' definiert verschiedene Makros für die Kommunikation mit und Konfiguration
 des TAP-Windows6-Treibers.
 
-Das Makro ''TAP\_WIN\_COMPONENT\_ID'' mit Wert 'tap0901'' wird genutzt, um in der Registry
-valide TAP-Geräte unter den Netzwerkverbindungen zu finden. Dabei wird der String-Wert ''ComponentId''
+Das Makro \texttt{TAP\_WIN\_COMPONENT\_ID} mit Wert 'tap0901'' wird genutzt, um in der Registry
+valide TAP-Geräte unter den Netzwerkverbindungen zu finden. Dabei wird der String-Wert \texttt{ComponentId}
 überprüft. Wenn sein Inhalt ''tap0901'' ist, dann ist das Gerät ein valides TAP-Gerät.
 
 Die existierenden Netzwerkadapter können unter {HKEY\_LOCAL\_MACHINE\linebreak
@@ -206,11 +206,11 @@ Werte sind in~\autoref{fig:tap-ioctls} zu finden.
 
 
 \subsubsection{kernel-libipsec}
-Die primäre Aufgabe hier war die Installation der Routen in ''kernel\_libipsec\_ipsec.c''
+Die primäre Aufgabe hier war die Installation der Routen in \texttt{kernel\_libipsec\_ipsec.c}
 für Windows anzupassen, da hier ein Gateway verwendet wird auf einem TAP-Gerät
 statt ein echtes TUN-Gerät, sowie die Anpassung des Codes für die Ein- und Ausgabe 
 und einige Methoden in
-''kernel\_libipsec\_router.c'', da das Multiplexen der Handles, sowie die Benachrichtigung
+\texttt{kernel\_libipsec\_router.c} da das Multiplexen der Handles, sowie die Benachrichtigung
 von anderen Threads auf Windows anders abläuft als auf Linux und UNIX.
 
 \paragraph{Multiplexing}
@@ -259,10 +259,10 @@ dargestellt.
 
 
 Wie aus dem Diagramm hervorgeht, wird im Prinzip nur ein Array mit Strukturen des Typs
-''pollfd'' erstellt, dann mit einem Notification-\ac{FD} und den \acp{FD} der TUN-Geräte befüllt
-und als gewünschte Events ''POLLIN'' gesetzt. Das heißt, dass der Aufruf von poll() ohne
+\texttt{pollfd} erstellt, dann mit einem Notification-\ac{FD} und den \acp{FD} der TUN-Geräte befüllt
+und als gewünschte Events \texttt{POLLIN} gesetzt. Das heißt, dass der Aufruf von poll() ohne
 Fehler beendet wird, wenn Daten auf dem \acp{FD} zur Verfügung stehen.
-Danach wird poll() auf die ''pollfd''-Datenstruktur ausgeführt und analysiert,
+Danach wird poll() auf die \texttt{pollfd}-Datenstruktur ausgeführt und analysiert,
 auf welchen \acp{FD} Daten zur Verfügung stehen. Dieser Code ist relativ kurz im
 Vergleich zum Analogon mit WaitFor*Objects() Funktionen unter Windows.
 Dies geht aus den vergleichbaren Implementierungsmöglichkeiten, die sich aus den
@@ -282,16 +282,16 @@ da es schneller und effektiver ist.
 
 In handle\_plain werden zwei verschiedene Arrays benutzt.
 \begin{description}
-\item[bundle\_array] Ein Array aus Strukturen vom Typ ''handle\_overlapped\_buffer\_t''. 
+\item[bundle\_array] Ein Array aus Strukturen vom Typ \texttt{handle\_overlapped\_buffer\_t}. 
 \item[event\_array] Ein Array aus Events (HANDLE).
 \end{description}
 
-Strukturen vom Typ ''handle\_overlapped\_buffer\_t'' beinhalten jeweils ein Objekt
+Strukturen vom Typ \texttt{handle\_overlapped\_buffer\_t} beinhalten jeweils ein Objekt
 vom Typ HANDLE, ein Objekt vom Typ *OVERLAPPED und ein Objekt vom Typ chunk\_t.
 Das Handle gehört zu einem TUN-Handle, das OVERLAPPED-Objekt wird direkt für asynchrones
 IO benötigt und das Objekt vom Typ chunk\_t beinhaltet den Pufferspeicher und dessen Länge.
 
-Das ''event\_array'' Array zum Multiplexen mittels WaitForMultiplEvents() genutzt und
+Das \texttt{event\_array} Array zum Multiplexen mittels WaitForMultiplEvents() genutzt und
 beinhaltet die gleichen Events, wie die Strukturen des Typs OVERLAPPED.
 Bei der Ausführung von WaitForMultipleObjects() auf das Array wird darauf gewartet, dass
 eine vorher gestartete Leseoperation auf einem Handle fertig gestellt wird.
@@ -309,7 +309,7 @@ Der Code auf Seite \pageref{lst:handle-plain-windows} zeigt die Implementierung 
 auf Windows. Die Funktionen zum Starten von asynchronen Leseoperationen auf Handles
 wurden in start\_read() abgekapselt. Das Übersetzen von Fehlercodes in menschenlesbare
 Texte wurde in format\_error() abgekapselt. Bei Fehlern beim Lesen startet sich der Job
-mit JOB\_REQUEUE\_FAIR neu, sodass der Job als letzter vom Job-Manager in ''charon'' neugestartet wird,
+mit JOB\_REQUEUE\_FAIR neu, sodass der Job als letzter vom Job-Manager in \texttt{charon} neugestartet wird,
 wenn hoffentlich der Fehler nicht erneut auftritt.
 
 \begin{figure}
@@ -336,14 +336,14 @@ daher keine Kollisionsdomäne über das Gerät erreichbar ist. Daher ergibt es k
 Sinn das ''next hop''-Feld zu setzen.
 Auf Windows ist dies jedoch, wie zuvor erläutert, nicht der Fall, da der TAP-Windows-Treiber
 TUN-Geräte als Ethernet-Gerät emuliert.
-Der Struct ''route'' is vom Typ ''route\_entry\_t'' und wird in der Funktion
-''install\_route'' genutzt, um die zu installierende Route zu bestimmen.
+Der Struct \texttt{route} is vom Typ \texttt{route\_entry\_t} und wird in der Funktion
+\texttt{install\_route} genutzt, um die zu installierende Route zu bestimmen.
 Das Gateway-Feld wird genutzt, um das Next-Hop-Feld der Routen im Routing-Table
 zu setzen. 
 Der TAP-Windows6-Treiber nutzt für IPv6 einen statische IP addresse im link-local-Bereich
 der IPv6-Spezifikation.
 Für IPv4 lässt sich die IP-Adresse des Adapters implizit konfigurieren, wie zuvor erklärt.
-Das Object, welches mittels ''host\_create\_from\_string'' erstellt wird,
+Das Object, welches mittels \texttt{host\_create\_from\_string} erstellt wird,
 wird von der Funktion auf dem Heap abgelegt. Damit ist es auch nach dem Verlassen
 des Funktionsblocks noch valide. Es wird automatisch beim Zerstören des
 \texttt{route}-Objekts freigegeben.
@@ -414,10 +414,10 @@ OpenVPN, spezifisch in  der Datei ''src/openvpn/tun.c.''.
 
 \paragraph{TAP-Geräte erstellen}
 Das Erstellen von TAP-Geräten ist im Moment nicht unterstützt. Der Grund dafür ist,
-dass die Funktionalität von ''devcon.exe'' dafür nachgebaut werden müsste.
-Des weiteren ist der Quellcode von ''devcon.exe'' zwar verfügbar\footnote{\url{https://github.com/Microsoft/Windows-driver-samples/tree/master/setup/devcon}},
+dass die Funktionalität von \texttt{devcon.exe} dafür nachgebaut werden müsste.
+Des weiteren ist der Quellcode von \texttt{devcon.exe} zwar verfügbar\footnote{\url{https://github.com/Microsoft/Windows-driver-samples/tree/master/setup/devcon}},
 aber nur unter einer proprietären Lizenz von Microsoft, der MS-PL\footnote{\url{https://github.com/Microsoft/Windows-driver-samples/blob/master/LICENSE}},
-verfügbar. Eine Reimplementierung müsste Code aus dem Quellcode von ''devcon.exe'' nutzen,
+verfügbar. Eine Reimplementierung müsste Code aus dem Quellcode von \texttt{devcon.exe} nutzen,
 welcher dann auch unter der MS-PL stünde. Die Verbreitung des Codes wäre dann nicht möglich,
 da die MS-PL mit der GPL inkompatibel ist\footcite[][]{_gnu.org_2016}.
 Da der Code unter der MIT-Lizenz beim strongSwan-Projekt eingereicht werden muss
@@ -444,8 +444,8 @@ Der Code hierfür ist im Appendix unter \autoref{lst:get_tap_req} aufzufinden.
 \paragraph{TAP-Geräte öffnen}
 TAP-Geräte sind im Usermode über den Globalen Addressraum für Userspaceadapter
 unter ''\textbackslash{}\textbackslash{}.\textbackslash{}\textbackslash{}Global\textbackslash{}\textbackslash{}\$NetCfgInstanceId.tap'' erreichbar.
-''\$NetCfgInstanceId'' steht hierbei für die vorher mit ''get\_tap\_req()'' gefundenen
-''NetCfgInstanceId''-Werte der gefundenen TAP-Adapter.
+\texttt{\$NetCfgInstanceId} steht hierbei für die vorher mit \texttt{get\_tap\_req()} gefundenen
+\texttt{NetCfgInstanceId}-Werte der gefundenen TAP-Adapter.
 
 \begin{lstlisting}[numbers=none]
 CreateFile(device_path, GENERIC_READ \| GENERIC_WRITE, 0,
@@ -633,7 +633,7 @@ static bool init_tun(private_tun_device_t *this, const char *name_tmpl)
 \paragraph{Lesen und Schreiben vom Adapter}
 Beim Öffnen des Adapters wurde ein Handle erstellt.
 Durch asynchrone Lese- und Schreiboperationen mittels ReadFile() und WriteFile()
-unter Benutzung von ''OVERLAPPED''-Strukturen und Events lassen sich Pakete
+unter Benutzung von \texttt{OVERLAPPED}-Strukturen und Events lassen sich Pakete
 lesen und schreiben.
 
 \paragraph{tun\_device\_t}
@@ -723,15 +723,15 @@ nur das Handle des TAP-Geräts geschlossen werden.
 % komplexe Änderungen des Verhaltens von kernel-libipsec
 
 \subsubsection{kernel-iph}
-kernel-iph ist ein Plugin für ''charon'', das das Kernel-Interface
+kernel-iph ist ein Plugin für \texttt{charon}, das das Kernel-Interface
 für die Verwaltung von IP-Adressen und Routen implementiert.
 
 Ursprünglich war das Verwalten von IP-Adressen im Master-Zweig nicht implementiert.
-Eine vollständige Implementierung existiert im Zweig ''win-vip'', die in den Zweig 'windows-libipsec'
+Eine vollständige Implementierung existiert im Zweig \texttt{win-vip}, die in den Zweig 'windows-libipsec'
 gemerged wurde, um eine vollständige Implementierung dort zu erhalten.
 
-Nachgerüstet werden musste Code zum Beachten des ''charon.install\_virtual\_ip\_on'' Parameters
-der in der Datei ''strongswan.conf'' definiert werden kann und den libipsec nutzt um
+Nachgerüstet werden musste Code zum Beachten des \texttt{charon.install\_virtual\_ip\_on} Parameters
+der in der Datei \texttt{strongswan.conf} definiert werden kann und den libipsec nutzt um
 die Installation der empfangenen IP-Adresse(n) auf den richtigen Adapter zu erzwingen.
 Der Code kopiert den Adapternamen während der Initialisierung des Plugins, daher
 ändert ein Ändern des Parameters während der Laufzeit nicht die Schnittstelle,
@@ -929,7 +929,7 @@ Damit das WDK es findet, muss es in ''Eigene Zertifikate'' zu finden sein.
 \end{figure}
 
 Mit Windows im Testmodus kann der Treiber geladen werden und TAP-Geräte konnen
-mittels tapinstall.exe (Was eigentlich ''devcon.exe'' ist). Die Datei ist im Quellcode des
+mittels tapinstall.exe (Was eigentlich \texttt{devcon.exe} ist). Die Datei ist im Quellcode des
 Treibers nicht mitenthalten. Sie kann jedoch durch die Installation des Treiber-Pakets
 von der OpenVPN-Webseite erhalten werden. Nach der Installation des Pakets
 ist die Datei unter \textit{C:\textbackslash{}Program Files\textbackslash{}TAP-Windows\textbackslash{}bin\textbackslash{}tapinstall.exe}
@@ -939,7 +939,7 @@ Der erste Parameter ist ''install'' oder ''remove''. Der Pfad zur .inf-Datei
 über den Treiber muss beim Erstellen eines Geräts angegeben werden. Hier im Beispiel
 ist es die Datei, die mittels des Python-Skripts erstellt wurde. Bei der Installation
 dieses Treibers wird der kompilierte Treiber installiert, welcher sich unter 
-''C:\textbackslash{}Users\textbackslash{}Noel\textbackslash{}tap-driver\textbackslash{}dist\textbackslash{}amd64\textbackslash{}OemVista.inf''
+\texttt{C:\textbackslash{}Users\textbackslash{}Noel\textbackslash{}tap-driver\textbackslash{}dist\textbackslash{}amd64\textbackslash{}OemVista.inf}
 befindet.
 
 \begin{lstlisting}[caption=Erstellung eines TAP-Geraets]
@@ -1012,9 +1012,16 @@ Der komplette Patch ist auf der CD unter
 
 
 \subsection{Test des Codes}
-Zum Konfigurieren und Bauen des Quellcodes wurde der folgende Befehl verwendet.
-Im Testszenario wurde der Quellcode auf Linux für Windows 64-Bit cross kompiliert
+Zum Testen des Codes wurde er mit der implementierten TAP-Treiber-Unterstützung
+kompiliert und im Netzwerk getestet, sowie mit TravisCI in einer standardisierten
+Umgebung gebaut. Dabei werden verschiedene Standardkonfiguriatonen auf Linux und auf Mac OSX
+kompiliert, sowie von Linux auf Windows crosscompiled und überprüft, ob es
+Fehler während des Build-Vorgangs auftragen. TravisCI überprüft alle Builds
+auf Fehler und sendet eine Benachrichtigung aus, wenn der Build-Vorgang fehlgeschlagen ist.
+
+Im Testszenario für den Netzwerktest wurde der Quellcode auf Linux für Windows 64-Bit cross kompiliert
 und in einer \ac{VM} mit Windows 8.1 ausgeführt.
+
 Die gebauten Binärdateien wurden über ein geteiltes Verzeichnis der \ac{VM}
 zugänglich gemacht. Danach wurden sie in ''C:\textbackslash{}\textbackslash{}Users\textbackslash{}\textbackslash{}Thermi\textbackslash{}\textbackslash{}bin
 kopiert und in 'cmd' mit Administratorrechten ausgeführt. 
@@ -1036,19 +1043,18 @@ sowie das Zertifikat der Server-\ac{CA}.
 \label{fig:CA-Struktur}
 \end{figure}
 
-Die Datei ''this\_log'' wurde von der Logger-Konfiguration des Dienstes erstellt.
-Hierbei wurde zuerst ''charon-svc.exe''
+Die Datei \texttt{this\_log} wurde von der Logger-Konfiguration des Dienstes erstellt.
+Hierbei wurde zuerst \texttt{charon-svc.exe}
 in einem ersten Fenster ausgeführt. In einem zweiten Fenster wurde die Konfiguration geladen
-und der Tunnelaufbau mittels ''swanctl.exe'' gestartet. Hierbei wurden die folgenden
-Befehle verwendet: ''swanctl.exe --load-all'' und ''swanctl --i --child bar''.
-Nach dem Testen wurde der Tunnel, sollte ''charon-svc.exe'' nicht gecrasht sein, mit ''swanctl -t --ike foo''
+und der Tunnelaufbau mittels \texttt{swanctl.exe} gestartet. Hierbei wurden \texttt{swanctl.exe --load-all} und \texttt{swanctl --i --child bar}.
+Nach dem Testen wurde der Tunnel, sollte \texttt{charon-svc.exe} nicht gecrasht sein, mit \texttt{swanctl -t --ike foo}
 beendet, sodass keine virtuellen IP-Adressen oder Routen für den nächsten Test zurückbleiben.
 
-Wenn ''charon-svc.exe'' getötet wird, während ein Tunnel mit Routen und \ac{IP}-Adressen
+Wenn \texttt{charon-svc.exe} getötet wird, während ein Tunnel mit Routen und \ac{IP}-Adressen
 aufgebaut ist, so verbleiben IP-Adressen und Routen auf dem Adapter, was verhindern kann dass
 dieselben Routen und \ac{IP}-Adressen wieder installiert werden. Das führt dazu, dass der
 Aufbau der CHILD\_SA fehlschlägt und ein neuer Tunnel nicht aufgebaut werden kann.
-In diesem Fall müssen sie manuell über die Nutzung von ''route delete'' oder ''netsh''
+In diesem Fall müssen sie manuell über die Nutzung von \texttt{route delete}} oder \texttt{netsh}
 gelöscht werden oder Windows neu gestartet werden.
 
 OpenSSL auf Windows wird für die Kryptographie benötigt und liegt nicht in den Standardsuchpfaden
@@ -1088,7 +1094,6 @@ CFLAGS=-g -O2 -Wall -Werror -Wno-pointer-sign -Wno-format-security -Wno-format -
 LDFLAGS=-L/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/win32-headers/files/lib/ -L/home/thermi/FH-Stuff/UNITS-8/Bachelorarbeit/win32-headers/files/bin/
 make clean && make
 \end{lstlisting}
-
 
 Der Befehl konfiguriert den strongSwan Quellcode zum Bauen der benötigten Plugins, sowie einiger
 Extras für die Authentifizierung und dazu den 64-Bit Compiler des MINGW32-Projekts zu nutzen.
