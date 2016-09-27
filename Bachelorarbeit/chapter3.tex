@@ -305,7 +305,7 @@ und das Event zurückgesetzt, sowie der Puffer mit Nullen initialisiert und die 
 Danach wird ein neuer Lesevorgang auf dem oder den Handles gestartet, deren Leseoperationen
 fertig sind.
 
-Der Code in auf Seite \pageref{lst:handle-plain-windows} zeigt die Implementierung von handle\_plain()
+Der Code auf Seite \pageref{lst:handle-plain-windows} zeigt die Implementierung von handle\_plain()
 auf Windows. Die Funktionen zum Starten von asynchronen Leseoperationen auf Handles
 wurden in start\_read() abgekapselt. Das Übersetzen von Fehlercodes in menschenlesbare
 Texte wurde in format\_error() abgekapselt. Bei Fehlern beim Lesen startet sich der Job
@@ -345,8 +345,8 @@ der IPv6-Spezifikation.
 Für IPv4 lässt sich die IP-Adresse des Adapters implizit konfigurieren, wie zuvor erklärt.
 Das Object, welches mittels ''host\_create\_from\_string'' erstellt wird,
 wird von der Funktion auf dem Heap abgelegt. Damit ist es auch nach dem Verlassen
-des Funktionsblocks noch valide. Es wird automatisch beim Zerstören des Objekts
-''route'' freigegeben.
+des Funktionsblocks noch valide. Es wird automatisch beim Zerstören des
+\texttt{route}-Objekts freigegeben.
 
 \begin{lstlisting}[caption=Patch für die Routen-Installation von libipsec]
 #ifdef __linux__
@@ -374,8 +374,8 @@ des Funktionsblocks noch valide. Es wird automatisch beim Zerstören des Objekts
                 break;
         }
 #else
-	/* on Linux we cant't install a gateway */
-	route->gateway = charon->kernel->get_nexthop(charon->kernel, dst, -1, src);
+        /* on Linux we cant't install a gateway */
+        route->gateway = charon->kernel->get_nexthop(charon->kernel, dst, -1, src);
 #endif
 \end{lstlisting}
 
@@ -464,45 +464,54 @@ welches in die OVERLAPPED-Struktur eingefügt wird. Das Event wird dynamisch mit
 erstellt und nach der Nutzung mittels CloseHandle() geschlossen.
 
 \paragraph{Ändern der MTU eines TAP-Geräts}
-Das Ändern der \ac{MTU} ist im Moment nicht unterstützt. Der Treiber ermöglicht es,
+Der Treiber ermöglicht es,
 die \ac{MTU} über die Windows-Registry zu ändern. Dort wird der Schlüssel ''MTU''
 dafür genutzt. Er steht standardmäßig auf ''1500'', welches die Standard-\ac{MTU}
-von Ethernet ist.
+von Ethernet ist. Alternativ ist es vermutlich möglich, die Funktionen 
+\texttt{SetIpInterfaceEntry}\footcite[][]{_setipinterfaceentry_2016} dafür zu nutzen, welche Teil der IP-Helper-\ac{API} ist.
+
 \paragraph{Konfiguration eines TAP-Geräts}
 Die Konfiguration eines TAP-Geräts geschieht mit den IOCTL-Werten aus ~/autoref{fig:tap-ioctls}.
 
-Bei der Konfiguration eines TAP-Geräts für die Benutzung mit strongSwan müssen die folgenden
-Schritte ausgeführt werden:
+Im Funktionskopf von \texttt{init\_tun} wird das Argument \texttt{name\_tmpl} übergeben,
+welches auf Linux/UNIX den Anfang des Gerätenamens angibt, welcher dort \texttt{ipsec}
+ist. Da das Erstellen von TAP-Geräten auf Windows in charon (noch) nicht implementiert
+ist, wird es ignoriert.
+
+Um ein TAP-Gerät erfolgreich zu konfigurieren muss zuerst eines gefunden werden. Das wird mit der Funktion
+\texttt{find\_tap\_devices} getan. Sie sucht in der Registry, wie im Paragraph ''TAP-Geräte suchen''
+beschrieben.
+Nachdem alle TAP-Geräte gefunden wurden, wird versucht im globalen Geräteverzeichnis ein Handle
+auf dem Gerät zu öffnen. Der Pfad zum Gerät wird hierbei aus dem globalen Geräteverzeichnis, der GUID des Geräts,
+sowie der Endung ''.tap'' zusammengebaut.
+Danach werden die folgenden Konfigurationsschritte ausgeführt.
 \begin{itemize}
-\item Das Gerät in den TUN-Modus setzen. Dabei werden als Parameter
+\item Das Gerät wird in den TUN-Modus setzen. Dabei werden als Parameter
 die lokale IP (169.254.128.127), die IP des virtuellen Routers (169.254.128.128)
 und die Netzmaske des entfernten Netzwerks (255.255.255.255) gesetzt. 
-(TAP\_WIN\_IOCTL\_CONFIG\_TUN)
-\item Deaktivierung der Überprüfung des ''Sender protocol address''-Feldes.\\
-(TAP\_WIN\_IOCTL\_CONFIG\_SET\_SRC\_CHECK)
-\item Adapter in den ''up''-Zustand setzen (einschalten). 
+\texttt{(TAP\_WIN\_IOCTL\_CONFIG\_TUN)}
+\item Die Überprüfung des ''Sender protocol address''-Feldes muss deaktiviert werden.\\
+\texttt{(TAP\_WIN\_IOCTL\_CONFIG\_SET\_SRC\_CHECK)}
+\item Der Adapter muss in den ''up''-Zustand gesetzt werden (einschalten). 
 Nach dem Setzen des Zustands muss kurz gewartet werden um sicher zu gehen, dass das Gerät auch aktiv ist.\\
-(TAP\_WIN\_IOCTL\_SET\_MEDIA\_STATUS)
+\texttt{(TAP\_WIN\_IOCTL\_SET\_MEDIA\_STATUS)}
 \end{itemize}
 
-Folgend ist der Code für das Konfigurieren eines TAP-Geräts:
-\begin{lstlisting}[caption=Konfiguration eines TAP-Geräts]
+
+\begin{lstlisting}[caption=Konfiguration eines TAP-Geräts,label=lst:tap-device-configuration]
 /**
  * Initialize the tun device
  */
 static bool init_tun(private_tun_device_t *this, const char *name_tmpl)
-[...]
+        [...]
 #elif defined(WIN32)
-        /* WIN32 TAP driver stuff*/
-        /* Check if there is an unused tun device following the IPsec name scheme*/
         enumerator_t *enumerator;
         char *guid;
         BOOL success = FALSE;
-        linked_list_t *possible_devices = get_tap_reg();
+        /* Get all existing TAP devices */
+        linked_list_t *possible_devices = find_tap_devices();
         memset(this->if_name, 0, sizeof(this->if_name));
 
-        this->read_event_name = malloc(WIN32_TUN_EVENT_LENGTH);
-        this->write_event_name = malloc(WIN32_TUN_EVENT_LENGTH);
         /* Iterate over list */
         enumerator = possible_devices->create_enumerator(possible_devices);
         /* Try to open that device */
@@ -540,6 +549,9 @@ static bool init_tun(private_tun_device_t *this, const char *name_tmpl)
          */
         enumerator->destroy(enumerator);
         possible_devices->destroy(possible_devices);
+        /* If we didn't find one or could open one, we need to bail out.
+         * We currently can not create new devices.
+         */
         if (!success)
         {
             return FALSE;
@@ -548,11 +560,11 @@ static bool init_tun(private_tun_device_t *this, const char *name_tmpl)
         /* We set a fake gateway of 169.254.254.128 that we route packets over
          The TAP driver strips the Ethernet header and trailer of the Ethernet frames
          before sending them back to the application that listens on the handle */
-	struct in_addr ep[3];
+        struct in_addr ep[3];
         ULONG status = TRUE;
         DWORD len;
         /* Local address (just fake one): 169.254.128.127 */
-	ep[0].S_un.S_un_b.s_b1 = 169;
+        ep[0].S_un.S_un_b.s_b1 = 169;
         ep[0].S_un.S_un_b.s_b2 = 254;
         ep[0].S_un.S_un_b.s_b3 = 128;
         ep[0].S_un.S_un_b.s_b4 = 127;
@@ -565,19 +577,19 @@ static bool init_tun(private_tun_device_t *this, const char *name_tmpl)
          */
         /* We need to integrate support for IPv6, too. */
         /* Just fake a link local address for now (169.254.128.128) */
-	ep[1].S_un.S_un_b.s_b1 = 169;
+        ep[1].S_un.S_un_b.s_b1 = 169;
         ep[1].S_un.S_un_b.s_b2 = 254;
         ep[1].S_un.S_un_b.s_b3 = 128;
         ep[1].S_un.S_un_b.s_b4 = 128;
         /* Remote netmask (255.255.255.255) */
-	ep[2].S_un.S_un_b.s_b1 = 255;
+        ep[2].S_un.S_un_b.s_b1 = 255;
         ep[2].S_un.S_un_b.s_b2 = 255;
         ep[2].S_un.S_un_b.s_b3 = 255;
         ep[2].S_un.S_un_b.s_b4 = 255;
 
         if(!DeviceIoControl (this->tunhandle, TAP_WIN_IOCTL_CONFIG_TUN,
-		    ep, sizeof (ep),
-		    ep, sizeof (ep), &len, NULL))
+            ep, sizeof (ep),
+            ep, sizeof (ep), &len, NULL))
         {
             DBG1 (DBG_LIB, "WARNING: The TAP-Windows driver rejected a TAP_WIN_IOCTL_CONFIG_TUN DeviceIoControl call.");
         }
@@ -603,21 +615,20 @@ static bool init_tun(private_tun_device_t *this, const char *name_tmpl)
         /* Set device to up */
 
         if (!DeviceIoControl (this->tunhandle, TAP_WIN_IOCTL_SET_MEDIA_STATUS,
-  			  &status, sizeof (status),
+                &status, sizeof (status),
                             &status, sizeof (status), &len, NULL))
         {
             DBG1 (DBG_LIB, "WARNING: The TAP-Windows driver rejected a TAP_WIN_IOCTL_SET_MEDIA_STATUS DeviceIoControl call.");
         }
 
             /* Give the adapter 2 seconds to come up */
-        /* Create event with special template */
-        snprintf(this->read_event_name, WIN32_TUN_EVENT_LENGTH, WIN32_TUN_READ_EVENT_TEMPLATE, this->if_name);
-        snprintf(this->write_event_name, WIN32_TUN_EVENT_LENGTH, WIN32_TUN_WRITE_EVENT_TEMPLATE, this->if_name);
+
         sleep(2);
         return TRUE;
         [...]
 }
 \end{lstlisting}
+
 
 \paragraph{Lesen und Schreiben vom Adapter}
 Beim Öffnen des Adapters wurde ein Handle erstellt.
@@ -626,12 +637,12 @@ unter Benutzung von ''OVERLAPPED''-Strukturen und Events lassen sich Pakete
 lesen und schreiben.
 
 \paragraph{tun\_device\_t}
-Folgend der Code für das Erstellen eines Objects vom Typ ''tun\_device\_t''.
+Die Klasse für TUN-Geräte musste für Windows angepasst werden.
+Spezifisch mussten neue Funktionen zum Lesen und Schreiben implementiert werden,
+sowie Attribute geändert werden.
+Auf Windows wird ein Objekt vom Typ \texttt{HANDLE} genutzt, statt eines \ac{FD}.
 
-\begin{lstlisting}[caption=Code für das Erstellen von tun\_device\_t]
-/*
- * Described in header
- */
+\begin{lstlisting}[caption=Code für das Erstellen von tun\_device\_t,label=lst:tun_device_t_create]
 tun_device_t *tun_device_create(const char *name_tmpl)
 {
 	private_tun_device_t *this;
@@ -646,8 +657,6 @@ tun_device_t *tun_device_create(const char *name_tmpl)
                         /* For WIN32, that's a handle. */
 #ifdef WIN32
                         .get_handle = _get_handle,
-                        .get_write_event_name = _get_write_event_name,
-                        .get_read_event_name = _get_read_event_name,
 #else
 			.get_fd = _get_fd,
 #endif /* WIN32 */
@@ -659,6 +668,7 @@ tun_device_t *tun_device_create(const char *name_tmpl)
 #ifdef WIN32
                 .tunhandle = NULL,
 #else
+
 		.tunfd = -1,
 		.sock = -1,
 #endif /* WIN32 */
@@ -669,10 +679,11 @@ tun_device_t *tun_device_create(const char *name_tmpl)
 		free(this);
 		return NULL;
 	}
+#ifdef WIN32
+	DBG1(DBG_LIB, "opened TUN device: %s", this->if_name);
+#else
 	DBG1(DBG_LIB, "created TUN device: %s", this->if_name);
 
-#ifdef WIN32
-#else
 	this->sock = socket(AF_INET, SOCK_DGRAM, 0);
 	if (this->sock < 0)
 	{
@@ -683,26 +694,29 @@ tun_device_t *tun_device_create(const char *name_tmpl)
 #endif /* WIN32 */
 	return &this->public;
 }
-
-#endif /* TUN devices supported */
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Relevanter code für tun\_device\_t->destroy()]
+
+\begin{lstlisting}[caption=Relevanter code für tun\_device\_t->destroy(),label=lst:tun_device_t_destroy]
 METHOD(tun_device_t, destroy, void,
 	private_tun_device_t *this)
 {
 #ifdef WIN32
         /* close file handle, destroy interface */
         CloseHandle(this->tunhandle);
-        free(this->read_event_name);
-        free(this->write_event_name);
 #else
         [...]
+#ifdef __FreeBSD__
+        [...]
 #endif
-    	DESTROY_IF(this->address);
-    	free(this);
+        [...]
+#endif
+	DESTROY_IF(this->address);
+	free(this);
 }
 \end{lstlisting}
+Beim Destruktur für die Klasse musste nur statt dem Zerstören eines TUN-Geräts
+nur das Handle des TAP-Geräts geschlossen werden.
 % callbacks
 % synchronous
 % WaitForMultipleObjects
@@ -729,7 +743,7 @@ wird einerseits durch manuelles Einfügen und Entfernen von selbstinstallierten 
 bewerkstelligt, als auch durch Events, die die Anwendung über ein Handle
 vom Kernel empfängt.
 
-\begin{lstlisting}[caption=Ergänzung zu private\_kernel\_iph\_net\_t]
+\begin{lstlisting}[caption=Ergänzung zu private\_kernel\_iph\_net\_t,label=lst:kernel_iph]
 /**
  * Private data of kernel_iph_net implementation.
  */
@@ -748,16 +762,21 @@ struct private_kernel_iph_net_t {
 };
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Code für add\_ip]
+Die Klasse für das Plugin \texttt{kernel-iph} wurde um zwei Attribute für die Installation
+von \ac{IP}-Adressen erweitert. Einerseits ein bool'scher Wert, der die Installation
+aktiviert und deaktiviert und andererseits einen \texttt{char *}, der genutzt wird
+um das Gerät zu konfigurieren, auf welchem alle \ac{IP}-Adressen installiert werden sollen.
+
+\begin{lstlisting}[caption=Code für add\_ip,label=lst:kernel_iph_add_ip]
 METHOD(kernel_net_t, add_ip, status_t,
-	private_kernel_iph_net_t *this, host_t *vip, int prefix, char *name)
+    private_kernel_iph_net_t *this, host_t *vip, int prefix, char *name)
 {
-	if (!this->install_virtual_ip)
-	{	/* disabled by config */
-		return SUCCESS;
-	}
-	MIB_UNICASTIPADDRESS_ROW row;
-	u_long status;
+        if (!this->install_virtual_ip)
+        {    /* disabled by config */
+            return SUCCESS;
+        }
+        MIB_UNICASTIPADDRESS_ROW row;
+        u_long status;
         iface_t *iface = NULL, *entry = NULL;
 
         /* Print out all known interfaces */
@@ -767,9 +786,9 @@ METHOD(kernel_net_t, add_ip, status_t,
             DBG1(DBG_KNL, "interface %s\n index: %d\n description %s\n type %d", entry->ifname, entry->ifindex, entry->ifdesc, entry->iftype);
         }
         enumerator->destroy(enumerator);
-	/* name of the MS Loopback adapter */
+        /* name of the MS Loopback adapter */
         if (!this->install_virtual_ip_on || this->ifaces->find_first(this->ifaces, (void*)iface_by_name,
-						(void**)&iface, this->install_virtual_ip_on) != SUCCESS)
+                        (void**)&iface, this->install_virtual_ip_on) != SUCCESS)
         {
             name = "{DB2C49B1-7C90-4253-9E61-8C6A881194ED}";
         }
@@ -777,70 +796,83 @@ METHOD(kernel_net_t, add_ip, status_t,
         {
             name = this->install_virtual_ip_on;
         }
-	host2unicast(vip, prefix, &row);
+        host2unicast(vip, prefix, &row);
 
-	row.InterfaceIndex = add_addr(this, name, vip, TRUE);
-	if (!row.InterfaceIndex)
-	{
-		DBG1(DBG_KNL, "interface '%s' not found", name);
-		return NOT_FOUND;
-	}
+        row.InterfaceIndex = add_addr(this, name, vip, TRUE);
+        if (!row.InterfaceIndex)
+        {
+            DBG1(DBG_KNL, "interface '%s' not found", name);
+            return NOT_FOUND;
+        }
 
-	status = CreateUnicastIpAddressEntry(&row);
-	if (status != NO_ERROR)
-	{
-		DBG1(DBG_KNL, "creating IPH address entry failed: %lu", status);
-		remove_addr(this, vip);
-		return FAILED;
-	}
-	return SUCCESS;
+        status = CreateUnicastIpAddressEntry(&row);
+        if (status != NO_ERROR)
+        {
+            DBG1(DBG_KNL, "creating IPH address entry failed: %lu", status);
+            remove_addr(this, vip);
+            return FAILED;
+        }
+        return SUCCESS;
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Code für del\_ip]
+Die Methode \texttt{add\_ip} in~\autoref{lst:kernel_iph_add_ip} des \texttt{kernel-iph}-Plugins musste angepasst werden.
+Ursprünglich war sie nur ein Stub, der \texttt{return NOT\_SUPPORTED;} enthielt.
+Nach dem der Quellcode aus dem Zweig \texttt{win-vip} gemerged wurde, wurde der Code erweitert
+um die Attribute \texttt{install\_virtual\_ip\_on} und \texttt{install\_virtual\_ip} zu beachten.
+Dabei wird zuerst überprüft, ob \ac{IP}-Adressen überhaupt installiert werden
+sollen und danach, ob eine Schnittstelle konfiguriert ist.
+Wenn eine Schnittstelle konfiguriert ist, dann wird sie in der internen
+Schnittstellenliste von \texttt{kernel-iph} mittels \texttt{this->ifaces->find\_first()}
+nachgeschlagen um zu überprüfen ob sie existiert. Wenn sie existiert,
+wird die \ac{IP}-Adresse mittels \texttt{host2unicast} und
+\texttt{CreateUnicastAddressEntry} darauf installiert. Wenn sie nicht existiert, 
+wird die \ac{IP}-Adresse auf dem Loopback-Adapter installiert.
+
+\begin{lstlisting}[caption=Code für del\_ip,label=lst:kernel_iph_del_ip]
 METHOD(kernel_net_t, del_ip, status_t,
-	private_kernel_iph_net_t *this, host_t *vip, int prefix, bool wait)
+    private_kernel_iph_net_t *this, host_t *vip, int prefix, bool wait)
 {
         if (!this->install_virtual_ip)
-	{	/* disabled by config */
-		return SUCCESS;
-	}
+        {    /* disabled by config */
+            return SUCCESS;
+        }
 
-	MIB_UNICASTIPADDRESS_ROW row;
-	u_long status;
+        MIB_UNICASTIPADDRESS_ROW row;
+        u_long status;
 
-	host2unicast(vip, prefix, &row);
+        host2unicast(vip, prefix, &row);
 
-	row.InterfaceIndex = remove_addr(this, vip);
-	if (!row.InterfaceIndex)
-	{
-		DBG1(DBG_KNL, "virtual IP %H not found", vip);
-		return NOT_FOUND;
-	}
+        row.InterfaceIndex = remove_addr(this, vip);
+        if (!row.InterfaceIndex)
+        {
+            DBG1(DBG_KNL, "virtual IP %H not found", vip);
+            return NOT_FOUND;
+        }
 
-	status = DeleteUnicastIpAddressEntry(&row);
-	if (status != NO_ERROR)
-	{
-		DBG1(DBG_KNL, "deleting IPH address entry failed: %lu", status);
-		return FAILED;
-	}
+        status = DeleteUnicastIpAddressEntry(&row);
+        if (status != NO_ERROR)
+        {
+            DBG1(DBG_KNL, "deleting IPH address entry failed: %lu", status);
+            return FAILED;
+        }
 
-	return SUCCESS;
+        return SUCCESS;
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Ergänzung zu kernel\_iph\_net\_create()]
+\begin{lstlisting}[caption=Ergänzung zu kernel\_iph\_net\_create(),label=lst:kernel_iph_create]
 *
  * Described in header.
  */
 kernel_iph_net_t *kernel_iph_net_create()
 {
         [...}
-		.install_virtual_ip = lib->settings->get_bool(lib->settings,
-						"%s.install_virtual_ip", TRUE, lib->ns),
-		.install_virtual_ip_on = lib->settings->get_str(lib->settings,
-						"%s.install_virtual_ip_on", NULL, lib->ns),
-	   [...]
+        .install_virtual_ip = lib->settings->get_bool(lib->settings,
+                        "%s.install_virtual_ip", TRUE, lib->ns),
+        .install_virtual_ip_on = lib->settings->get_str(lib->settings,
+                        "%s.install_virtual_ip_on", NULL, lib->ns),
+       [...]
 }
 \end{lstlisting}
 
@@ -1071,7 +1103,7 @@ und \autoref{lst:strongswan.conf} zu finden.
 \subsection{Test der Verbindung}
 Das Testen der Verbindung wurde durch durch einfaches Pingen über die Verbindung bewerkstelligt.
 Dabei wird durch Dumpen der Pakete mit tcpdump und Wireshark überprüft, ob die
-ARP requests auf dem TUN-Adapter beantwortet werden und ob das Paket auf dem
+\ac{ARP}-Requests auf dem TUN-Adapter beantwortet werden und ob das Paket auf dem
 anderen Endpunkt auftaucht. Des weiteren werden die Traffic-Counter der \acp{SA} überprüft,
 um zu überprüfen, ob die Pakete jemals verarbeitet wurden.
 
