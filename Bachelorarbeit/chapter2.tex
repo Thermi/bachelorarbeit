@@ -44,11 +44,11 @@ das Projekt gegebenenfalls zur GPLv3 wechseln kann und um es den Entwicklern üb
 zu ermöglichen, den Quellcode unter einer anderen Lizenz weiterzugeben\footcite[][Contributing]{_contributions_2014}.
 
 \subsubsection{charon}
-''charon'' ist der Daemon, der in der Diplomarbeit\footcite[][]{jan_hutter_strongswan_2005} entwickelt wurde.
+\texttt{charon} ist der Daemon, der in der Diplomarbeit\footcite[][]{jan_hutter_strongswan_2005} entwickelt wurde.
 Er arbeitet parallel und wurde in objektorientiertem C geschrieben, so wie die Software Xine.
-Intern werden verschiedene Bibliotheken genutzt, angefangen von ''libstrongswan'' bis zu ''libcharon''.
-Es existieren verschiedene Versionen von ''charon'' für verschiedene Zwecke, zum Beispiel
-''charon-svc''. ''charon-svc'' ist eine Version von ''charon'', die als Dienst auf Windows genutzt werden kann.
+Intern werden verschiedene Bibliotheken genutzt, angefangen von ''libstrongswan'' bis zu \texttt{libcharon}.
+Es existieren verschiedene Versionen von \texttt{charon-svc} für verschiedene Zwecke, zum Beispiel
+\texttt{charon-svc}. \texttt{charon-svc} ist eine Version von \texttt{charon}, die als Dienst auf Windows genutzt werden kann.
 
 Jegliche Funktionalität von strongSwan ist in Form einer Bibliothek untergebracht und in objektorientiertem
 C geschrieben. Das ermöglicht es die Namensräume in strongSwan relativ frei zu halten
@@ -60,22 +60,22 @@ allgemeine Datenstrukturen wie Linked Lists, Arrays und Hashtables, sowie Code f
 Multithreading implementiert.
 
 \paragraph{Kernel-Interfaces}
-''charon'' benötigt für die Verwaltung von \ac{IP}-Adressen, Routen, TUN-Schnittstellen,
+\texttt{charon} benötigt für die Verwaltung von \ac{IP}-Adressen, Routen, TUN-Schnittstellen,
 Firewallregeln und
 der \ac{SPD} und der \ac{SAD} Zugriff auf den Kernel. Die dafür nötigen Funktionen
-werden in Plugins für ''libcharon'' implementiert. Die Plugins implementieren ein
+werden in Plugins für \texttt{libcharon} implementiert. Die Plugins implementieren ein
 standardisiertes Interface für die Methoden, die sie implementieren.
 Die momentan existierenden Plugins,
 die Kernel-Schnittstellen implementieren, sind ''kernel-pfroute'', ''kernel-netlink'', ''kernel-wfp''
 und ''kernel-iph''.\footcite[][]{_pluginlist_2016}
-Um die Schnittstellen zum Kernel nutzen zu können, muss charon mit entsprechenden Rechten ausgeführt werden.
+Um die Schnittstellen zum Kernel nutzen zu können, muss \texttt{charon} mit entsprechenden Rechten ausgeführt werden.
 Die gängigste Methode hierfür ist, die .exe-Datei mit Administratorrechten auszuführen.
 Alternativ ist es auch möglich, die Datei mit einem Dienstkonto, welches die entsprechenden Rechte hat,
 auszuführen.
 
 % Mehr Informationen?
 \subsubsection{Userspace Processing}
-Userspace Processing wurde in ''charon'' von Guiliano Grassi und Ralf Sager für Android implementiert,
+Userspace Processing wurde in \texttt{charon} von Guiliano Grassi und Ralf Sager für Android implementiert,
 um die Entwicklung der strongSwan-App für Android zu ermöglichen. Auf Android ist Kernelspace Processing
 von \ac{IPsec}-Paketen nicht möglich, da die Privilegien der Anwendung das nicht erlauben.
 
@@ -173,7 +173,7 @@ raw-Socket geöffnet werden, über den rein IP gesprochen wird.
 %demultiplexing NON-ESP marker, SPI
 \subparagraph{libstrongswan}
 libstrongswan ist eine interne Bibliothek von strongSwan, die von den verschiedenen
-Versionen von ''charon'' geladen wird, um diverse Funktionalität zu erhalten, wie
+Versionen von \texttt{charon} geladen wird, um diverse Funktionalität zu erhalten, wie
 Linked-Lists, Hashtables, Arrays, sowie die Funktionen um TUN-Geräte zu erstellen und zu öffnen.
 
 Der Code für das lesen und schreiben von Paketen existiert bereits für Linux, Mac OSX
