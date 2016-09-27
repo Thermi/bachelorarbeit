@@ -396,20 +396,24 @@ charon-svc {
 #endif /* WIN32_H */
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Code für das Suchen eines TAP-Geräts,label=lst:get_tap_req]
+\begin{lstlisting}[caption=Code für das Suchen eines TAP-Geräts,label=lst:find_tap_devices]
 /*
  * Searches through the registry for suitable TAP driver interfaces
  * On Windows, the TAP interface metadata is stored and described in the registry.
  * It returns a linked list that contains all found guids. The guids describe the interfaces.
  */
 
-linked_list_t *get_tap_reg()
+linked_list_t *find_tap_devices()
 {
-    HKEY adapter_key;
+    char enum_name[256], unit_string[256],
+    instance_id[256], component_id[256],
+    component_id_string[] = "ComponentId",
+    instance_id_string[] = "NetCfgInstanceId";
     LONG status;
-    DWORD len;
+    uint32_t i = 0;
+    DWORD len, type;
+    HKEY adapter_key, unit_key;
     linked_list_t *list = linked_list_create();
-    int i = 0;
 
     /*
      * Open parent key. It contains all other keys that
@@ -422,104 +426,100 @@ linked_list_t *get_tap_reg()
             KEY_READ,
             &adapter_key);
 
-    if (status != ERROR_SUCCESS)
+    if (status == ERROR_SUCCESS)
     {
-        DBG2(DBG_LIB, "Error opening registry key: %s", ADAPTER_KEY);
-    }
-
-    while (true)
-    {
-        char enum_name[256];
-        char unit_string[256];
-        HKEY unit_key;
-        char component_id_string[] = "ComponentId";
-        char component_id[256];
-        char net_cfg_instance_id_string[] = "NetCfgInstanceId";
-        char net_cfg_instance_id[256];
-        DWORD data_type;
-
-        len = sizeof (enum_name);
-        status = RegEnumKeyEx(
-                adapter_key,
-                i,
-                enum_name,
-                &len,
-                NULL,
-                NULL,
-                NULL,
-                NULL);
-        if (status == ERROR_NO_MORE_ITEMS)
+        while (TRUE)
         {
-            break;
-        }
-        else if (status != ERROR_SUCCESS)
-        {
-            DBG2(DBG_LIB, "Error enumerating registry subkeys of key: %s",
-                    ADAPTER_KEY);
-        }
-
-        snprintf(unit_string, sizeof (unit_string), "%s\\%s",
-                ADAPTER_KEY, enum_name);
-
-        status = RegOpenKeyEx(
-                HKEY_LOCAL_MACHINE,
-                unit_string,
-                0,
-                KEY_READ,
-                &unit_key);
-
-        if (status != ERROR_SUCCESS)
-        {
-            DBG2(DBG_LIB, "Error opening registry key: %s", unit_string);
-        }
-        else
-        {
-            len = sizeof (component_id);
-            status = RegQueryValueEx(
-                    unit_key,
-                    component_id_string,
+            len = sizeof (enum_name);
+            status = RegEnumKeyEx(
+                    adapter_key,
+                    i,
+                    enum_name,
+                    &len,
                     NULL,
-                    &data_type,
-                    component_id,
-                    &len);
-
-            if (status != ERROR_SUCCESS || data_type != REG_SZ)
+                    NULL,
+                    NULL,
+                    NULL);
+            if (status == ERROR_SUCCESS)
             {
-                DBG2(DBG_LIB, "Error opening registry key: %s\\%s",
-                        unit_string, component_id_string);
+                snprintf(unit_string, sizeof (unit_string), "%s\\%s",
+                        ADAPTER_KEY, enum_name);
+
+                status = RegOpenKeyEx(
+                        HKEY_LOCAL_MACHINE,
+                        unit_string,
+                        0,
+                        KEY_READ,
+                        &unit_key);
+
+                if (status == ERROR_SUCCESS)
+                {
+                    len = sizeof (component_id);
+                    status = RegQueryValueEx(
+                            unit_key,
+                            component_id_string,
+                            NULL,
+                            &type,
+                            component_id,
+                            &len);
+
+                    if (status == ERROR_SUCCESS && type == REG_SZ)
+                    {
+                        len = sizeof (instance_id);
+                        status = RegQueryValueEx(
+                                unit_key,
+                                instance_id_string,
+                                NULL,
+                                &type,
+                                instance_id,
+                                &len);
+
+                        if (status == ERROR_SUCCESS && type == REG_SZ)
+                        {
+                            if (!strcmp(component_id, TAP_WIN_COMPONENT_ID))
+                            {
+                                /* That thing is a valid interface key */
+                                /* link into return list */
+                                char *guid = malloc(sizeof(instance_id));
+                                memcpy(guid, instance_id, sizeof(instance_id));
+                                list->insert_last(list, guid);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        DBG2(DBG_LIB, "Error opening registry key: %s\\%s",
+                                unit_string, component_id_string);
+                    }
+                    RegCloseKey(unit_key);
+                }
+                else if (status != ERROR_SUCCESS)
+                {
+                    DBG2(DBG_LIB, "Error opening registry key: %s", unit_string);
+                }
+                i++;
+            }
+            else if (status == ERROR_NO_MORE_ITEMS)
+            {
+                break;
             }
             else
             {
-                len = sizeof (net_cfg_instance_id);
-                status = RegQueryValueEx(
-                        unit_key,
-                        net_cfg_instance_id_string,
-                        NULL,
-                        &data_type,
-                        net_cfg_instance_id,
-                        &len);
-
-                if (status == ERROR_SUCCESS && data_type == REG_SZ)
-                {
-                    if (!strcmp(component_id, TAP_WIN_COMPONENT_ID))
-                    {
-                        /* That thing is a valid interface key */
-                        /* link into return list */
-                        char *guid = malloc(sizeof(net_cfg_instance_id));
-                        memcpy(guid, net_cfg_instance_id, sizeof(net_cfg_instance_id));
-                        list->insert_last(list, guid);
-                    }
-                }
+                DBG2(DBG_LIB, "Error enumerating registry subkeys of key: %s",
+                        ADAPTER_KEY);
             }
-            RegCloseKey(unit_key);
         }
-        ++i;
+    }
+    else
+    {
+        DBG2(DBG_LIB, "Error opening registry key: %s", ADAPTER_KEY);
     }
 
     RegCloseKey(adapter_key);
     return list;
 }
 \end{lstlisting}
+
 
 \begin{lstlisting}[caption=Code für handle\_plain auf Windows,label=lst:handle-plain-windows]
 /**
@@ -528,11 +528,10 @@ linked_list_t *get_tap_reg()
 static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
 {
 #ifdef WIN32
-        DBG2(DBG_ESP, "entered handle_plain.");
         void **key = NULL;
         bool oldstate;
         uint32_t length, event_status = 0, i = 0, j = 0, offset;
-        handle_overlapped_buffer_t *bundle_array = NULL, dummy, tun_device_handle_overlapped_buffer, *structures = NULL;
+        handle_overlapped_buffer_t *bundle_array = NULL, dummy, tun_device_handle_overlapped_buffer;
         OVERLAPPED *overlapped = NULL;
         HANDLE *event_array = NULL, tun_device_event;
         tun_device_t *tun_device = this->tun.tun;
@@ -560,53 +559,37 @@ static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
         memset(overlapped, 0, (length+2)*sizeof(OVERLAPPED));
         memset(bundle_array, 0, (length+2)*sizeof(handle_overlapped_buffer_t));
 
-        DBG2(DBG_ESP, "Allocated arrays, opened events");
-
         /* These are the arrays we're going to work with */
 
         /* first position is the event we use for synchronisation  */
         /* Insert notification event */
         event_array[i] = this->event;
-        DBG2(DBG_ESP, "put notification event into index %d", i);
         /* Insert dummy structure */
         bundle_array[i] = dummy;
         i++;
 
         /* second position is this->tun */
         /* insert event object for this->tun device */
-        tun_device_event = CreateEvent(NULL, FALSE, FALSE, this->tun.tun->get_read_event_name(this->tun.tun));
+        tun_device_event = CreateEvent(NULL, FALSE, FALSE, FALSE);
         if (!tun_device_event)
         {
             char *error_message = format_error(GetLastError());
-            DBG2(DBG_ESP, "Error: %s", error_message);
             free(error_message);
             return JOB_REQUEUE_FAIR;
         }
         event_array[i] = tun_device_event;
-        DBG2(DBG_ESP, "Put TUN %s event in index %d", this->tun.tun->get_name(this->tun.tun), i);
         ResetEvent(event_array[i]);
         /* bundle for the read on this->tun */
         /* Reserve memory for the buffer*/
-        tun_device_handle_overlapped_buffer.buffer = chunk_alloc(tun_device->get_mtu(tun_device));
+        tun_device_handle_overlapped_buffer.buffer = chunk_alloca(tun_device->get_mtu(tun_device));
+        /* Initialise the buffer */
+        memset(tun_device_handle_overlapped_buffer.buffer.ptr, 0, tun_device_handle_overlapped_buffer.buffer.len);
 
-        DBG2(DBG_ESP, "Allocated buffer.");
         tun_device_handle_overlapped_buffer.fileHandle = tun_device->get_handle(tun_device);
-        DBG2(DBG_ESP, "Allocated file handle.");
         tun_device_handle_overlapped_buffer.overlapped = overlapped;
-        DBG2(DBG_ESP, "Allocated overlapped..");
-        /* Fill in code */
-        /*
-        tun_device_handle_overlapped_buffer.overlapped->hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, this->tun.tun->get_read_event_name(this->tun.tun));
-        */
+
         tun_device_handle_overlapped_buffer.overlapped->hEvent= tun_device_event;
-        if (tun_device_handle_overlapped_buffer.overlapped->hEvent == NULL)
-        {
-            char *error_message = format_error(GetLastError());
-            DBG2(DBG_ESP, "Error: %s", error_message);
-            free(error_message);
-            return JOB_REQUEUE_FAIR;
-        }
-        DBG2(DBG_ESP, "Created event");
+
         bundle_array[i] = tun_device_handle_overlapped_buffer;
 
         i++;
@@ -621,35 +604,31 @@ static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
         /* pad bundle_array with two empty structures */
         /* iterate over all our tun devices, create event handles, reset them, queue read operations on all handles */
 
-        DBG2(DBG_ESP, "Enumerating tun devices ...");
 
         tuns_enumerator = this->tuns->create_enumerator(this->tuns);
         while(tuns_enumerator->enumerate(tuns_enumerator, key, &tun_device))
         {
-            DBG2(DBG_ESP, "TUN device %s", *key);
             /* Allocate structure and buffer */
 
-            structures[j].buffer = chunk_alloc(tun_device->get_mtu(tun_device));
-            memset(structures[j].buffer.ptr, 0, structures[j].buffer.len);
-            structures[j].fileHandle = tun_device->get_handle(tun_device);
+            bundle_array[i].buffer = chunk_alloca(tun_device->get_mtu(tun_device));
+            memset(bundle_array[i].buffer.ptr, 0, bundle_array[i].buffer.len);
+            bundle_array[i].fileHandle = tun_device->get_handle(tun_device);
             /* Allocate and initialise OVERLAPPED structure */
-            structures[j].overlapped = alloca(sizeof(OVERLAPPED));
-            (*structures[j].overlapped) = overlapped[j];
-            memset(&structures[j].overlapped, 0, sizeof(OVERLAPPED));
+            bundle_array[i].overlapped = alloca(sizeof(OVERLAPPED));
+            (*bundle_array[i].overlapped) = overlapped[i];
+            memset(&bundle_array[i].overlapped, 0, sizeof(OVERLAPPED));
             /* Create unique name for that event. */
             /* Create unique event for read accesses on that device
              * No security attributes, no manual reset, initial state is unsignaled,
              * name is the special name we created
              */
-            structures[j].overlapped->hEvent = CreateEvent(NULL, FALSE, FALSE, tun_device->get_read_event_name(tun_device));
+            bundle_array[i].overlapped->hEvent = CreateEvent(NULL, FALSE, FALSE, FALSE);
             // event_array[i] = OpenEvent(EVENT_ALL_ACCESS, FALSE, tun_device->get_read_event_name(tun_device));
-            event_array[i] = structures[j].overlapped->hEvent;
-            bundle_array[i] = structures[j];
+            event_array[i] = bundle_array[i].overlapped->hEvent;
 
             if (event_array[i] == NULL)
             {
                 char *error_message = format_error(GetLastError());
-                DBG2(DBG_ESP, "Error: %s", error_message);
                 free(error_message);
                 return JOB_REQUEUE_FAIR;
             }
@@ -657,17 +636,16 @@ static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
 
             /* Initialise read with the allocate overwrite structure */
             DBG2(DBG_ESP, "Reading on %s", tun_device->get_name(tun_device));
-            if (!start_read(&structures[j], structures[j].overlapped->hEvent))
+            if (!start_read(&bundle_array[i], bundle_array[i].overlapped->hEvent))
             {
                     // TODO: Cleanup heap
                     this->lock->unlock(this->lock);
                     return JOB_REQUEUE_FAIR;
             }
-            j++;
+            i++;
         }
         tuns_enumerator->destroy(tuns_enumerator);
 
-        this->lock->unlock(this->lock);
         while (TRUE)
         {
             /* Wait for a handle to be signaled */
@@ -675,13 +653,10 @@ static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
              * This translates to 63 tun devices. I think this is sufficiently high to not have to implement a mechanism for waiting for more
              * events /support more TUN devices */
             oldstate = thread_cancelability(FALSE);
-            DBG2(DBG_ESP, "Waiting for events...");
             event_status = WaitForMultipleObjects(i, event_array, FALSE, INFINITE);
             thread_cancelability(oldstate);
-            DBG2(DBG_ESP, "Event triggered with event_status %d", event_status);
             offset = event_status - WAIT_OBJECT_0;
-            DBG2(DBG_ESP, "offset == %d", offset);
-            
+
             /* A handle was signaled. Find the tun handle whose read was successful */
 
             /* We can only use the event_status of indication for the first completed IO operation.
@@ -707,90 +682,65 @@ static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
                     /* Notification about changes regarding the tun devices.
                      * Or the object is destroyed.
                      * We need to rebuild the array. So exit and rebuild. */
-                    DBG2(DBG_ESP, "cleanup.");
                     /* Cleanup
                      *  Starts with 1 to skip over the dummy
                      */
-                    for(uint32_t k=1;k<i;k++)
+                    for(j=1;j<i;j++)
                     {
                         /* stop all asynchronous IO */
-                        CancelIo(bundle_array[k].fileHandle);
-                        CloseHandle(bundle_array[k].overlapped->hEvent);
-                        memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
-                        free(bundle_array[k].buffer.ptr);
-                        ResetEvent(event_array[k]);
-                        CloseHandle(event_array[k]);
+                        CancelIo(bundle_array[j].fileHandle);
+                        CloseHandle(bundle_array[j].overlapped->hEvent);
+                        memset(bundle_array[j].buffer.ptr, 0, bundle_array[j].buffer.len);
+                        free(bundle_array[j].buffer.ptr);
+                        ResetEvent(event_array[j]);
+                        CloseHandle(event_array[j]);
                     }
                     /* exit */
-                    DBG2(DBG_ESP, "Cleanup done.");
                     return JOB_REQUEUE_DIRECT;
                 }
-                for(uint32_t k=1;k<i; k++)
+                /* The arrays have the same length and the same positioning of the elements.
+                 * Therefore, if event_array[j] is signaled, the read on bundle_array[i].fileHandle has succeeded
+                 * and bundle_array[j].buffer has our data now.
+                 */
+
+                char foo[(bundle_array[offset].buffer.len *4)/3 + 1];
+                memset(foo, 0, (bundle_array[offset].buffer.len *4)/3 + 1);
+                chunk_to_base64(bundle_array[offset].buffer, foo);
+
+                ip_packet_t *packet;
+                /* clone the buffer */
+                chunk_t buffer_clone = chunk_clone (bundle_array[offset].buffer);
+                packet = ip_packet_create(buffer_clone);
+                if (packet)
                 {
-                    DBG2(DBG_ESP, "position %d in array", k);
-                    /* Is the object signaled? */
-                    DBG2(DBG_ESP, "checking if event is signaled.");
-                    DWORD WaitResult = WaitForSingleObject(bundle_array[k].overlapped->hEvent, 0);
-                    DBG2(DBG_ESP, "WaitForSingleObject returned %d", WaitResult);
-                    if (WaitResult == WAIT_OBJECT_0)
-                    {
-                        /* The arrays have the same length and the same positioning of the elements.
-                         * Therefore, if event_array[k] is signaled, the read on bundle_array[i].fileHandle has succeeded
-                         * and bundle_array[k].buffer has our data now. */
-                        DBG2(DBG_ESP, "Event is signaled. Processing packet.");
-                        /* Do we need to copy the chunk before we enqueue it? */
-                        char *foo = alloca((bundle_array[k].buffer.len *4)/3 + 1);
-                        memset(foo, 0, (bundle_array[k].buffer.len *4)/3 + 1);
-                        DBG2(DBG_ESP, "Length of buffer: %u", bundle_array[k].buffer.len);
-                        chunk_to_base64(bundle_array[k].buffer, foo);
-                        DBG2(DBG_ESP, "Content of Buffer: %s", foo);
-
-                        ip_packet_t *packet;
-                        /* clone the buffer */
-                        chunk_t buffer_clone = chunk_clone (bundle_array[k].buffer);
-                        packet = ip_packet_create(buffer_clone);
-                        DBG2(DBG_ESP, "Packet contents: %B", packet->get_encoding(packet));
-                        if (packet)
-                        {
-                                ipsec->processor->queue_outbound(ipsec->processor, packet);
-                        }
-                        else
-                        {
-                                DBG2(DBG_ESP, "invalid IP packet read from TUN device");
-                        }
-                        /* Reset the overlapped structure, event and buffer */
-                        /* Print out the package for debugging */
-                        memset(&bundle_array[k].overlapped, 0, sizeof(OVERLAPPED));
-                        /* Don't leak packets */
-                        memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
-
-                        bundle_array[k].overlapped->hEvent = event_array[k];
-
-                        if (!start_read(&bundle_array[k], bundle_array[k].overlapped->hEvent))
-                        {
-                           /* Cleanup
-                            *  Starts with 1 to skip over the dummy
-                            */
-                            for(uint32_t k=1;k<i;k++)
-                            {
-                                /* stop all asynchronous IO */
-                                CancelIo(bundle_array[k].fileHandle);
-                                CloseHandle(bundle_array[k].overlapped->hEvent);
-                                memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
-                                free(bundle_array[k].buffer.ptr);
-                                ResetEvent(event_array[k]);
-                                CloseHandle(event_array[k]);
-                            }
-                            this->lock->unlock(this->lock);
-                            return JOB_REQUEUE_FAIR;
-                        }
-                    }
-                    else
-                    {
-                        DBG2(DBG_ESP, "Event is not signaled.");
-                    }
+                        ipsec->processor->queue_outbound(ipsec->processor, packet);
                 }
+                else
+                {
+                        DBG2(DBG_ESP, "invalid IP packet read from TUN device");
+                }
+                /* Reset the overlapped structure, event and buffer */
+                /* Print out the package for debugging */
+                /* Don't leak packets */
+                memset(bundle_array[offset].buffer.ptr, 0, bundle_array[offset].buffer.len);
+                memset(bundle_array[offset].overlapped, 0, sizeof(OVERLAPPED));
 
+                if (!start_read(&bundle_array[offset], bundle_array[offset].overlapped->hEvent))
+                {
+                   /* Cleanup
+                    *  Starts with 1 to skip over the dummy
+                    */
+                    for(j=1;j<i;j++)
+                    {
+                        /* stop all asynchronous IO */
+                        CancelIo(bundle_array[j].fileHandle);
+                        CloseHandle(bundle_array[j].overlapped->hEvent);
+                        memset(bundle_array[j].buffer.ptr, 0, bundle_array[j].buffer.len);
+                        free(bundle_array[j].buffer.ptr);
+                    }
+                    this->lock->unlock(this->lock);
+                    return JOB_REQUEUE_FAIR;
+                }
             }
             /* Function failed */
             else
@@ -800,24 +750,26 @@ static job_requeue_t handle_plain(private_kernel_libipsec_router_t *this)
                 /* Cleanup
                  *  Starts with 1 to skip over the dummy
                  */
-                for(uint32_t k=1;k<i;k++)
+                for(j=1;j<i;j++)
                 {
                     /* stop all asynchronous IO */
-                    CancelIo(bundle_array[k].fileHandle);
-                    CloseHandle(bundle_array[k].overlapped->hEvent);
-                    memset(bundle_array[k].buffer.ptr, 0, bundle_array[k].buffer.len);
-                    free(bundle_array[k].buffer.ptr);
-                    ResetEvent(event_array[k]);
-                    CloseHandle(event_array[k]);
+                    CancelIo(bundle_array[j].fileHandle);
+                    CloseHandle(bundle_array[j].overlapped->hEvent);
+                    memset(bundle_array[j].buffer.ptr, 0, bundle_array[j].buffer.len);
+                    free(bundle_array[j].buffer.ptr);
+                    ResetEvent(event_array[j]);
+                    CloseHandle(event_array[j]);
                 }
+                this->lock->unlock(this->lock);
                 return JOB_REQUEUE_FAIR;
 
             }
         }
+        this->lock->unlock(this->lock);
         return JOB_REQUEUE_DIRECT;
-        #else
+#else
         [...]
-        #endif
+#endif /* WIN32 */
 }
 \end{lstlisting}
 
