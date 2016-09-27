@@ -636,6 +636,162 @@ Durch asynchrone Lese- und Schreiboperationen mittels ReadFile() und WriteFile()
 unter Benutzung von \texttt{OVERLAPPED}-Strukturen und Events lassen sich Pakete
 lesen und schreiben.
 
+Die Methoden hierfür wurden in \texttt{tun\_device.c} implementiert
+und nutzen einfache Event-basierte asynchrone IO-Operationen mittels \texttt{ReadFile()}
+und \texttt{WriteFile()}.
+Die Implementierung für \texttt{read\_packet} ist in~\autoref{lst:read_packet} zu sehen.
+
+Die benötigten Variablen werden auf dem Stack allokiert, da sie nach dem Lesen
+des Pakets nicht mehr benötigt werden. Dabei wird ein Putter für das Paket in Größe
+der \ac{MTU} des Geräts allokiert. Ein einzelnes Event wird für die asynchrone
+Leseoperation benötigt, welches ins Feld \texttt{hevent} der Struktur eingesetzt wird.
+Es wird ohne Name erstellt, da es nicht zur Benachrichtigung oder Synchronisation
+von mehreren Threads genutzt wird. Nach dem Starten des Lesevorgangs mittels \texttt{ReadFile}
+wird auf die Benachrichtigung des Events gewartet. Wenn ein Paket gelesen wurde,
+wird es mittels \texttt{chunk\_clone} auf den Heap kopiert und in das im Funktionskopf
+übergebene Objekt vom Typ \texttt{chunk\_t} geschrieben.
+Da das Warten auf das Event
+blockierend ist, wird dort ein Thread-Cancelation-Punkt gesetzt, damit der Thread dort
+gegebenenfalls sicher beendet werden kann.
+
+\begin{lstlisting}[caption=Code für read\_packet,label=lst:read_packet]
+METHOD(tun_device_t, read_packet, bool,
+	private_tun_device_t *this, chunk_t *packet)
+{
+	bool old, status;
+        DWORD error;
+        OVERLAPPED overlapped;
+	    chunk_t data;
+        HANDLE read_event = CreateEvent(NULL, FALSE, FALSE, FALSE);
+
+        ResetEvent(read_event);
+
+        error = GetLastError();
+        switch(error)
+        {
+            case ERROR_SUCCESS:
+                break;
+            default:
+                /* Just fine. Don't do anything. */
+                break;
+        }
+
+        memset(&overlapped, 0, sizeof(OVERLAPPED));
+
+        overlapped.hEvent = read_event;
+
+	    data = chunk_alloca(get_mtu(this));
+
+        /* Read chunk from handle */
+        status = ReadFile(this->tunhandle,
+                    &data.ptr,
+                    data.len,
+                    NULL,
+                    &overlapped);
+        error = GetLastError();
+
+        if (status)
+        {
+            /* Read returned immediately. */
+            SetEvent(read_event);
+        }
+        else
+        {
+            switch(error)
+            {
+                case ERROR_SUCCESS:
+                case ERROR_IO_PENDING:
+                    /* all fine */
+                    break;
+                default:
+                    DBG1(DBG_LIB, "reading from TUN device %s failed: %u", this->if_name,
+                       error);
+                    CloseHandle(read_event);
+                    return FALSE;
+                    break;
+            }
+        }
+        old = thread_cancelability(TRUE);
+
+        WaitForSingleObject(read_event, INFINITE);
+
+	    thread_cancelability(old);
+
+	    *packet = chunk_clone(data);
+
+        CloseHandle(read_event);
+        return TRUE;
+}
+\end{lstlisting}
+
+Beim Schreiben von Paketen ist ähnlich implementiert wie das Lesen von Paketen.
+Auch hier werden die Variablen auf dem Stack allokiert, ein Event erstellt
+und es in die \texttt{OVERLAPPED}-Struktur eingesetzt.
+Danach wird Der Schreibvorgang gestartet und auf seine Beendigung gewartet.
+Fehler werden abgefangen und angemessen behandelt. Da das Warten auf das Event
+blockierend ist, wird dort ein Thread-Cancelation-Punkt gesetzt, damit der Thread dort
+gegebenenfalls sicher beendet werden kann.
+
+\begin{lstlisting}[caption=Code für write\_packet,label=lst:write_packet]
+METHOD(tun_device_t, write_packet, bool,
+	private_tun_device_t *this, chunk_t packet)
+{
+        bool status;
+        DWORD error;
+        OVERLAPPED overlapped;
+        HANDLE write_event;
+
+        write_event = CreateEvent(NULL, FALSE, FALSE, NULL);
+        error = GetLastError();
+        if (error != ERROR_SUCCESS)
+        {
+           DBG1(DBG_LIB, "creating an event to write to the TUN device %s failed: %d",
+                   this->if_name, error);
+           return FALSE;
+        }
+
+
+        memset(&overlapped, 0, sizeof(OVERLAPPED));
+
+        overlapped.hEvent = write_event;
+
+        status = WriteFile(
+                this->tunhandle,
+                packet.ptr,
+                packet.len,
+                NULL,
+                &overlapped
+                );
+        error = GetLastError();
+
+        if (status) {
+            /* Read returned immediately. */
+            SetEvent(write_event);
+        }
+        else
+        {
+            switch(error)
+            {
+                case ERROR_SUCCESS:
+                case ERROR_IO_PENDING:
+                    /* all fine */
+                    break;
+                default:
+                    DBG1(DBG_LIB, "writing to TUN device %s failed: %u",
+                            this->if_name, error);
+                    CloseHandle(write_event);
+                    return FALSE;
+                    break;
+            }
+         }
+        WaitForSingleObject(write_event, INFINITE);
+
+        CloseHandle(write_event);
+
+        return TRUE;
+}
+\end{lstlisting}
+
 \paragraph{tun\_device\_t}
 Die Klasse für TUN-Geräte musste für Windows angepasst werden.
 Spezifisch mussten neue Funktionen zum Lesen und Schreiben implementiert werden,
@@ -654,9 +810,9 @@ tun_device_t *tun_device_create(const char *name_tmpl)
 			.get_mtu = _get_mtu,
 			.set_mtu = _set_mtu,
 			.get_name = _get_name,
-                        /* For WIN32, that's a handle. */
+            /* For WIN32, that's a handle. */
 #ifdef WIN32
-                        .get_handle = _get_handle,
+            .get_handle = _get_handle,
 #else
 			.get_fd = _get_fd,
 #endif /* WIN32 */
@@ -666,7 +822,7 @@ tun_device_t *tun_device_create(const char *name_tmpl)
 			.destroy = _destroy,
 		},
 #ifdef WIN32
-                .tunhandle = NULL,
+         .tunhandle = NULL,
 #else
 
 		.tunfd = -1,
@@ -715,7 +871,7 @@ METHOD(tun_device_t, destroy, void,
 	free(this);
 }
 \end{lstlisting}
-Beim Destruktur für die Klasse musste nur statt dem Zerstören eines TUN-Geräts
+Beim Destruktur für die Klasse muss nur statt dem Zerstören eines TUN-Geräts
 nur das Handle des TAP-Geräts geschlossen werden.
 % callbacks
 % synchronous
@@ -829,6 +985,11 @@ wird die \ac{IP}-Adresse mittels \texttt{host2unicast} und
 \texttt{CreateUnicastAddressEntry} darauf installiert. Wenn sie nicht existiert, 
 wird die \ac{IP}-Adresse auf dem Loopback-Adapter installiert.
 
+Die Methode \texttt{del\_ip} in~\autoref{lst:kernel_iph_del_ip} wurde komplett aus dem Zweig \texttt{win-vip} übernommen
+und bedarf keiner Veränderung. Sie übersetzt die übergebene IP in ein
+Objekt vom Typ \texttt{MIB\_UNICASTIPADDRESS\_ROW}, welches dann den Index der ''virtuellen''
+\ac{IP}-Adresse ermittelt und mithilfe von \texttt{DeleteUnicastIpAddressEntry()}
+gelöscht.
 \begin{lstlisting}[caption=Code für del\_ip,label=lst:kernel_iph_del_ip]
 METHOD(kernel_net_t, del_ip, status_t,
     private_kernel_iph_net_t *this, host_t *vip, int prefix, bool wait)
@@ -860,6 +1021,12 @@ METHOD(kernel_net_t, del_ip, status_t,
         return SUCCESS;
 }
 \end{lstlisting}
+
+Um die Variablen, der Klasse zu initialisieren, musste die Funktion \texttt{kernel\_iph\_net\_create()}
+angepasst werden. Aufgrund der Unterstützung für die Installation von \ac{IP}-Adressen
+müssen die neuen Attribute \texttt{install\_virtual\_ip\_on} und \texttt{install\_virtual\_ip}
+initialisiert werden. Da beide Attribute ihre Werte aus dem Konfigurationssystem
+beziehen, werden diese mithilfe von \texttt{lib->settings->get\_bool} und \texttt{lib->settings->get\_str} initialisiert.
 
 \begin{lstlisting}[caption=Ergänzung zu kernel\_iph\_net\_create(),label=lst:kernel_iph_create]
 *
