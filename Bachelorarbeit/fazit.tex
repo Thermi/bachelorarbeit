@@ -20,32 +20,15 @@ der Routinen für das Öffnen und Konfigurieren von TAP-Geräten, die vom TAP-Wi
 bereitgestellt werden. Des weiteren wurde die Installation von IP-Adressen getestet
 und erweitert, sowie Code zum Lesen und Schreiben von Paketen auf Handles auf Windows.
 
-Die Lösung ist unvollständig, da das Empfangen und Senden von Paketen noch nicht funktioniert.
-Nichtsdestotrotz wurde mit der \ac{BA} ein Großteil der Basis geschaffen um ''strongSwan''
-dazu zu befähigen TAP-Geräte zu nutzen und der TAP-Windows-Treiber in seiner Funktionalität
-erweitert.
+Im Verlauf der Arbeit wurden mehrere Probleme mit dem C-Standard, sowie mit
+verschiedenen Windowsfunktionen gefunden. Sie wurden in der Arbeit dokumentiert
+und um sie herumgearbeitet. Es war etwas überraschend, dass so simple Arbeiten,
+wie die Implementierung von Multiplexing mittels Events Probleme bereiten.
 
-Die Probleme, die die Implementierung schlussendlich scheitern ließen lassen es zu
-die Frage zu stellen, ob Anwendungen, die mit MinGW-W64 kompiliert wurden überhaupt
-fehlerfrei auf Handles von Usermodedevice-Treiber zugreifen können und ob
-nicht weitere Fehler in MinGW-W64 existieren, die das Implementieren der Kompatibilität
-mit TAP-Geräten verhindern. Die Alternativanwendung ''OpenVPN'' benutzt den
-Treiber problemlos, wobei sie jedoch mit Visual Studio kompiliert wird,
-was den kritischen Unterschied im Verhalten ausmachen könnte.
-Von mingw64 ist bekannt, dass es ab und zu Probleme mit falschen Headern und ähnlichem
-gibt. Es steht offen, ob es tatsächlich ein Problem mit dem eigenen geschriebenen Code
-aus der Bachelorarbeit ist, oder ob es tiefer herrürht.
+Die Leistung des Adapters sollte für die typischen Anwendungen in Unternehmen ausreichen.
 
-Die weitere Verfolgung der Probleme in tiefere Schichten des Systems wurden aus
-Zeitmangel nicht weiter verfolgt.
 
 Die gesamte Arbeit ist gemeinfrei und unterliegt der GPLv3. Somit kann sie,
 sowie der Quellcode, frei vertrieben werden, in der Hoffnung dass sie jemandem nutzt.
 Der Quellcode der Arbeit, sowie komplette Git-Bäume und diffs vom jeweiligen Root-Commit
 der jeweiligen Softwareprojekte sind auf der CD mitenthalten.
-
-Es bleibt offen, ob es zu schaffen ist den Treiber Problemlos in strongSwan zu integrieren.
-Mit der Arbeit wurde auf jeden Fall eine gute Basis gelegt und die \ac{ABI} des
-TAP-Windows-Treibers dokumentiert.
-
-
