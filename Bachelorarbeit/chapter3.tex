@@ -257,7 +257,6 @@ dargestellt.
 \label{fig:poll_fd}
 \end{figure}
 
-
 Wie aus dem Diagramm hervorgeht, wird im Prinzip nur ein Array mit Strukturen des Typs
 \texttt{pollfd} erstellt, dann mit einem Notification-\ac{FD} und den \acp{FD} der TUN-Geräte befüllt
 und als gewünschte Events \texttt{POLLIN} gesetzt. Das heißt, dass der Aufruf von poll() ohne
@@ -270,42 +269,18 @@ WaitFor*Objects()-Funktionen ergeben. Dies wird im Diagramm \autoref{fig:WaitFor
 und \autoref{fig:WaitForMultipleObjects2} hervor. Diese Diagramme haben weitaus
 mehr Zustände als \autoref{fig:poll_fd}.
 
-Der Unterschied zwischen der Implementierung von \autoref{fig:WaitForMultipleObjects}
-und \autoref{fig:WaitForMultipleObjects2} ist, dass \autoref{fig:WaitForMultipleObjects2}
-effektiver und schneller ist, da die Puffer nach jedem Lesevorgang beibehalten werden
-und IO-Operationen weiterlaufen können.
-In \autoref{fig:WaitForMultipleObjects} werden die Puffer und Operationen
-immer freigegeben und gestoppt. Das ist unnötig, bringt die Implementierung
-jedoch näher an das Verhalten von \autoref{fig:poll_fd}.
-Es wurde das Verfahren aus \autoref{fig:WaitForMultipleObjects2} implementiert,
-da es schneller und effektiver ist.
-
-In handle\_plain werden zwei verschiedene Arrays benutzt.
-\begin{description}
-\item[bundle\_array] Ein Array aus Strukturen vom Typ \texttt{handle\_overlapped\_buffer\_t}. 
-\item[event\_array] Ein Array aus Events (HANDLE).
-\end{description}
-
-Strukturen vom Typ \texttt{handle\_overlapped\_buffer\_t} beinhalten jeweils ein Objekt
-vom Typ HANDLE, ein Objekt vom Typ *OVERLAPPED und ein Objekt vom Typ chunk\_t.
-Das Handle gehört zu einem TUN-Handle, das OVERLAPPED-Objekt wird direkt für asynchrones
-IO benötigt und das Objekt vom Typ chunk\_t beinhaltet den Pufferspeicher und dessen Länge.
-
-Das \texttt{event\_array} Array zum Multiplexen mittels WaitForMultiplEvents() genutzt und
-beinhaltet die gleichen Events, wie die Strukturen des Typs OVERLAPPED.
-Bei der Ausführung von WaitForMultipleObjects() auf das Array wird darauf gewartet, dass
-eine vorher gestartete Leseoperation auf einem Handle fertig gestellt wird.
-Das signalisiert ein Event im Array und dessen Position im Array verrät welche
-Position im bundle\_array einen nun gefüllten Puffer hat. Die Position signalisiert
-hierbei nur die niedrigste Position im Array, deren Event signalisiert wurde. Ein
-im Array höher gelegenes Event könnte auch signalisiert sein.
-Der Puffer kann nun gelesen
-werden und an die Queue zu libipsec gehängt werden. Nach dem Lesen wird die OVERLAPPED-Struktur
-und das Event zurückgesetzt, sowie der Puffer mit Nullen initialisiert und die Länge zurückgesetzt.
-Danach wird ein neuer Lesevorgang auf dem oder den Handles gestartet, deren Leseoperationen
-fertig sind.
+Der Code für  die Implementierung von handle\_plain() auf Windows ist auf~\pageref{lst:handle-plain-windows}
+zu sehen. Der Code für die Implementierung auf Windows ist 239 Zeilen lang, was
+deutlich mehr ist als bei anderen Funktionen. Das liegt daran, dass die Initialisierung
+der Strukturen relativ aufwendig ist und mehrfach durchgeführt werden muss.
+Die Funktionen zum Starten von asynchronen Leseoperationen auf Handles
+wurden in start\_read() ausgelagert und das Übersetzen von Fehlercodes in menschenlesbare
+Texte in format\_error(). Bei Fehlern beim Lesen startet sich der Job
+mit JOB\_REQUEUE\_FAIR neu, sodass der Job als letzter vom Job-Manager in \texttt{charon} neugestartet wird,
+wenn hoffentlich der Fehler nicht erneut auftritt.
 
 \begin{figure}[h!]
+\caption{Arrays aus handle\_plain}
 \begin{bytefield}[boxformatting={\centering\itshape},
 bitwidth=2em,
 endianness=big,
@@ -328,13 +303,9 @@ bitheight=6ex
 \bitbox{5}{\dots}
 \end{leftwordgroup} \\
 \end{bytefield}
+\label{fig:arrays}
 \end{figure}
-Der Code auf Seite \pageref{lst:handle-plain-windows} zeigt die Implementierung von handle\_plain()
-auf Windows. Die Funktionen zum Starten von asynchronen Leseoperationen auf Handles
-wurden in start\_read() abgekapselt. Das Übersetzen von Fehlercodes in menschenlesbare
-Texte wurde in format\_error() abgekapselt. Bei Fehlern beim Lesen startet sich der Job
-mit JOB\_REQUEUE\_FAIR neu, sodass der Job als letzter vom Job-Manager in \texttt{charon} neugestartet wird,
-wenn hoffentlich der Fehler nicht erneut auftritt.
+
 
 \begin{figure}
 \centering
@@ -351,6 +322,45 @@ wenn hoffentlich der Fehler nicht erneut auftritt.
 \caption{Zustände in handle\_plain() mittels WaitForMultipleObjects(), Variante 2}
 \label{fig:WaitForMultipleObjects2}
 \end{figure}
+
+Der Unterschied zwischen der Implementierung von \autoref{fig:WaitForMultipleObjects}
+und \autoref{fig:WaitForMultipleObjects2} ist, dass \autoref{fig:WaitForMultipleObjects2}
+effektiver und schneller ist, da die Puffer nach jedem Lesevorgang beibehalten werden
+und IO-Operationen weiterlaufen können.
+In \autoref{fig:WaitForMultipleObjects} werden die Puffer und Operationen
+immer freigegeben und gestoppt. Das ist unnötig, bringt die Implementierung
+jedoch näher an das Verhalten von \autoref{fig:poll_fd}.
+Es wurde das Verfahren aus \autoref{fig:WaitForMultipleObjects2} implementiert,
+da es schneller und effektiver ist.
+
+In handle\_plain werden zwei verschiedene Arrays benutzt, deren Strukturen in~\autoref{fig:arrays}
+dargestellt sind.
+
+\begin{description}
+\item[bundle\_array] Ein Array aus Strukturen vom Typ \texttt{handle\_overlapped\_buffer\_t}. 
+\item[event\_array] Ein Array aus Events (HANDLE).
+\end{description}
+
+Strukturen vom Typ \texttt{handle\_overlapped\_buffer\_t} beinhalten jeweils ein Objekt
+vom Typ HANDLE, ein Objekt vom Typ \texttt{*OVERLAPPED} und ein Objekt vom Typ chunk\_t.
+Das Handle gehört zu einem TUN-Gerät, das \texttt{OVERLAPPED}-Objekt wird direkt für asynchrones
+IO benötigt und das Objekt vom Typ chunk\_t beinhaltet den Pufferspeicher und dessen Länge
+für die asynchronen Lesevorgänge. Die Puffer und die \texttt{OVERLAPPED}-Objekte
+müssen während der Lesevorgänge in zugänglichen Speicherbereichen sein.
+
+Das \texttt{event\_array} Array zum Multiplexen mittels WaitForMultiplEvents() genutzt und
+beinhaltet die gleichen Events, wie die Strukturen des Typs OVERLAPPED.
+Bei der Ausführung von WaitForMultipleObjects() auf das Array wird darauf gewartet, dass
+eine vorher gestartete Leseoperation auf einem Handle fertig gestellt wird.
+Das signalisiert ein Event im Array und dessen Position im Array verrät welche
+Position im bundle\_array einen nun gefüllten Puffer hat. Die Position signalisiert
+hierbei nur die niedrigste Position im Array, deren Event signalisiert wurde. Ein
+im Array höher gelegenes Event könnte auch signalisiert sein.
+Der Puffer kann nun gelesen
+werden und an die Queue zu libipsec gehängt werden. Nach dem Lesen wird die OVERLAPPED-Struktur
+und das Event zurückgesetzt, sowie der Puffer mit Nullen initialisiert und die Länge zurückgesetzt.
+Danach wird ein neuer Lesevorgang auf dem oder den Handles gestartet, deren Leseoperationen
+fertig sind.
 
 \paragraph{Routing}
 libipsec setzt für die von ihr installierten Routen standardmäßig das ''Gateway''
@@ -457,13 +467,12 @@ HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11
 \end{lstlisting}
 nach Verbindungen gesucht, deren ''ComponentId''-Feld den Wert ''tap0901'' besitzen.
 Bei passenden Schlüsseln wird der Wert ''NetCfgInstanceId'' an eine linked list
-angehängt. Die NetCfgInstanceId identifiziert jeden Netzwerkadapter unter Windows
-mittels einer einzigartigen ID.
+angehängt. Jeder Netzwerkadapter unter Windows wird mittels seiner NetCfgInstanceId identifiziert.
 Vor dem Beenden der Funktion wird die linked list zurückgegeben.
 Diese Funktionalität ist in der Funktion get\_tap\_reg() in der Datei
 ''src/libstrongswan/networking/tun\_device.c'' gekapselt.
 
-Der Code hierfür ist im Appendix unter \autoref{lst:get_tap_req} aufzufinden.
+Der Code hierfür ist im Appendix unter \autoref{lst:find_tap_devices} aufzufinden.
 
 \paragraph{TAP-Geräte öffnen}
 TAP-Geräte sind im Usermode über den Globalen Addressraum für Userspaceadapter
@@ -1592,12 +1601,19 @@ den Wert ''WAIT\_OBJECT\_0'' (0x0) zurückgeben:
 WaitForSingleObject(event_array[offset], 0)
 \end{lstlisting}]
 Das ist jedoch nicht der Fall. Der Aufruf beendet mit ''WAIT\_TIMEOUT'' (0x102, 258),
-was bedeuted, dass das Event nicht signalisiert ist. Wenn der Rückgabewert
-ignoriert wird, dann befindet sich im Puffer kein valides IPv4-Packet.
+was bedeuted, dass das Event nicht signalisiert ist. Dieser Rückgabewert ist jedoch falsch,
+da das Event tatsächlich signalisiert wird.
 
 Das Problem ist besonders evident bei der Betrachtung des Debug-Logs,
 welches sich auf Seite \pageref{lst:debug-log} finden lässt.
 Es wird vom Code in auf Seite \pageref{lst:handle-plain-windows} ausgegeben.
+
+\paragraph{TAP-Treiber schneidet DHCP-Pakete ab}
+Beim Testen des Lesens ist aufgefallen, dass DHCP-Pakete abgeschnitten
+an die Anwendung weitergegeben werden. Dies hatte mit dem Problem mit
+\texttt{WaitForSingleObject()} die Auswirkung, dass es sehr schwierig war das eigentliche
+Problem herauszufinden, da der Treiber scheinbar nur ein einziges Paket übergab
+und dieses beschädigt war.
 
 \paragraph{GetLastError()}
 Des weiteren gibt die Funktion ''GetLastError()'' den Fehlerwert 0 zurück, wenn sie nicht
