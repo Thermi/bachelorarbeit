@@ -913,8 +913,7 @@ openssl pkcs12 -export -in key key.key -in certificate.pem -out pkcs12.p12
 \end{lstlisting}
 Die mit diesem Befehl erstellte Datei pkcs12.p12 kann dann durch einen Doppelklick auf sie
 in den Windows importiert werden.
-
-Der Befehl um den Treiber dann zu bauen kann so aussehen:
+Folgend ist ein beispielhafter Befehl zum Bau des Treibers.
 \begin{lstlisting}[caption=TAP-Windows bauen]
 python buildtap.py -c -b -d --cert="csc" --sign --crosscert="C:\Users\Noel\certs\rootca.pem"
 \end{lstlisting}
@@ -936,10 +935,10 @@ von der OpenVPN-Webseite erhalten werden. Nach der Installation des Pakets
 ist die Datei unter \textit{C:\textbackslash{}Program Files\textbackslash{}TAP-Windows\textbackslash{}bin\textbackslash{}tapinstall.exe}
 zu finden und kann zur Erstellung und zum Löschen von TAP-Geräten genutzt werden.
 
-Der erste Parameter ist offensichtlich ''install'' oder ''remove''. Der Pfad zur .inf-Datei
+Der erste Parameter ist ''install'' oder ''remove''. Der Pfad zur .inf-Datei
 über den Treiber muss beim Erstellen eines Geräts angegeben werden. Hier im Beispiel
 ist es die Datei, die mittels des Python-Skripts erstellt wurde. Bei der Installation
-dieses Treibers wird der von mir kompilierte Treiber installiert, welcher sich unter 
+dieses Treibers wird der kompilierte Treiber installiert, welcher sich unter 
 ''C:\textbackslash{}Users\textbackslash{}Noel\textbackslash{}tap-driver\textbackslash{}dist\textbackslash{}amd64\textbackslash{}OemVista.inf''
 befindet.
 
