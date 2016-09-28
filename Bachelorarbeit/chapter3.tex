@@ -275,9 +275,11 @@ Dies wird im Diagramm \autoref{fig:WaitForMultipleObjects}
 und \autoref{fig:WaitForMultipleObjects2} hervor. Diese Diagramme haben weitaus
 mehr Zustände als \autoref{fig:poll_fd}. 
 
-Der Code für die Implementierung von \texttt{handle\_plain} auf Windows ist 239 Zeilen lang.
+Der Code für die Implementierung von \texttt{handle\_plain()} auf Windows ist 239 Zeilen lang.
 Daher wurde darauf verzichtet, sie hier in den Text zu kopieren. Stattdessen ist sie
 im Appendix auf Seite~\pageref{lst:handle-plain-windows} zu finden.
+~\autoref{fig:WaitForMultipleObjects2} stellt die Zustände in der Implementierung
+von \texttt{handle\_plain()} unter Windows dar.
 
 Die Funktionen zum Starten von asynchronen Leseoperationen auf Handles
 wurden in \texttt{start\_read()} ausgelagert und das Übersetzen von Fehlercodes in menschenlesbare
@@ -364,7 +366,7 @@ static char* format_error(DWORD error)
 
 \end{lstlisting}
 \begin{figure}[h!]
-\caption{Arrays aus handle\_plain}
+\caption{Arrays aus handle\_plain()}
 \begin{bytefield}[boxformatting={\centering\itshape},
 bitwidth=2em,
 endianness=big,
@@ -417,7 +419,7 @@ jedoch näher an das Verhalten von \autoref{fig:poll_fd}.
 Es wurde das Verfahren aus \autoref{fig:WaitForMultipleObjects2} implementiert,
 da es schneller und effektiver ist.
 
-In \texttt{handle\_plain} werden zwei verschiedene Arrays benutzt, deren Strukturen in~\autoref{fig:arrays}
+In \texttt{handle\_plain()} werden zwei verschiedene Arrays benutzt, deren Strukturen in~\autoref{fig:arrays}
 dargestellt sind.
 
 \begin{description}
@@ -841,9 +843,9 @@ METHOD(tun_device_t, read_packet, bool,
 
         WaitForSingleObject(read_event, INFINITE);
 
-	    thread_cancelability(old);
+        thread_cancelability(old);
 
-	    *packet = chunk_clone(data);
+        *packet = chunk_clone(data);
 
         CloseHandle(read_event);
         return TRUE;
@@ -1179,7 +1181,7 @@ das IO-Multiplexen dort abgelegt. Die Datei ist im Appendix unter \autoref{lst:l
 zu finden.
 
 Der gesamte gepatchte Quellcode von strongSwan ist auf der CD unter strongSwan/ zu finden
-Der Patch ansich ist unter patches/strongSwan/tap-handling.patch zu finden.
+Der Patch selbst ist unter patches/strongSwan/tap-handling.patch zu finden.
 
 \subsection{TAP-Treiber}
 % openvpn
@@ -1194,7 +1196,7 @@ virtuellen IP des Clients mit dem entfernten IP-Netzwerk kommunizieren zu könne
 Um den Treiber zu bauen, wird zuallererst der Quellcode benötigt, sowie die
 Vorraussetzungen, welche auf der Github-Seite dort aufgelistet sind.
 Die aktuellen Minimalvorraussetzungen sind Python 2.7, das Microsoft Windows 7 WDK (Windows Driver Kit)
-und ein Windows Code signing certificate.
+und ein Windows Code-Signing-Certificate.
 Das Zertifikat muss nicht valid sein, wenn der Treiber nicht produktiv ausgerollt
 werden soll. Der Grund ist, dass unter Windows das Überprüfen der Treibersignatur deaktiviert
 werden kann, aber der Treiber muss trotzdem signiert sein. Der Trust-path muss aber nicht
