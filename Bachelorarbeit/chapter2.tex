@@ -96,19 +96,22 @@ des Betriebssystems auf.
 Der OpenVPN-Tap-Treiber ist unter den Namen ''TAP-Windows'' bekannt und wurde von
 OpenVPN Technologies, Inc. für den Einsatz mit OpenVPN entwickelt.
 Er steht unter der GPLv2.
+
 Der Treiber stellt unter Windows ein Ethernet-Gerät dar, inklusive Kollisionsdomäne.
 Dies ist für dein Einsatz mit \ac{IPsec} etwas unbeholfen, da \ac{IPsec} \ac{IP}-Pakete
 überträgt und keine Ethernet-Rahmen.
 Der Treiber unterstützt, wie OpenVPN, das Tunneln von Ethernet-Frames jedoch (TAP-Modus).
-Der Treiber bewerkstelligt das, indem er den Ethernet-Rahmen eines eingehenden Pakets vom
+Er bewerkstelligt das, indem er den Ethernet-Rahmen eines eingehenden Pakets vom
 Host verwirft und nur das IP-Paket weiterleitet. Vice Versa ergänzt er IP-Pakete, die er von
 der Software erhält um einen Ethernet-Rahmen. Um über den Adapter kommunizieren zu können
 stellt der Treiber einen virtuellen Router bereit, dessen \ac{IP}-Adresse, wie die lokale  und
 die entfernte IP-Adresse(n) konfigurierbar ist.
+
 Der Treiber reagiert nicht auf jede ARP-Anfrage, sondern nur auf solche, bei denen
 die Quelladresse im ARP-Request der lokalen konfigurierten gleicht, sowie die erfragte Adresse
 der konfigurierten entfernten Adresse (oder einer der Entfernten, falls ein gesamtes Netzwerk
 als entfernte IP konfiguriert wurde) gleicht.
+
 Die MAC-Adresse des virtuellen Routers hängt von der GUID des Adapters ab, welche zufällig ist
 und bei der Erstellung des Adapters initialisiert wird. Die MAC-Adresse kann 
 auch über die Registry verändert werden.
