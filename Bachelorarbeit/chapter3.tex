@@ -102,8 +102,8 @@ Die Bibliotheken und Plugins um libipsec nutzen diverse Datenstrukturen und Kons
 die in C-Header-Dateien von Linux definiert sind. Diese sind unter Windows nicht verfügbar.
 Aus diesem Grund wurde eine Kopie der relevanten Definitionen in den Quellcode kopiert
 und fehlende Teile ergänz.
-Spezifisch wurde aus dem Quellcode von GLIBC die Definition eines \ac{IP}v4-Headers
-und eines \ac{IP}v6-Headers kopiert und die fehlenden Protokollkonstanten per Hand ergänzt.
+Spezifisch wurde die Definition eines \ac{IP}v4-Headers
+und eines \ac{IP}v6-Headers aus der glibc kopiert und die fehlenden Protokollkonstanten per Hand ergänzt.
 
 Ursprünglich wurden diese in ''src/libipsec/win32.h'' abgelegt und in ''src/libpsec/ip\_packet.h'' und ''src/libipsec/ip\_packet.c''
 inkludiert. Dabei wurden die Header aus den Headern des Kernels oder den Headenr der GNU LIBC kopiert.
@@ -112,13 +112,18 @@ Als Name für das Ifdef-Guard wurde \\
 von Header-Dateien in C zu unterbinden. Wenn eine Header-Datei erneut importiert wird,
 dann führt das dazu, dass die Kompilierung abbricht, da eine Variable redefiniert wird.
 Die Redefinierung einer Variable produziert in C eine Warnung oder einen Fehler.
-C-Code wird in der Regel mit dem Argument ''-Wall'' kompiliert, welches
+C-Code wird in der Regel mit dem Argument \texttt{-Wall} kompiliert, welches
 alle Warnungen zu Fehlern umwandelt. Das wird getan, um Warnungen nicht zu übersehen.
 Der Compiler generiert Warnungen, wenn er Programmierfehler erkennt,
 die berichtenswert sind, aber kein größeres Hinderniss für die Kompilierung sind.
 
-Die Header wurden am Ende der \ac{BA} verändert, sodass sie nicht mehr unter der GPL stehen,
-sondern unter der MIT-Lizenz. Das wurde getan, um die Änderungen ins Projekt eintragen zu können.
+Die Header wurden am Ende der \ac{BA} vereinfacht und stark verändert, sodass sie nicht mehr unter der GPL stehen,
+sondern unter der MIT-X11-Lizenz. Die Header wurden von Tobias Brunner bereitgestellt und inkludiert.
+Das wurde getan, um die Änderungen ins Projekt eintragen zu können.
+Es stellt sich die Frage, ob es ausreicht, dass die nun benutzten Header so verschieden von
+denen aus dem Original sind, dass es lizenzrechtlich in Ordnung ist diese so in ein
+Projekt unter der MIT-X11-Lizenz zu integrieren. Das ist jedoch außerhalb des Aufgabengebiets
+der \ac{BA}.
 
 \begin{lstlisting}[caption=win32.h-Headerdatei für den TAP-Windows6-Treiber,label=win32.h]
 #ifndef WIN32_H
@@ -282,7 +287,8 @@ wenn hoffentlich der Fehler nicht erneut auftritt.
 
 Die Funktion \texttt{start\_read()} ist in~\autoref{lst:start_read} abgebildet.
 Sie startet eine asynchrone Leseoperationen mit dem übergebenen \texttt{handle\_overlapped\_buffer\_t}-Objekt
-und überprüft den Rückgabewert von \texttt{ReadFile()}.
+und überprüft den Rückgabewert von \texttt{ReadFile()}. Sie gibt einen booleschen Wert
+zurück, bei dem True einen Erfolg signalisiert und False einen Fehlschlag.
 
 \begin{lstlisting}[caption=Code von start\_read(),label=lst:start_read]
 /*
@@ -318,7 +324,6 @@ static BOOL start_read(handle_overlapped_buffer_t *structure, HANDLE event)
                 }
                 default:
                 {
-                    /* Leave the NULL; here. Otherwise mingw64 complains about char *error_message = format_error(error); not being a label.*/
                     char *error_message = format_error(error);
                     DBG2(DBG_ESP, "Error %d.", format_error);
                     free(error_message);
@@ -587,6 +592,9 @@ die \ac{MTU} über die Windows-Registry zu ändern. Dort wird der Schlüssel ''M
 dafür genutzt. Er steht standardmäßig auf ''1500'', welches die Standard-\ac{MTU}
 von Ethernet ist. Alternativ ist es vermutlich möglich, die Funktionen 
 \texttt{SetIpInterfaceEntry}\footcite[][]{_setipinterfaceentry_2016} dafür zu nutzen, welche Teil der IP-Helper-\ac{API} ist.
+Es ist zu beachten, dass der \ac{MTU}-Eintrag in der Registry nur beim Erstellen des Geräts
+ausgelesen werden. Daher bewirkt das Ändern dieses Eintrags nur eine Änderung
+der \ac{MTU} bei einem Neustart des Computers.
 
 \paragraph{Konfiguration eines TAP-Geräts}
 Die Konfiguration eines TAP-Geräts geschieht mit den IOCTL-Werten aus ~/autoref{fig:tap-ioctls}.
@@ -1039,7 +1047,7 @@ struct private_kernel_iph_net_t {
 \end{lstlisting}
 
 Die Klasse für das Plugin \texttt{kernel-iph} wurde um zwei Attribute für die Installation
-von \ac{IP}-Adressen erweitert. Einerseits ein bool'scher Wert, der die Installation
+von \ac{IP}-Adressen erweitert. Einerseits ein boolescher Wert, der die Installation
 aktiviert und deaktiviert und andererseits einen \texttt{char *}, der genutzt wird
 um das Gerät zu konfigurieren, auf welchem alle \ac{IP}-Adressen installiert werden sollen.
 
