@@ -15,8 +15,7 @@
 \section{Vorgehensweise}
 
 Zuerst wurden alle nötigen Änderungen ausfindig gemacht. Dies beinhaltete
-die Migrierung von Code von UNIX/Linux-spezifischem IO-Multiplexing
-mittels poll() zu anderen Verfahren.
+die Implementierung von Code von für IO-Multiplexiung unter Windows.
 
 Des weiteren mussten fehlende Features gefunden werden. Einen Hinweis
 darauf ließ sich bereits auf den Wiki-Seiten über die Plugins für Windows finden.
@@ -43,7 +42,7 @@ mit dem TAP-Treiber funktioniert.
 \subsection{Portierung von libipsec auf Windows}
 Die Portierung von libipsec auf Windows, sodass sie dort lauffähig ist, ist das Ziel
 der Bachelorarbeit. Die zu portierenden Teile des Programmcodes betreffen nur
-die Codesegmente, die Plattformspezifische \acp{API} oder \acp{ABI} verwenden,
+die Codesegmente, die plattformspezifische \acp{API} oder \acp{ABI} verwenden,
 also primär alles um Dateiein- und Ausgabe, sowie das Verwalten von TUN-Geräten.
 Unter Unix und Linux werden hier \acp{FD} verwendet. Unter Windows werden stattdessen
 Handles genutzt, welche einen anderen Dateityp darstellen. Des weiteren unterscheidet
@@ -108,7 +107,8 @@ und eines \ac{IP}v6-Headers kopiert und die fehlenden Protokollkonstanten per Ha
 
 Ursprünglich wurden diese in ''src/libipsec/win32.h'' abgelegt und in ''src/libpsec/ip\_packet.h'' und ''src/libipsec/ip\_packet.c''
 inkludiert. Dabei wurden die Header aus den Headern des Kernels oder den Headenr der GNU LIBC kopiert.
-Als Name für das Ifdef-Guard wurde \texttt{WINDOWS\_32\_PROTOCOL\_HEADERS} gewählt. Ein Ifdef-Guard wird benötigt um das Reimportieren
+Als Name für das Ifdef-Guard wurde \\
+\texttt{WINDOWS\_32\_PROTOCOL\_HEADERS} gewählt. Ein Ifdef-Guard wird benötigt um das Reimportieren
 von Header-Dateien in C zu unterbinden. Wenn eine Header-Datei erneut importiert wird,
 dann führt das dazu, dass die Kompilierung abbricht, da eine Variable redefiniert wird.
 Die Redefinierung einer Variable produziert in C eine Warnung oder einen Fehler.
